@@ -20,10 +20,8 @@
       <span class="pulse-dot"></span>
       <span>Официальный магазин техники в Бишкеке</span>
     </div>
-    <h1 class="hero-main-title">Мощные игровые ПК<br>и ноутбуки в Бишкеке</h1>
-    <p class="hero-subtitle">
-      Сборки любой сложности на RTX 40-й серии, проверенные ноутбуки с гарантией, выгодная рассрочка с банком и без банка, бесплатная доставка по всему Кыргызстану.
-    </p>
+    <h1 class="hero-main-title">{{ site.hero_title }}</h1>
+    <p class="hero-subtitle">{{ site.hero_subtitle }}</p>
 
     <div class="hero-cta-row">
       <a class="btn btn-primary btn-hero" href="{% url 'catalog:list' %}">
@@ -129,7 +127,7 @@
         <span class="section-kicker">Хиты продаж</span>
         <h2>Популярные модели</h2>
       </div>
-      <a class="section-link" href="{% url 'catalog:list' %}">Весь каталог ({{ page.paginator.count|default:"12" }}) →</a>
+      <a class="section-link" href="{% url 'catalog:list' %}">Весь каталог ({{ total }}) →</a>
     </div>
 
     {% if featured %}

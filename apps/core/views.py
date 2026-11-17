@@ -23,6 +23,7 @@ def home(request):
         "core/home.html",
         {
             "featured": featured,
+            "total": products.count(),
             "categories": categories,
             "use_cases": UseCase.objects.all(),
         },

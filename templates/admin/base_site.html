@@ -1,0 +1,79 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{{ title }} | {{ site_title|default:"CyberStore" }}{% endblock %}
+
+{# Django's own base_site.html defines this block; without it the header renders empty. #}
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:"CyberStore" }}</a></div>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  /* Same palette as the storefront, applied to Django's admin variables. */
+  html[data-theme="light"],
+  html[data-theme="dark"],
+  :root {
+    --primary: #4d9dff;
+    --secondary: #0c1422;
+    --accent: #4d9dff;
+    --primary-fg: #05080f;
+
+    --header-color: #e6f4ff;
+    --header-branding-color: #ff2e88;
+    --header-bg: #05080f;
+    --header-link-color: #e6f4ff;
+
+    --breadcrumbs-fg: #9aacc4;
+    --breadcrumbs-link-fg: #4d9dff;
+    --breadcrumbs-bg: #0c1422;
+
+    --link-fg: #4d9dff;
+    --link-hover-color: #ff2e88;
+    --link-selected-fg: #ff2e88;
+
+    --button-bg: #4d9dff;
+    --button-fg: #05080f;
+    --button-hover-bg: #6aacff;
+    --default-button-bg: #4d9dff;
+    --default-button-hover-bg: #6aacff;
+    --object-tools-bg: #0c1422;
+    --object-tools-hover-bg: #182236;
+    --object-tools-fg: #e6f4ff;
+    --close-button-bg: #333a45;
+    --close-button-hover-bg: #454e5c;
+  }
+
+  html[data-theme="dark"] {
+    --body-bg: #05080f;
+    --body-fg: #e6f4ff;
+    --body-quiet-color: #9aacc4;
+    --body-medium-color: #b2c4d7;
+    --body-loud-color: #ffffff;
+    --darkened-bg: #0c1422;
+    --selected-bg: #182236;
+    --selected-row: #14202f;
+    --hairline-color: rgba(255, 255, 255, .08);
+    --border-color: rgba(255, 255, 255, .16);
+    --font-family-primary: "Geist", "Segoe UI", system-ui, Roboto, Arial, sans-serif;
+    --font-family-monospace: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+</style>
+{% endblock %}
+
+{% block extrahead %}{{ block.super }}
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  // Match the storefront: dark unless the operator explicitly picks light.
+  (function () {
+    var saved = null;
+    try { saved = window.localStorage.getItem("theme"); } catch (e) {}
+    if (saved === "light" || saved === "dark") return;
+    document.documentElement.setAttribute("data-theme", "dark");
+    document.addEventListener("DOMContentLoaded", function () {
+      document.documentElement.setAttribute("data-theme", "dark");
+    });
+  })();
+</script>
+{% endblock %}

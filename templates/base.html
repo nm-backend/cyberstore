@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   {% block head_extra %}{% endblock %}
 </head>
@@ -63,15 +63,14 @@
     <div class="header-actions">
       <form class="header-search-pill" action="{% url 'catalog:list' %}" role="search">
         <svg class="search-icon"><use href="#i-search"/></svg>
-        <input id="q" type="search" name="q" placeholder="Поиск товаров..." value="{{ query|default:'' }}">
+        <input id="q" type="search" name="q" placeholder="Поиск товаров..." aria-label="Поиск товаров" value="{{ query|default:'' }}">
       </form>
 
-      <a class="header-phone" href="tel:{{ site.phone_tel }}">
+      <a class="header-phone" href="tel:{{ site.phone_tel }}" aria-label="Позвонить {{ site.phone }}" title="{{ site.phone }}">
         <svg><use href="#i-phone"/></svg>
         <span>{{ site.phone }}</span>
       </a>
 
-      <div class="header-currency-badge" title="Валюта каталога">COM</div>
 
       <a class="header-wa-btn" href="{% whatsapp_generic %}" target="_blank" rel="noopener" title="Написать в WhatsApp">
         <svg><use href="#i-wa"/></svg>
@@ -162,7 +161,6 @@
 <!-- Floating WhatsApp Button -->
 <a class="wa-float" href="{% whatsapp_generic %}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">
   <svg><use href="#i-wa"/></svg>
-  <span class="wa-float-pulse"></span>
 </a>
 
 <script src="{% static 'js/main.js' %}" defer></script>

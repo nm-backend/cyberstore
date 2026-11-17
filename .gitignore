@@ -9,4 +9,6 @@ media/*
 !media/products/*.jpg
 !media/products/*.png
 staticfiles/
+dev-server.log
 .DS_Store
+_audit/

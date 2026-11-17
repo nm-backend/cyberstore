@@ -53,12 +53,18 @@ class SiteSettings(models.Model):
     )
 
     hero_title = models.CharField(
-        "Заголовок на главной", max_length=120, default="Ноутбук или ПК под вашу задачу"
+        "Заголовок на главной",
+        max_length=120,
+        default="Мощные игровые ПК и ноутбуки в Бишкеке",
     )
     hero_subtitle = models.CharField(
         "Подзаголовок на главной",
         max_length=250,
-        default="Рассрочка с банком и без банка. Нужен только паспорт. Бесплатная доставка по КР.",
+        default=(
+            "Сборки любой сложности на RTX 40-й серии, проверенные ноутбуки с гарантией, "
+            "выгодная рассрочка с банком и без банка, бесплатная доставка по всему Кыргызстану."
+        ),
+        help_text="Показывается под главным заголовком на первом экране.",
     )
     hero_video = models.FileField(
         "Видео на главной", upload_to="hero/", storage=video_storage, blank=True,
