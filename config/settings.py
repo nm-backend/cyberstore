@@ -48,10 +48,26 @@ INSTALLED_APPS = [
     # cloudinary_storage is intentionally NOT in INSTALLED_APPS: its collectstatic override
     # still reads STATICFILES_STORAGE, which Django 5.1+ removed. The storage classes work without it.
     "django.contrib.staticfiles",
+    "rest_framework",
+    "drf_spectacular",
     "apps.core",
     "apps.catalog",
     "apps.leads",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 12,
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "CyberStore API",
+    "DESCRIPTION": "API интернет-магазина CyberStore — ноутбуки, готовые ПК и комплектующие.",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
