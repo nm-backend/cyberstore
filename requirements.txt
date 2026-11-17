@@ -7,3 +7,5 @@ Pillow==13.0.0
 python-dotenv==1.2.4
 django-cloudinary-storage==0.3.0
 cloudinary==1.47.0
+djangorestframework==3.18.3
+drf-spectacular==0.30.0

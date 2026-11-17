@@ -176,7 +176,7 @@ class Product(models.Model):
         return list(self.specs.all())[:4]
 
     @property
-    def discount_percent(self):
+    def discount_percent(self) -> int:
         if self.price and self.old_price and self.old_price > self.price:
             return round((1 - self.price / self.old_price) * 100)
         return 0

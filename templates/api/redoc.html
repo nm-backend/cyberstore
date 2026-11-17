@@ -1,0 +1,22 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CyberStore API — ReDoc</title>
+  <style>
+    body { margin: 0; padding: 0; }
+  </style>
+</head>
+<body>
+  <div id="redoc-container"></div>
+  <script src="{% static 'js/redoc.standalone.js' %}"></script>
+  <script>
+    const spec = {{ schema_json|safe }};
+    Redoc.init(spec, {
+      scrollYOffset: 0,
+      hideDownloadButton: false,
+    }, document.getElementById('redoc-container'));
+  </script>
+</body>
+</html>
