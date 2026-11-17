@@ -24,7 +24,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY") or ("dev-only-insecure-key" if (DEBUG 
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set. Copy .env.example to .env or set it in Render.")
 
-ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1,testserver")
+if (DEBUG or TESTING) and "testserver" not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append("testserver")
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
 
 # Render sets this variable automatically for every web service.

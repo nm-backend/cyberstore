@@ -27,8 +27,9 @@ def whatsapp_product(context, product):
     category_name = getattr(product.category, "name", "").lower()
     icon = "💻" if "ноут" in category_name else ("🖥️" if "пк" in category_name or "комп" in category_name else "🔧")
 
+    category_title = f" ({product.category.name})" if product.category_id else ""
     lines = [
-        f"Здравствуйте! Заинтересовал {product.category.name if product.category_id else 'товар'}:",
+        f"Здравствуйте! Заинтересовал товар{category_title}:",
         f"{icon} {product.title}",
     ]
     if product.price:
