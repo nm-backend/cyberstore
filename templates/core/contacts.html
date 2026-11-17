@@ -2,22 +2,107 @@
 {% load shop_tags %}
 {% block title %}Контакты — {{ site.shop_name }}, {{ site.city }}, {{ site.address }}{% endblock %}
 {% block content %}
-<section class="section">
+<section class="contacts-page">
   <div class="wrap">
-    <div class="page-head" style="padding-top:0"><h1>Контакты</h1></div>
-    <div class="two-col">
-      <div class="info-grid" style="grid-template-columns:1fr">
-        <div class="info-card"><h3>Адрес</h3><p><a href="{{ site.map_search_url }}" target="_blank" rel="noopener">{{ site.city }}, {{ site.address }}</a></p></div>
-        <div class="info-card"><h3>Часы работы</h3><p>{{ site.work_hours }}</p></div>
-        <div class="info-card">
-          <h3>Связаться</h3>
-          <p><a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></p>
-          <p><a class="btn btn-wa" href="{% whatsapp_generic %}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Написать в WhatsApp</a></p>
-          {% if site.gis_url %}<p><a href="{{ site.gis_url }}" target="_blank" rel="noopener">📍 Открыть в 2GIS</a></p>{% endif %}
-          {% if site.instagram_url %}<p style="margin:0"><a href="{{ site.instagram_url }}" target="_blank" rel="noopener">📸 Instagram (@cyberstore_nout)</a></p>{% endif %}
+    <!-- Centered Header exactly like compshop.kg -->
+    <div class="contacts-head">
+      <h1>Свяжитесь с нами</h1>
+      <p>Приходите к нам в магазин или напишите — ответим за 5 минут</p>
+    </div>
+
+    <div class="contacts-layout">
+      <!-- Left Column: Cards -->
+      <div class="contacts-cards">
+        <!-- Card 1: Address -->
+        <div class="contact-card">
+          <div class="contact-card-icon">
+            <svg><use href="#i-pin"/></svg>
+          </div>
+          <div class="contact-card-content">
+            <span class="contact-label">Адрес</span>
+            <div class="contact-main-text">{{ site.city }}, ул. {{ site.address }}</div>
+            {% if site.address_note %}<div class="contact-sub-text">▼ {{ site.address_note }}</div>{% endif %}
+          </div>
+          {% if site.gis_url %}
+            <a class="contact-top-link" href="{{ site.gis_url }}" target="_blank" rel="noopener">
+              <span>2GIS</span>
+              <svg><use href="#i-ext"/></svg>
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Card 2: Phone -->
+        <div class="contact-card">
+          <div class="contact-card-icon">
+            <svg><use href="#i-phone"/></svg>
+          </div>
+          <div class="contact-card-content">
+            <span class="contact-label">Телефон</span>
+            <div class="contact-main-text">
+              <a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a>
+            </div>
+            <div class="contact-sub-text">Консультация и приём заказов</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Working Hours -->
+        <div class="contact-card">
+          <div class="contact-card-icon">
+            <svg><use href="#i-clock"/></svg>
+          </div>
+          <div class="contact-card-content">
+            <span class="contact-label">Время работы</span>
+            <div class="contact-main-text">{{ site.work_days }}</div>
+            <div class="contact-live-status">
+              <span class="pulse-dot"></span>
+              <span>{{ site.work_hours }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row of 3 Messengers / Socials -->
+        <div class="contact-social-grid">
+          <a class="social-box social-box-wa" href="{{ site.whatsapp_url }}" target="_blank" rel="noopener">
+            <div class="social-box-icon">
+              <svg><use href="#i-wa"/></svg>
+            </div>
+            <span>WhatsApp</span>
+          </a>
+
+          {% if site.instagram_url %}
+          <a class="social-box social-box-ig" href="{{ site.instagram_url }}" target="_blank" rel="noopener">
+            <div class="social-box-icon">
+              <svg><use href="#i-ig"/></svg>
+            </div>
+            <span>Instagram</span>
+          </a>
+          {% endif %}
+
+          {% if site.telegram_url %}
+          <a class="social-box social-box-tg" href="{{ site.telegram_url }}" target="_blank" rel="noopener">
+            <div class="social-box-icon">
+              <svg><use href="#i-tg"/></svg>
+            </div>
+            <span>Telegram</span>
+          </a>
+          {% endif %}
         </div>
       </div>
-      <iframe class="map" title="Карта: {{ site.full_address }}" src="{{ site.map_embed_url }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+      <!-- Right Column: Map -->
+      <div class="contacts-map-wrap">
+        <a class="map-overlay-btn" href="{{ site.map_search_url }}" target="_blank" rel="noopener">
+          <span>Открыть в Картах</span>
+          <svg><use href="#i-ext"/></svg>
+        </a>
+        <iframe
+          class="contacts-map-iframe"
+          title="Карта: {{ site.full_address }}"
+          src="{{ site.map_embed_url }}"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
     </div>
   </div>
 </section>

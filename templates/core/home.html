@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static shop_tags %}
+{% block title %}{{ site.shop_name }} — Ноутбуки и готовые игровые ПК в Бишкеке | Каталог, рассрочка, доставка{% endblock %}
 {% block content %}
-<section class="hero">
+<!-- Hero Section -->
+<section class="hero-compshop">
   {% if site.hero_video %}
     <div class="hero-media">
       <video autoplay muted loop playsinline preload="metadata"{% if site.hero_poster %} poster="{{ site.hero_poster.url }}"{% endif %}>
@@ -11,132 +13,228 @@
   {% elif site.hero_poster %}
     <div class="hero-media"><img src="{{ site.hero_poster.url }}" alt=""></div>
   {% endif %}
-  <div class="hero-grid-bg"></div>
-  <div class="wrap hero-inner">
-    <h1>{{ site.hero_title }}</h1>
-    <p class="hero-sub">{{ site.hero_subtitle }}</p>
-    <form class="finder" action="{% url 'catalog:list' %}" method="get">
-      <label>Для чего нужен компьютер
-        <select name="use_case">
-          <option value="">Любая задача</option>
-          {% for u in use_cases %}<option value="{{ u.slug }}">{{ u.icon }} {{ u.name }}</option>{% endfor %}
-        </select>
-      </label>
-      <label>Бюджет
-        <select name="price_max">
-          <option value="">Любой</option>
-          <option value="40000">До 40 000 сом</option>
-          <option value="70000">До 70 000 сом</option>
-          <option value="110000">До 110 000 сом</option>
-          <option value="150000">До 150 000 сом</option>
-        </select>
-      </label>
-      <button class="btn btn-primary" type="submit">Подобрать</button>
-    </form>
-  </div>
-</section>
+  <div class="hero-overlay"></div>
 
-<section class="trust-bar">
-  <div class="wrap trust-grid">
-    <div class="trust-item">
-      <span class="trust-icon">⭐</span>
-      <div>
-        <strong>500+ отзывов</strong>
-        <p>Реальные отзывы довольных клиентов</p>
-      </div>
+  <div class="wrap hero-content-box">
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      <span>Официальный магазин техники в Бишкеке</span>
     </div>
-    <div class="trust-item">
-      <span class="trust-icon">🏦</span>
-      <div>
-        <strong>Рассрочка (18+)</strong>
-        <p>С банком и без банка, только паспорт</p>
-      </div>
+    <h1 class="hero-main-title">Мощные игровые ПК<br>и ноутбуки в Бишкеке</h1>
+    <p class="hero-subtitle">
+      Сборки любой сложности на RTX 40-й серии, проверенные ноутбуки с гарантией, выгодная рассрочка с банком и без банка, бесплатная доставка по всему Кыргызстану.
+    </p>
+
+    <div class="hero-cta-row">
+      <a class="btn btn-primary btn-hero" href="{% url 'catalog:list' %}">
+        Открыть каталог
+      </a>
+      <a class="btn btn-wa btn-hero" href="{% whatsapp_generic 'Здравствуйте! Помогите, пожалуйста, подобрать ноутбук или компьютер под мой бюджет.' %}" target="_blank" rel="noopener">
+        <svg><use href="#i-wa"/></svg>
+        <span>Подобрать в WhatsApp</span>
+      </a>
     </div>
-    <div class="trust-item">
-      <span class="trust-icon">🚚</span>
-      <div>
-        <strong>Бесплатная доставка</strong>
-        <p>По Бишкеку и всему Кыргызстану</p>
-      </div>
-    </div>
-    <div class="trust-item">
-      <span class="trust-icon">🛡️</span>
-      <div>
-        <strong>Гарантия качества</strong>
-        <p>Стресс-тесты каждого ПК и ноутбука</p>
-      </div>
+
+    <!-- Quick filter pill bar -->
+    <div class="hero-quick-categories">
+      <span class="quick-cat-label">Быстрый переход:</span>
+      <a class="quick-cat-pill" href="/catalog/c/pc/">🖥️ Готовые ПК</a>
+      <a class="quick-cat-pill" href="/catalog/c/laptops/">💻 Ноутбуки</a>
+      <a class="quick-cat-pill" href="/catalog/c/components/">🔧 Комплектующие</a>
+      <a class="quick-cat-pill" href="{% url 'core:installment' %}">🏦 Рассрочка 18+</a>
     </div>
   </div>
 </section>
 
+<!-- Trust Bar / Benefits -->
+<section class="trust-bar-section">
+  <div class="wrap">
+    <div class="trust-grid-modern">
+      <div class="trust-card-m">
+        <div class="trust-icon-wrap">⭐</div>
+        <div>
+          <h4>500+ отзывов</h4>
+          <p>Реальные покупатели и видео-отзывы в Instagram</p>
+        </div>
+      </div>
+      <div class="trust-card-m">
+        <div class="trust-icon-wrap">🏦</div>
+        <div>
+          <h4>Рассрочка без банка</h4>
+          <p>Оформление от 18 лет, нужен только паспорт КР</p>
+        </div>
+      </div>
+      <div class="trust-card-m">
+        <div class="trust-icon-wrap">🚚</div>
+        <div>
+          <h4>Бесплатная доставка</h4>
+          <p>2–3 часа по Бишкеку и до 48 ч во все регионы КР</p>
+        </div>
+      </div>
+      <div class="trust-card-m">
+        <div class="trust-icon-wrap">🛡️</div>
+        <div>
+          <h4>Гарантия и стресс-тесты</h4>
+          <p>100% проверка стабильности перед выдачей клиенту</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Catalog Main Categories -->
 <section class="section">
   <div class="wrap">
-    <div class="section-head"><h2>Разделы каталога</h2></div>
-    <div class="cat-grid">
-      {% for c in categories %}
-        <a class="cat-card" href="{{ c.get_absolute_url }}">
-          <span class="cat-icon">{{ c.icon }}</span>
-          <h3>{{ c.name }}</h3>
-          {% if c.description %}<p>{{ c.description }}</p>{% endif %}
-          <span class="cat-count">Товаров: {{ c.total }}</span>
-        </a>
-      {% endfor %}
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Ассортимент</span>
+        <h2>Разделы каталога</h2>
+      </div>
+      <a class="section-link" href="{% url 'catalog:list' %}">Все товары →</a>
+    </div>
+
+    <div class="cat-grid-modern">
+      <a class="cat-box" href="/catalog/c/pc/">
+        <div class="cat-box-bg"></div>
+        <div class="cat-box-icon">🖥️</div>
+        <h3>Готовые ПК</h3>
+        <p>Игровые и рабочие сборки под любые задачи с аккуратным кабель-менеджментом</p>
+        <span class="cat-box-action">Выбрать сборку →</span>
+      </a>
+
+      <a class="cat-box cat-box-accent" href="/catalog/c/laptops/">
+        <div class="cat-box-bg"></div>
+        <div class="cat-box-icon">💻</div>
+        <h3>Ноутбуки</h3>
+        <p>Игровые монстры Dell Alienware, HP Omen, Acer Extensa и доступные модели от 29 500 сом</p>
+        <span class="cat-box-action">Смотреть ноутбуки →</span>
+      </a>
+
+      <a class="cat-box" href="/catalog/c/components/">
+        <div class="cat-box-bg"></div>
+        <div class="cat-box-icon">🔧</div>
+        <h3>Комплектующие</h3>
+        <p>Видеокарты GeForce RTX, процессоры Ryzen и Intel, скоростные NVMe SSD и память</p>
+        <span class="cat-box-action">Выбрать детали →</span>
+      </a>
     </div>
   </div>
 </section>
 
+<!-- Featured Products (Хиты продаж) -->
 <section class="section" style="padding-top:0">
   <div class="wrap">
     <div class="section-head">
-      <h2>Популярные модели</h2>
-      <a href="{% url 'catalog:list' %}">Весь каталог</a>
+      <div>
+        <span class="section-kicker">Хиты продаж</span>
+        <h2>Популярные модели</h2>
+      </div>
+      <a class="section-link" href="{% url 'catalog:list' %}">Весь каталог ({{ page.paginator.count|default:"12" }}) →</a>
     </div>
+
     {% if featured %}
-      <div class="grid">{% for p in featured %}{% include "partials/_card.html" %}{% endfor %}</div>
+      <div class="grid">
+        {% for p in featured %}{% include "partials/_card.html" %}{% endfor %}
+      </div>
     {% else %}
-      <div class="empty"><h3>Каталог скоро появится</h3><p>Напишите нам в WhatsApp, и менеджер подберёт технику под вашу задачу.</p></div>
+      <div class="empty">
+        <h3>Каталог формируется</h3>
+        <p>Напишите нам в WhatsApp, и менеджер подберёт технику под ваши требования.</p>
+      </div>
     {% endif %}
   </div>
 </section>
 
+<!-- Filter by Use Case (Для чего нужен компьютер) -->
 {% if use_cases %}
 <section class="section" style="padding-top:0">
   <div class="wrap">
-    <div class="section-head"><h2>Подбор по задаче</h2></div>
-    <div class="use-grid">
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Быстрый подбор</span>
+        <h2>Подбор по вашей задаче</h2>
+      </div>
+    </div>
+    <div class="use-cases-grid">
       {% for u in use_cases %}
-        <a class="use-tile" href="{% url 'catalog:list' %}?use_case={{ u.slug }}"><span>{{ u.icon }}</span>{{ u.name }}</a>
+        <a class="use-case-card" href="{% url 'catalog:list' %}?use_case={{ u.slug }}">
+          <span class="use-case-icon">{{ u.icon }}</span>
+          <span class="use-case-name">{{ u.name }}</span>
+        </a>
       {% endfor %}
     </div>
   </div>
 </section>
 {% endif %}
 
+<!-- Installment Banner -->
 <section class="section" style="padding-top:0">
   <div class="wrap">
-    <div class="banner">
-      <div>
-        <h2>Берите в рассрочку</h2>
-        {% for line in site.installment_paragraphs %}<p>{{ line }}</p>{% endfor %}
-        <a class="btn btn-primary" href="{% url 'core:installment' %}">Как оформить рассрочку</a>
-      </div>
-      <div>
-        <h3>Есть вопросы по выбору?</h3>
-        <p class="muted">Напишите менеджеру, он подберёт ноутбук или ПК под вашу задачу и бюджет.</p>
-        <a class="btn btn-wa" href="{% whatsapp_generic %}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Написать в WhatsApp</a>
+    <div class="modern-banner">
+      <div class="modern-banner-content">
+        <span class="plan-pill plan-pill-accent">Рассрочка без банка и с банком</span>
+        <h2>Заберите ноутбук или ПК сегодня, платите потом</h2>
+        <p>Нужен только один документ — ID-паспорт гражданина Кыргызстана. Возраст от 18 лет. Оформление за 15 минут в магазине или дистанционно онлайн.</p>
+        <div class="banner-banks-row">
+          <span class="bank-chip">Айыл Банк</span>
+          <span class="bank-chip">MBank</span>
+          <span class="bank-chip">Doscredobank</span>
+          <span class="bank-chip">О!Деньги</span>
+          <span class="bank-chip highlight">Без банка (18+)</span>
+        </div>
+        <div class="banner-btn-row">
+          <a class="btn btn-primary" href="{% url 'core:installment' %}">Условия рассрочки</a>
+          <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Хочу рассчитать рассрочку на ПК или ноутбук.' %}" target="_blank" rel="noopener">
+            <svg><use href="#i-wa"/></svg>
+            Рассчитать в WhatsApp
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Quick Contacts Preview on Homepage -->
 <section class="section" style="padding-top:0">
-  <div class="wrap info-grid">
-    <div class="info-card"><h3>Где нас найти</h3><p><a href="{{ site.map_search_url }}" target="_blank" rel="noopener">{{ site.city }}, {{ site.address }}</a></p></div>
-    <div class="info-card"><h3>Когда работаем</h3><p>{{ site.work_hours }}</p></div>
-    <div class="info-card">
-      <h3>Отзывы покупателей</h3>
-      {% if site.instagram_url %}<p>Реальные отзывы клиентов мы публикуем в <a href="{{ site.instagram_url }}" target="_blank" rel="noopener">Instagram</a>.</p>
-      {% else %}<p>Свяжитесь с нами, и мы расскажем подробнее.</p>{% endif %}
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Локация</span>
+        <h2>Наш магазин в Бишкеке</h2>
+      </div>
+      <a class="section-link" href="{% url 'core:contacts' %}">Все контакты →</a>
+    </div>
+
+    <div class="home-contacts-row">
+      <div class="contact-card">
+        <div class="contact-card-icon"><svg><use href="#i-pin"/></svg></div>
+        <div class="contact-card-content">
+          <span class="contact-label">Адрес</span>
+          <div class="contact-main-text">{{ site.city }}, ул. {{ site.address }}</div>
+          <div class="contact-sub-text">▼ {{ site.address_note }}</div>
+        </div>
+        {% if site.gis_url %}
+        <a class="contact-top-link" href="{{ site.gis_url }}" target="_blank" rel="noopener"><span>2GIS</span><svg><use href="#i-ext"/></svg></a>
+        {% endif %}
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-icon"><svg><use href="#i-phone"/></svg></div>
+        <div class="contact-card-content">
+          <span class="contact-label">Телефон</span>
+          <div class="contact-main-text"><a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></div>
+          <div class="contact-sub-text">Звонки и WhatsApp 24/7</div>
+        </div>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-card-icon"><svg><use href="#i-clock"/></svg></div>
+        <div class="contact-card-content">
+          <span class="contact-label">Время работы</span>
+          <div class="contact-main-text">{{ site.work_days }}</div>
+          <div class="contact-live-status"><span class="pulse-dot"></span><span>{{ site.work_hours }}</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

@@ -32,12 +32,24 @@ class SiteSettings(models.Model):
         "Адрес", max_length=200, default="Айни 31",
         help_text="Если вы переезжаете, смените адрес здесь (например, «Айни 31»). Адрес, подвал и интерактивная карта обновятся на всём сайте автоматически.",
     )
+    address_note = models.CharField(
+        "Уточнение к адресу", max_length=100, blank=True, default="Цокольный этаж",
+        help_text="Например: «Цокольный этаж» или «1 этаж, вход с торца».",
+    )
     work_hours = models.CharField(
-        "Часы работы", max_length=120, default="Ежедневно с 9:00 до 22:00, без выходных"
+        "Часы работы", max_length=120, default="09:00 – 22:00"
+    )
+    work_days = models.CharField(
+        "Дни работы", max_length=60, default="Ежедневно",
+        help_text="Например: «Ежедневно» или «Пн-Сб».",
+    )
+    telegram_url = models.URLField(
+        "Telegram", blank=True, default="https://t.me/cyberstore_kg",
+        help_text="Ссылка на Telegram аккаунт или канал магазина.",
     )
     gis_url = models.URLField(
-        "Ссылка на 2GIS", blank=True, default="",
-        help_text="Необязательно. Прямая ссылка на филиал в 2GIS.",
+        "Ссылка на 2GIS", blank=True, default="https://2gis.kg/bishkek",
+        help_text="Прямая ссылка на филиал в 2GIS.",
     )
 
     hero_title = models.CharField(

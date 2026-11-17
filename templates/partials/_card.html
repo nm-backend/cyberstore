@@ -9,29 +9,51 @@
       {% endif %}
     {% endwith %}
     <div class="badges">
-      {% if p.status == "in_stock" %}<span class="badge badge-ok">В наличии</span>
-      {% elif p.status == "preorder" %}<span class="badge badge-warn">Под заказ</span>
-      {% else %}<span class="badge badge-bad">Нет в наличии</span>{% endif %}
-      {% if p.discount_percent %}<span class="badge badge-sale">−{{ p.discount_percent }}%</span>{% endif %}
+      {% if p.status == "in_stock" %}
+        <span class="badge badge-ok"><span class="dot-online"></span>В наличии</span>
+      {% elif p.status == "preorder" %}
+        <span class="badge badge-warn">Под заказ</span>
+      {% else %}
+        <span class="badge badge-bad">Нет в наличии</span>
+      {% endif %}
+      {% if p.discount_percent %}
+        <span class="badge badge-sale">−{{ p.discount_percent }}%</span>
+      {% endif %}
     </div>
+    {% if p.brand %}<span class="card-brand-tag">{{ p.brand.name }}</span>{% endif %}
   </a>
+
   <div class="card-body">
-    {% if p.brand %}<div class="card-brand">{{ p.brand.name }}</div>{% endif %}
-    <h3 class="card-title"><a href="{{ p.get_absolute_url }}">{{ p.title }}</a></h3>
+    <div class="card-category-label">{{ p.category.name }}</div>
+    <h3 class="card-title">
+      <a href="{{ p.get_absolute_url }}">{{ p.title }}</a>
+    </h3>
+
     {% if p.card_specs %}
-    <ul class="spec-list">
-      {% for s in p.card_specs %}<li><span>{{ s.spec_type.name }}</span><span>{{ s.value }}</span></li>{% endfor %}
-    </ul>
+    <div class="spec-pills-wrap">
+      {% for s in p.card_specs %}
+        <div class="spec-pill">
+          <span class="spec-pill-name">{{ s.spec_type.name }}:</span>
+          <span class="spec-pill-val">{{ s.value }}</span>
+        </div>
+      {% endfor %}
+    </div>
     {% endif %}
+
     <div class="card-foot">
       <div class="price-row">
         <span class="price{% if not p.price %} ask{% endif %}">{{ p.price|price }}</span>
-        {% if p.discount_percent %}<span class="old-price">{{ p.old_price|price }}</span>{% endif %}
+        {% if p.discount_percent %}
+          <span class="old-price">{{ p.old_price|price }}</span>
+        {% endif %}
       </div>
       <div class="card-actions">
-        <a class="btn" href="{{ p.get_absolute_url }}">Подробнее</a>
+        <a class="btn btn-card-details" href="{{ p.get_absolute_url }}">Подробнее</a>
         {% whatsapp_product p as wa %}
-        <a class="btn btn-wa" href="{{ wa }}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Заказать</a>
+        <a class="btn btn-wa btn-card-wa" href="{{ wa }}" target="_blank" rel="noopener" title="Купить в 1 клик через WhatsApp">
+          <svg><use href="#i-wa"/></svg>
+          <span>Заказать</span>
+        </a>
       </div>
     </div>
   </div>

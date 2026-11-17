@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load shop_tags %}
 {% block title %}{{ product.title }} — {{ product.price|price }} | {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description }} Рассрочка, доставка по КР. Заказ через WhatsApp.{% endblock %}
+{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description }} Официальная гарантия, рассрочка без банка, доставка по Кыргызстану.{% endblock %}
 {% block og_title %}{{ product.title }}{% endblock %}
 {% block head_extra %}
 <script type="application/ld+json">
@@ -12,14 +12,21 @@
 {% endblock %}
 {% block content %}
 <div class="wrap">
+  <!-- Breadcrumbs -->
   <nav class="crumbs" aria-label="Путь">
-    <a href="{% url 'core:home' %}">Главная</a> / <a href="{% url 'catalog:list' %}">Каталог</a> /
+    <a href="{% url 'core:home' %}">Главная</a>
+    <span class="crumb-sep">/</span>
+    <a href="{% url 'catalog:list' %}">Каталог</a>
+    <span class="crumb-sep">/</span>
     <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+    <span class="crumb-sep">/</span>
+    <span class="crumb-current">{{ product.title }}</span>
   </nav>
 
-  <div class="product">
-    <div>
-      <div class="gallery-main">
+  <div class="product-detail-layout">
+    <!-- Gallery Column -->
+    <div class="product-gallery">
+      <div class="gallery-main-card">
         {% if images %}
           <img data-gallery-main src="{{ images.0.image.url }}" alt="{{ images.0.alt|default:product.title }}" width="900" height="675">
         {% else %}
@@ -37,74 +44,186 @@
       {% endif %}
     </div>
 
-    <div class="product-info">
-      {% if product.brand %}<div class="card-brand">{{ product.brand.name }}</div>{% endif %}
-      <h1>{{ product.title }}</h1>
-      <div class="meta-row">
-        {% if product.status == "in_stock" %}<span class="badge badge-ok">В наличии</span>
-        {% elif product.status == "preorder" %}<span class="badge badge-warn">Под заказ</span>
-        {% else %}<span class="badge badge-bad">Нет в наличии</span>{% endif %}
-        {% if product.installment_available %}<span class="chip">Можно в рассрочку</span>{% endif %}
-        {% if product.warranty %}<span class="chip">Гарантия: {{ product.warranty }}</span>{% endif %}
-      </div>
-      {% if product.short_description %}<p class="muted">{{ product.short_description }}</p>{% endif %}
-
-      <div class="product-price">
-        <span class="price{% if not product.price %} ask{% endif %}">{{ product.price|price }}</span>
-        {% if product.discount_percent %}<span class="old-price">{{ product.old_price|price }}</span><span class="badge badge-sale">−{{ product.discount_percent }}%</span>{% endif %}
+    <!-- Product Summary Column -->
+    <div class="product-summary">
+      <div class="product-top-tags">
+        <span class="product-cat-tag">{{ product.category.name }}</span>
+        {% if product.brand %}<span class="product-brand-tag">{{ product.brand.name }}</span>{% endif %}
       </div>
 
-      <div class="cta-stack">
+      <h1 class="product-detail-title">{{ product.title }}</h1>
+
+      <div class="product-status-row">
+        {% if product.status == "in_stock" %}
+          <span class="badge badge-ok"><span class="dot-online"></span> В наличии</span>
+        {% elif product.status == "preorder" %}
+          <span class="badge badge-warn">Под заказ</span>
+        {% else %}
+          <span class="badge badge-bad">Нет в наличии</span>
+        {% endif %}
+        {% if product.installment_available %}<span class="chip-m">🏦 Рассрочка 18+</span>{% endif %}
+        {% if product.warranty %}<span class="chip-m">🛡️ Гарантия {{ product.warranty }}</span>{% endif %}
+      </div>
+
+      {% if product.short_description %}
+        <p class="product-short-desc">{{ product.short_description }}</p>
+      {% endif %}
+
+      <!-- Price Box -->
+      <div class="product-price-box">
+        <div class="price-val-wrap">
+          <span class="price-main{% if not product.price %} ask{% endif %}">{{ product.price|price }}</span>
+          {% if product.discount_percent %}
+            <span class="price-old">{{ product.old_price|price }}</span>
+            <span class="badge badge-sale">−{{ product.discount_percent }}%</span>
+          {% endif %}
+        </div>
+        <div class="price-installment-hint">
+          {% if product.price %}
+            от <strong>{% widthratio product.price 12 1 %}&nbsp;сом/мес</strong> в рассрочку без банка
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="product-cta-stack">
         {% whatsapp_product product as wa %}
-        <a class="btn btn-wa btn-block" href="{{ wa }}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Заказать в WhatsApp</a>
-        <button class="btn btn-block" type="button" data-open-lead>Оставить заявку, мы перезвоним</button>
+        <a class="btn btn-wa btn-lg btn-block" href="{{ wa }}" target="_blank" rel="noopener">
+          <svg><use href="#i-wa"/></svg>
+          <span>Заказать в WhatsApp</span>
+        </a>
+        <button class="btn btn-block btn-outline" type="button" data-open-lead>
+          Оставить заявку, мы перезвоним
+        </button>
+      </div>
+
+      <!-- Value Props Micro-Cards -->
+      <div class="product-perks-box">
+        <div class="perk-item">
+          <span class="perk-icon">🚚</span>
+          <div>
+            <strong>Бесплатная доставка</strong>
+            <span>2–3 часа по Бишкеку, 24–48 ч по Кыргызстану</span>
+          </div>
+        </div>
+        <div class="perk-item">
+          <span class="perk-icon">🏦</span>
+          <div>
+            <strong>Рассрочка без банка</strong>
+            <span>Оформление за 15 минут по паспорту (18+)</span>
+          </div>
+        </div>
+        <div class="perk-item">
+          <span class="perk-icon">🛡️</span>
+          <div>
+            <strong>Проверка перед оплатой</strong>
+            <span>Осмотр техники при получении, официальная гарантия</span>
+          </div>
+        </div>
       </div>
 
       {% if use_cases %}
-      <h3>Подходит для</h3>
-      <div class="meta-row">{% for u in use_cases %}<a class="chip" href="{% url 'catalog:list' %}?use_case={{ u.slug }}">{{ u.icon }} {{ u.name }}</a>{% endfor %}</div>
+      <div class="product-use-cases">
+        <span class="use-case-label">Подходит для задач:</span>
+        <div class="use-case-chips-row">
+          {% for u in use_cases %}
+            <a class="chip-m" href="{% url 'catalog:list' %}?use_case={{ u.slug }}">{{ u.icon }} {{ u.name }}</a>
+          {% endfor %}
+        </div>
+      </div>
       {% endif %}
     </div>
   </div>
 
-  <div class="two-col" style="padding-bottom:40px">
-    <section>
-      <h2>Характеристики</h2>
-      {% if specs %}
-      <table class="spec-table">
-        {% for s in specs %}<tr><th scope="row">{{ s.spec_type.name }}</th><td>{{ s.value }}</td></tr>{% endfor %}
-      </table>
-      {% else %}<p class="muted">Характеристики уточняйте у менеджера.</p>{% endif %}
-    </section>
-    {% if product.description %}
-    <section class="prose">
-      <h2>Описание</h2>
-      {{ product.description|linebreaks }}
-    </section>
-    {% endif %}
+  <!-- Specs & Description Tabs Section -->
+  <div class="product-info-tabs-wrap">
+    <div class="two-col-details">
+      <!-- Specifications Table -->
+      <section class="details-section">
+        <div class="details-section-head">
+          <h2>Технические характеристики</h2>
+        </div>
+        {% if specs %}
+        <table class="spec-table-modern">
+          <tbody>
+            {% for s in specs %}
+            <tr>
+              <th scope="row">{{ s.spec_type.name }}</th>
+              <td>{{ s.value }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p class="muted">Характеристики уточняйте у менеджера.</p>
+        {% endif %}
+      </section>
+
+      <!-- Description Section -->
+      {% if product.description %}
+      <section class="details-section">
+        <div class="details-section-head">
+          <h2>Описание и особенности</h2>
+        </div>
+        <div class="product-prose-body">
+          {{ product.description|linebreaks }}
+        </div>
+      </section>
+      {% endif %}
+    </div>
   </div>
 
+  <!-- Related Products -->
   {% if related %}
-  <section class="section" style="padding-top:0">
-    <div class="section-head"><h2>Похожие модели</h2></div>
-    <div class="grid">{% for p in related %}{% include "partials/_card.html" %}{% endfor %}</div>
+  <section class="section" style="padding-top:20px">
+    <div class="section-head">
+      <div>
+        <span class="section-kicker">Рекомендации</span>
+        <h2>Похожие модели</h2>
+      </div>
+      <a class="section-link" href="{{ product.category.get_absolute_url }}">Все в категории →</a>
+    </div>
+    <div class="grid">
+      {% for p in related %}{% include "partials/_card.html" %}{% endfor %}
+    </div>
   </section>
   {% endif %}
 </div>
 
-<dialog data-lead-dialog aria-labelledby="lead-title">
-  <form class="dialog-body" method="post" action="{% url 'leads:create' %}">
+<!-- Lead Request Modal Dialog -->
+<dialog class="lead-modal" data-lead-dialog aria-labelledby="lead-title">
+  <form class="dialog-body-modern" method="post" action="{% url 'leads:create' %}">
     {% csrf_token %}
-    <h2 id="lead-title" style="margin:0;font-size:1.2rem">Заявка на {{ product.title }}</h2>
+    <div class="dialog-head">
+      <h3 id="lead-title">Заявка на {{ product.title }}</h3>
+      <button class="dialog-close-btn" type="button" data-close-lead aria-label="Закрыть">✕</button>
+    </div>
+    <p class="dialog-sub">Оставьте контакты — менеджер свяжется с вами в течение 5 минут для уточнения заказа.</p>
+
     <input type="hidden" name="product_id" value="{{ product.pk }}">
     <input type="hidden" name="next" value="{{ request.path }}">
-    <div class="hp" aria-hidden="true"><label>Сайт<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-    <label>Ваше имя<input class="field" type="text" name="name" required maxlength="100" autocomplete="name"></label>
-    <label>Телефон<input class="field" type="tel" name="phone" required maxlength="30" placeholder="+996 ..." autocomplete="tel"></label>
-    <label class="check"><input type="checkbox" name="wants_installment" style="accent-color:var(--electric)">Интересует рассрочка</label>
-    <div class="dialog-actions">
-      <button class="btn btn-primary" type="submit" style="flex:1">Отправить заявку</button>
-      <button class="btn" type="button" data-close-lead>Закрыть</button>
+
+    <div class="form-field-group">
+      <label for="lead_name">Ваше имя</label>
+      <input class="field" id="lead_name" name="name" type="text" placeholder="Например, Эрмек" required>
+    </div>
+
+    <div class="form-field-group">
+      <label for="lead_phone">Номер телефона</label>
+      <input class="field" id="lead_phone" name="phone" type="tel" placeholder="+996 (___) __-__-__" required>
+    </div>
+
+    <label class="switch-row" style="margin-top:6px">
+      <input type="checkbox" name="wants_installment" value="1">
+      <span>Интересует оформление в рассрочку</span>
+    </label>
+
+    <div class="hp">
+      <label>Не заполняйте это поле: <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+    </div>
+
+    <div class="dialog-btn-row">
+      <button class="btn btn-primary btn-block" type="submit">Отправить заявку</button>
     </div>
   </form>
 </dialog>

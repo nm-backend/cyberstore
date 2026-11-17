@@ -8,8 +8,8 @@ from .models import InstallmentOption, SiteSettings
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
-        ("Контакты и адрес", {"fields": ("shop_name", "tagline", "phone", "whatsapp_number", "instagram_url")}),
-        ("Где находимся", {"fields": ("city", "address", "work_hours", "gis_url")}),
+        ("Контакты и соцсети", {"fields": ("shop_name", "tagline", "phone", "whatsapp_number", "instagram_url", "telegram_url")}),
+        ("Где находимся", {"fields": ("city", "address", "address_note", "work_days", "work_hours", "gis_url")}),
         ("Главная страница", {"fields": ("hero_title", "hero_subtitle", "hero_video", "hero_poster")}),
         ("Тексты страниц", {"fields": ("delivery_text", "installment_note")}),
     )
