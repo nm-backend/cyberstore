@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Контакты — {{ site.shop_name }}, {{ site.city }}, {{ site.address }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <div class="page-head" style="padding-top:0"><h1>Контакты</h1></div>
+    <div class="two-col">
+      <div class="info-grid" style="grid-template-columns:1fr">
+        <div class="info-card"><h3>Адрес</h3><p><a href="{{ site.map_search_url }}" target="_blank" rel="noopener">{{ site.city }}, {{ site.address }}</a></p></div>
+        <div class="info-card"><h3>Часы работы</h3><p>{{ site.work_hours }}</p></div>
+        <div class="info-card">
+          <h3>Связаться</h3>
+          <p><a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></p>
+          <p><a class="btn btn-wa" href="{% whatsapp_generic %}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Написать в WhatsApp</a></p>
+          {% if site.gis_url %}<p><a href="{{ site.gis_url }}" target="_blank" rel="noopener">📍 Открыть в 2GIS</a></p>{% endif %}
+          {% if site.instagram_url %}<p style="margin:0"><a href="{{ site.instagram_url }}" target="_blank" rel="noopener">📸 Instagram (@cyberstore_nout)</a></p>{% endif %}
+        </div>
+      </div>
+      <iframe class="map" title="Карта: {{ site.full_address }}" src="{{ site.map_embed_url }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</section>
+{% endblock %}

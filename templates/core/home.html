@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static shop_tags %}
+{% block content %}
+<section class="hero">
+  {% if site.hero_video %}
+    <div class="hero-media">
+      <video autoplay muted loop playsinline preload="metadata"{% if site.hero_poster %} poster="{{ site.hero_poster.url }}"{% endif %}>
+        <source src="{{ site.hero_video.url }}">
+      </video>
+    </div>
+  {% elif site.hero_poster %}
+    <div class="hero-media"><img src="{{ site.hero_poster.url }}" alt=""></div>
+  {% endif %}
+  <div class="hero-grid-bg"></div>
+  <div class="wrap hero-inner">
+    <h1>{{ site.hero_title }}</h1>
+    <p class="hero-sub">{{ site.hero_subtitle }}</p>
+    <form class="finder" action="{% url 'catalog:list' %}" method="get">
+      <label>Для чего нужен компьютер
+        <select name="use_case">
+          <option value="">Любая задача</option>
+          {% for u in use_cases %}<option value="{{ u.slug }}">{{ u.icon }} {{ u.name }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Бюджет
+        <select name="price_max">
+          <option value="">Любой</option>
+          <option value="40000">До 40 000 сом</option>
+          <option value="70000">До 70 000 сом</option>
+          <option value="110000">До 110 000 сом</option>
+          <option value="150000">До 150 000 сом</option>
+        </select>
+      </label>
+      <button class="btn btn-primary" type="submit">Подобрать</button>
+    </form>
+  </div>
+</section>
+
+<section class="trust-bar">
+  <div class="wrap trust-grid">
+    <div class="trust-item">
+      <span class="trust-icon">⭐</span>
+      <div>
+        <strong>500+ отзывов</strong>
+        <p>Реальные отзывы довольных клиентов</p>
+      </div>
+    </div>
+    <div class="trust-item">
+      <span class="trust-icon">🏦</span>
+      <div>
+        <strong>Рассрочка (18+)</strong>
+        <p>С банком и без банка, только паспорт</p>
+      </div>
+    </div>
+    <div class="trust-item">
+      <span class="trust-icon">🚚</span>
+      <div>
+        <strong>Бесплатная доставка</strong>
+        <p>По Бишкеку и всему Кыргызстану</p>
+      </div>
+    </div>
+    <div class="trust-item">
+      <span class="trust-icon">🛡️</span>
+      <div>
+        <strong>Гарантия качества</strong>
+        <p>Стресс-тесты каждого ПК и ноутбука</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head"><h2>Разделы каталога</h2></div>
+    <div class="cat-grid">
+      {% for c in categories %}
+        <a class="cat-card" href="{{ c.get_absolute_url }}">
+          <span class="cat-icon">{{ c.icon }}</span>
+          <h3>{{ c.name }}</h3>
+          {% if c.description %}<p>{{ c.description }}</p>{% endif %}
+          <span class="cat-count">Товаров: {{ c.total }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Популярные модели</h2>
+      <a href="{% url 'catalog:list' %}">Весь каталог</a>
+    </div>
+    {% if featured %}
+      <div class="grid">{% for p in featured %}{% include "partials/_card.html" %}{% endfor %}</div>
+    {% else %}
+      <div class="empty"><h3>Каталог скоро появится</h3><p>Напишите нам в WhatsApp, и менеджер подберёт технику под вашу задачу.</p></div>
+    {% endif %}
+  </div>
+</section>
+
+{% if use_cases %}
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head"><h2>Подбор по задаче</h2></div>
+    <div class="use-grid">
+      {% for u in use_cases %}
+        <a class="use-tile" href="{% url 'catalog:list' %}?use_case={{ u.slug }}"><span>{{ u.icon }}</span>{{ u.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    <div class="banner">
+      <div>
+        <h2>Берите в рассрочку</h2>
+        {% for line in site.installment_paragraphs %}<p>{{ line }}</p>{% endfor %}
+        <a class="btn btn-primary" href="{% url 'core:installment' %}">Как оформить рассрочку</a>
+      </div>
+      <div>
+        <h3>Есть вопросы по выбору?</h3>
+        <p class="muted">Напишите менеджеру, он подберёт ноутбук или ПК под вашу задачу и бюджет.</p>
+        <a class="btn btn-wa" href="{% whatsapp_generic %}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Написать в WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="wrap info-grid">
+    <div class="info-card"><h3>Где нас найти</h3><p><a href="{{ site.map_search_url }}" target="_blank" rel="noopener">{{ site.city }}, {{ site.address }}</a></p></div>
+    <div class="info-card"><h3>Когда работаем</h3><p>{{ site.work_hours }}</p></div>
+    <div class="info-card">
+      <h3>Отзывы покупателей</h3>
+      {% if site.instagram_url %}<p>Реальные отзывы клиентов мы публикуем в <a href="{{ site.instagram_url }}" target="_blank" rel="noopener">Instagram</a>.</p>
+      {% else %}<p>Свяжитесь с нами, и мы расскажем подробнее.</p>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

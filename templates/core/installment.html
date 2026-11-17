@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Рассрочка на ноутбуки и ПК — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <div class="page-head" style="padding-top:0"><h1>Рассрочка</h1></div>
+    <div class="prose">{% for line in site.installment_paragraphs %}<p>{{ line }}</p>{% endfor %}</div>
+    {% if options %}
+    <div class="info-grid" style="margin:24px 0">
+      {% for o in options %}
+        <div class="info-card">
+          <h3>{{ o.title }}{% if o.badge %} <span class="chip">{{ o.badge }}</span>{% endif %}</h3>
+          {% if o.description %}<p>{{ o.description }}</p>{% endif %}
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Хочу узнать условия рассрочки.' %}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Узнать условия в WhatsApp</a>
+    <a class="btn" href="{% url 'catalog:list' %}">Выбрать модель</a>
+  </div>
+</section>
+{% endblock %}

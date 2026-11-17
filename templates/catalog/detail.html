@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}{{ product.title }} — {{ product.price|price }} | {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description }} Рассрочка, доставка по КР. Заказ через WhatsApp.{% endblock %}
+{% block og_title %}{{ product.title }}{% endblock %}
+{% block head_extra %}
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Product","name":"{{ product.title|escapejs }}",
+"description":"{{ product.short_description|escapejs }}"{% if product.brand %},"brand":{"@type":"Brand","name":"{{ product.brand.name|escapejs }}"}{% endif %}{% if images %},"image":"{% absolute images.0.image.url %}"{% endif %}{% if product.price %},
+"offers":{"@type":"Offer","priceCurrency":"KGS","price":"{{ product.price }}","availability":"{% if product.is_available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}","url":"{% canonical %}"}{% endif %}}
+</script>
+{% endblock %}
+{% block content %}
+<div class="wrap">
+  <nav class="crumbs" aria-label="Путь">
+    <a href="{% url 'core:home' %}">Главная</a> / <a href="{% url 'catalog:list' %}">Каталог</a> /
+    <a href="{{ product.category.get_absolute_url }}">{{ product.category.name }}</a>
+  </nav>
+
+  <div class="product">
+    <div>
+      <div class="gallery-main">
+        {% if images %}
+          <img data-gallery-main src="{{ images.0.image.url }}" alt="{{ images.0.alt|default:product.title }}" width="900" height="675">
+        {% else %}
+          <div class="ph"><div><b>{{ product.category.icon|default:"💻" }}</b>{% firstof product.brand.name product.category.name %}</div></div>
+        {% endif %}
+      </div>
+      {% if images|length > 1 %}
+      <div class="thumbs">
+        {% for img in images %}
+          <button type="button" data-thumb data-full="{{ img.image.url }}" data-alt="{{ img.alt|default:product.title }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}" aria-label="Фото {{ forloop.counter }}">
+            <img src="{{ img.image.url }}" alt="" loading="lazy">
+          </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="product-info">
+      {% if product.brand %}<div class="card-brand">{{ product.brand.name }}</div>{% endif %}
+      <h1>{{ product.title }}</h1>
+      <div class="meta-row">
+        {% if product.status == "in_stock" %}<span class="badge badge-ok">В наличии</span>
+        {% elif product.status == "preorder" %}<span class="badge badge-warn">Под заказ</span>
+        {% else %}<span class="badge badge-bad">Нет в наличии</span>{% endif %}
+        {% if product.installment_available %}<span class="chip">Можно в рассрочку</span>{% endif %}
+        {% if product.warranty %}<span class="chip">Гарантия: {{ product.warranty }}</span>{% endif %}
+      </div>
+      {% if product.short_description %}<p class="muted">{{ product.short_description }}</p>{% endif %}
+
+      <div class="product-price">
+        <span class="price{% if not product.price %} ask{% endif %}">{{ product.price|price }}</span>
+        {% if product.discount_percent %}<span class="old-price">{{ product.old_price|price }}</span><span class="badge badge-sale">−{{ product.discount_percent }}%</span>{% endif %}
+      </div>
+
+      <div class="cta-stack">
+        {% whatsapp_product product as wa %}
+        <a class="btn btn-wa btn-block" href="{{ wa }}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Заказать в WhatsApp</a>
+        <button class="btn btn-block" type="button" data-open-lead>Оставить заявку, мы перезвоним</button>
+      </div>
+
+      {% if use_cases %}
+      <h3>Подходит для</h3>
+      <div class="meta-row">{% for u in use_cases %}<a class="chip" href="{% url 'catalog:list' %}?use_case={{ u.slug }}">{{ u.icon }} {{ u.name }}</a>{% endfor %}</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="two-col" style="padding-bottom:40px">
+    <section>
+      <h2>Характеристики</h2>
+      {% if specs %}
+      <table class="spec-table">
+        {% for s in specs %}<tr><th scope="row">{{ s.spec_type.name }}</th><td>{{ s.value }}</td></tr>{% endfor %}
+      </table>
+      {% else %}<p class="muted">Характеристики уточняйте у менеджера.</p>{% endif %}
+    </section>
+    {% if product.description %}
+    <section class="prose">
+      <h2>Описание</h2>
+      {{ product.description|linebreaks }}
+    </section>
+    {% endif %}
+  </div>
+
+  {% if related %}
+  <section class="section" style="padding-top:0">
+    <div class="section-head"><h2>Похожие модели</h2></div>
+    <div class="grid">{% for p in related %}{% include "partials/_card.html" %}{% endfor %}</div>
+  </section>
+  {% endif %}
+</div>
+
+<dialog data-lead-dialog aria-labelledby="lead-title">
+  <form class="dialog-body" method="post" action="{% url 'leads:create' %}">
+    {% csrf_token %}
+    <h2 id="lead-title" style="margin:0;font-size:1.2rem">Заявка на {{ product.title }}</h2>
+    <input type="hidden" name="product_id" value="{{ product.pk }}">
+    <input type="hidden" name="next" value="{{ request.path }}">
+    <div class="hp" aria-hidden="true"><label>Сайт<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
+    <label>Ваше имя<input class="field" type="text" name="name" required maxlength="100" autocomplete="name"></label>
+    <label>Телефон<input class="field" type="tel" name="phone" required maxlength="30" placeholder="+996 ..." autocomplete="tel"></label>
+    <label class="check"><input type="checkbox" name="wants_installment" style="accent-color:var(--electric)">Интересует рассрочка</label>
+    <div class="dialog-actions">
+      <button class="btn btn-primary" type="submit" style="flex:1">Отправить заявку</button>
+      <button class="btn" type="button" data-close-lead>Закрыть</button>
+    </div>
+  </form>
+</dialog>
+{% endblock %}

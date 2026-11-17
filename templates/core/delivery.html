@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Доставка — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block content %}
+<section class="section">
+  <div class="wrap">
+    <div class="page-head" style="padding-top:0"><h1>Доставка</h1></div>
+    <div class="prose">{% for line in site.delivery_paragraphs %}<p>{{ line }}</p>{% endfor %}</div>
+    <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить условия доставки.' %}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Уточнить в WhatsApp</a>
+    <p class="muted" style="margin-top:24px">Можно забрать заказ самостоятельно: {{ site.city }}, {{ site.address }}. {{ site.work_hours }}.</p>
+  </div>
+</section>
+{% endblock %}

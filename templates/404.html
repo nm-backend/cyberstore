@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Страница не найдена — {{ site.shop_name }}{% endblock %}
+{% block content %}
+<section class="section"><div class="wrap">
+  <div class="empty">
+    <h3>Такой страницы нет</h3>
+    <p>Возможно, товар уже продан или адрес изменился. Откройте каталог или напишите нам в WhatsApp.</p>
+    <p><a class="btn btn-primary" href="{% url 'catalog:list' %}">Открыть каталог</a></p>
+  </div>
+</div></section>
+{% endblock %}

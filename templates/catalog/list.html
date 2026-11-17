@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}{% if category %}{{ category.name }}{% else %}Каталог{% endif %} — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block description %}{% if category %}{{ category.name }} в {{ site.shop_name }}. {% endif %}Характеристики, цены в сомах, рассрочка. Заказ через WhatsApp.{% endblock %}
+{% block content %}
+<div class="wrap">
+  <nav class="crumbs" aria-label="Путь">
+    <a href="{% url 'core:home' %}">Главная</a> / {% if category %}<a href="{% url 'catalog:list' %}">Каталог</a> / {{ category.name }}{% else %}Каталог{% endif %}
+  </nav>
+  <div class="page-head">
+    <h1>{% if category %}{{ category.name }}{% elif query %}Поиск: {{ query }}{% else %}Каталог{% endif %}</h1>
+    {% if category.description %}<p class="muted">{{ category.description }}</p>{% endif %}
+  </div>
+
+  {% if subcategories %}
+  <div class="sub-cats">{% for sc in subcategories %}<a href="{{ sc.get_absolute_url }}">{{ sc.name }}</a>{% endfor %}</div>
+  {% endif %}
+
+  <div class="catalog-layout">
+    <aside class="filters" data-filters>
+      <form id="filter-form" data-filter-form method="get" style="display:contents">
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        {% if brands %}
+        <div>
+          <h3>Бренд</h3>
+          {% for b in brands %}
+            <label class="opt"><input type="checkbox" name="brand" value="{{ b.slug }}"{% if b.slug in selected_brands %} checked{% endif %}>{{ b.name }}</label>
+          {% endfor %}
+        </div>
+        {% endif %}
+        {% if use_cases %}
+        <div>
+          <h3>Подходит для</h3>
+          <select class="field" name="use_case" aria-label="Подходит для">
+            <option value="">Любая задача</option>
+            {% for u in use_cases %}<option value="{{ u.slug }}"{% if u.slug == use_case %} selected{% endif %}>{{ u.name }}</option>{% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <div>
+          <h3>Цена, сом</h3>
+          <div class="price-inputs">
+            <input class="field" type="number" min="0" step="1000" name="price_min" placeholder="От" value="{{ price_min|default_if_none:'' }}" aria-label="Цена от">
+            <input class="field" type="number" min="0" step="1000" name="price_max" placeholder="До" value="{{ price_max|default_if_none:'' }}" aria-label="Цена до">
+          </div>
+        </div>
+        <label class="opt"><input type="checkbox" name="in_stock" value="1"{% if in_stock %} checked{% endif %}>Только в наличии</label>
+        <div style="display:grid;gap:8px">
+          <button class="btn btn-primary btn-block" type="submit">Применить</button>
+          {% if has_filters %}<a class="btn btn-block" href="{{ request.path }}">Сбросить</a>{% endif %}
+        </div>
+      </form>
+    </aside>
+
+    <section>
+      <div class="list-top">
+        <div class="muted">Найдено: {{ page.paginator.count }}</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn filter-toggle" type="button" data-filter-toggle aria-expanded="false">Фильтры</button>
+          <select class="field" name="sort" form="filter-form" aria-label="Сортировка" onchange="this.form.submit()">
+            {% for key, label in sorts %}<option value="{{ key }}"{% if key == sort %} selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+
+      {% if page.object_list %}
+        <div class="grid in-list">{% for p in page.object_list %}{% include "partials/_card.html" %}{% endfor %}</div>
+        {% if page.has_other_pages %}
+        <nav class="pager" aria-label="Страницы">
+          {% if page.has_previous %}<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.previous_page_number }}">Назад</a>{% endif %}
+          {% for n in page.paginator.page_range %}
+            {% if n == page.number %}<span class="current" aria-current="page">{{ n }}</span>
+            {% else %}<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ n }}">{{ n }}</a>{% endif %}
+          {% endfor %}
+          {% if page.has_next %}<a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.next_page_number }}">Вперёд</a>{% endif %}
+        </nav>
+        {% endif %}
+      {% else %}
+        <div class="empty">
+          <h3>Ничего не нашлось</h3>
+          <p>{% if has_filters %}Попробуйте изменить или сбросить фильтры.{% else %}В этом разделе пока нет товаров.{% endif %} Или напишите нам, и менеджер подберёт вариант.</p>
+          <a class="btn btn-wa" href="{% whatsapp_generic %}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Написать в WhatsApp</a>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

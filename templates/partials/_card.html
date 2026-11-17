@@ -1,0 +1,38 @@
+{% load shop_tags %}
+<article class="card">
+  <a class="card-media" href="{{ p.get_absolute_url }}" aria-label="{{ p.title }}">
+    {% with img=p.main_image %}
+      {% if img %}
+        <img src="{{ img.image.url }}" alt="{{ img.alt|default:p.title }}" loading="lazy" width="640" height="480">
+      {% else %}
+        <div class="ph"><div><b>{{ p.category.icon|default:"💻" }}</b>{% firstof p.brand.name p.category.name %}</div></div>
+      {% endif %}
+    {% endwith %}
+    <div class="badges">
+      {% if p.status == "in_stock" %}<span class="badge badge-ok">В наличии</span>
+      {% elif p.status == "preorder" %}<span class="badge badge-warn">Под заказ</span>
+      {% else %}<span class="badge badge-bad">Нет в наличии</span>{% endif %}
+      {% if p.discount_percent %}<span class="badge badge-sale">−{{ p.discount_percent }}%</span>{% endif %}
+    </div>
+  </a>
+  <div class="card-body">
+    {% if p.brand %}<div class="card-brand">{{ p.brand.name }}</div>{% endif %}
+    <h3 class="card-title"><a href="{{ p.get_absolute_url }}">{{ p.title }}</a></h3>
+    {% if p.card_specs %}
+    <ul class="spec-list">
+      {% for s in p.card_specs %}<li><span>{{ s.spec_type.name }}</span><span>{{ s.value }}</span></li>{% endfor %}
+    </ul>
+    {% endif %}
+    <div class="card-foot">
+      <div class="price-row">
+        <span class="price{% if not p.price %} ask{% endif %}">{{ p.price|price }}</span>
+        {% if p.discount_percent %}<span class="old-price">{{ p.old_price|price }}</span>{% endif %}
+      </div>
+      <div class="card-actions">
+        <a class="btn" href="{{ p.get_absolute_url }}">Подробнее</a>
+        {% whatsapp_product p as wa %}
+        <a class="btn btn-wa" href="{{ wa }}" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Заказать</a>
+      </div>
+    </div>
+  </div>
+</article>
