@@ -14,19 +14,33 @@
   --gesso-fg: #e6f4ff;
   --gesso-fg-muted: #9aacc4;
   --gesso-primary: #4d9dff;
-  --gesso-on-accent: #05080f;
+  --gesso-on-accent: #000000;
+  --gesso-accent-text: #4d9dff;
   --gesso-secondary: #ff2e88;
+  --gesso-accent-2-text: #ff2e88;
 
+  --gesso-neutral-50: #05080f;
+  --gesso-neutral-100: #0c1422;
   --gesso-neutral-200: #242e3f;
   --gesso-neutral-300: #3f4b5e;
   --gesso-neutral-400: #5c6a7e;
   --gesso-neutral-500: #7a8aa0;
   --gesso-neutral-600: #9aacc4;
   --gesso-neutral-700: #b2c4d7;
+  --gesso-neutral-800: #cbdceb;
+  --gesso-neutral-900: #e6f4ff;
+  --gesso-neutral-950: #e9f5ff;
 
   --gesso-success: #16a34a;
   --gesso-warning: #d97706;
   --gesso-error: #e35151;
+
+  --gesso-data-1: #9d004e;
+  --gesso-data-2: #c40063;
+  --gesso-data-3: #ec0779;
+  --gesso-data-4: #ff4f92;
+  --gesso-data-5: #ff8aad;
+  --gesso-data-6: #ffb6c9;
 
   /* Typography */
   --gesso-font-display: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -54,18 +68,32 @@
   --gesso-space-12: 48px;
   --gesso-space-16: 64px;
   --gesso-space-24: 96px;
+  --gesso-space-32: 128px;
 
   /* Layout */
   --container-max-width: 1280px;
   --outer-margin: 64px;
   --section-padding: 80px;
   --grid-gutter: 24px;
+  --grid-columns: 12;
 
   /* Radius */
+  --radius-none: 0px;
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 16px;
   --radius-full: 9999px;
+
+  /* Shadows — tokens only; surfaces keep hairlines/glow */
+  --gesso-shadow-sm: 0 1px 2px rgba(0, 0, 0, .05);
+  --gesso-shadow-md: 0 4px 12px rgba(0, 0, 0, .08);
+  --gesso-shadow-lg: 0 16px 40px rgba(0, 0, 0, .12);
+
+  /* Breakpoints — documentation; media queries need literals */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
 
   /* Interaction states */
   --gesso-primary-hover: #6aacff;
@@ -202,7 +230,7 @@ h4 { font-size: var(--gesso-text-base); }
   font-weight: 700; font-size: var(--gesso-text-base); letter-spacing: 0.06em;
   color: var(--gesso-fg);
 }
-.brand-name span { color: var(--gesso-primary); }
+.brand-name span { color: var(--gesso-accent-text); }
 .brand-city {
   font-family: var(--gesso-font-mono);
   font-size: var(--gesso-text-2xs); font-weight: 500; letter-spacing: 0.18em;
@@ -252,7 +280,7 @@ h4 { font-size: var(--gesso-text-base); }
   font-variant-numeric: tabular-nums;
 }
 .header-phone svg { width: 18px; height: 18px; fill: var(--gesso-fg-muted); }
-.header-phone:hover { color: var(--gesso-primary); }
+.header-phone:hover { color: var(--gesso-accent-text); }
 
 .header-wa-btn {
   display: inline-flex; align-items: center; gap: var(--gesso-space-2);
@@ -261,8 +289,8 @@ h4 { font-size: var(--gesso-text-base); }
   color: var(--gesso-fg); font-weight: 500; font-size: var(--gesso-text-sm);
 }
 .header-wa-btn svg { width: 15px; height: 15px; fill: currentColor; color: var(--gesso-fg-muted); }
-.header-wa-btn:hover { border-color: var(--gesso-primary); color: var(--gesso-primary); }
-.header-wa-btn:hover svg { color: var(--gesso-primary); }
+.header-wa-btn:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-text); }
+.header-wa-btn:hover svg { color: var(--gesso-accent-text); }
 
 .burger {
   display: none; background: transparent; border: 1px solid var(--gesso-neutral-300);
@@ -318,13 +346,13 @@ h4 { font-size: var(--gesso-text-base); }
 .btn-outline {
   background: transparent;
   border: 1.5px solid var(--gesso-primary);
-  color: var(--gesso-primary);
+  color: var(--gesso-accent-text);
   padding: 11.5px 23px;
 }
 .btn-outline:hover {
   background: var(--gesso-primary-soft);
   border-color: var(--gesso-primary);
-  color: var(--gesso-primary);
+  color: var(--gesso-accent-text);
 }
 
 /* ==========================================================================
@@ -348,7 +376,7 @@ h4 { font-size: var(--gesso-text-base); }
 .badge-warn { color: var(--gesso-warning); border-color: var(--gesso-warning-line); }
 .badge-bad { color: var(--gesso-error); border-color: var(--gesso-error-line); }
 .badge-sale {
-  color: var(--gesso-secondary);
+  color: var(--gesso-accent-2-text);
   background: var(--gesso-secondary-soft);
   border-color: var(--gesso-secondary-line);
 }
@@ -361,7 +389,7 @@ h4 { font-size: var(--gesso-text-base); }
   font-size: var(--gesso-text-xs); font-weight: 500;
   color: var(--gesso-neutral-700);
 }
-a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary); }
+a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-text); }
 
 .plan-pill {
   display: inline-block; padding: 5px 12px; border-radius: var(--radius-full);
@@ -370,7 +398,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   text-transform: uppercase; color: var(--gesso-neutral-700);
 }
 .plan-pill-accent {
-  color: var(--gesso-secondary);
+  color: var(--gesso-accent-2-text);
   background: var(--gesso-secondary-soft);
   border-color: var(--gesso-secondary-line);
 }
@@ -413,7 +441,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 }
 
 .hero-main-title {
-  font-size: clamp(2.4rem, 5vw, var(--gesso-text-display));
+  font-size: clamp(2.4rem, 5vw, var(--gesso-text-4xl));
   font-weight: 600; letter-spacing: -0.035em; line-height: 1.04;
   margin-bottom: var(--gesso-space-4);
   max-width: 18ch;
@@ -445,7 +473,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   border: 1px solid var(--gesso-divider);
   color: var(--gesso-neutral-700); font-size: var(--gesso-text-xs); font-weight: 500;
 }
-.quick-cat-pill:hover { border-color: var(--gesso-primary); color: var(--gesso-primary); }
+.quick-cat-pill:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-text); }
 
 /* ==========================================================================
    TRUST BAR
@@ -492,7 +520,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 .section-head h2 { margin: 0; }
 .section-link {
   font-size: var(--gesso-text-sm); font-weight: 500;
-  color: var(--gesso-primary);
+  color: var(--gesso-accent-text);
 }
 .section-link:hover { color: var(--gesso-primary-hover); }
 
@@ -513,7 +541,6 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   transition: border-color .18s ease, background-color .18s ease;
 }
 .cat-box:hover { border-color: var(--gesso-primary-line); background: var(--gesso-surface-hover); }
-.cat-box-accent { background: var(--gesso-secondary-tint); border-color: var(--gesso-secondary-line); }
 .cat-box-icon { font-size: var(--gesso-text-2xl); line-height: 1; margin-bottom: var(--gesso-space-4); }
 .cat-box h3 { font-size: var(--gesso-text-xl); margin-bottom: var(--gesso-space-2); color: var(--gesso-fg); }
 .cat-box p {
@@ -521,8 +548,9 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   color: var(--gesso-fg-muted); margin-bottom: var(--gesso-space-6); flex: 1;
 }
 .cat-box-action {
-  font-size: var(--gesso-text-sm); font-weight: 500; color: var(--gesso-primary);
+  font-size: var(--gesso-text-sm); font-weight: 500; color: var(--gesso-fg);
 }
+.cat-box:hover .cat-box-action { color: var(--gesso-accent-text); }
 
 /* ==========================================================================
    USE CASES
@@ -573,7 +601,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   font-size: var(--gesso-text-xs); font-weight: 500; color: var(--gesso-neutral-700);
 }
 .bank-chip.highlight {
-  color: var(--gesso-secondary);
+  color: var(--gesso-accent-2-text);
   background: var(--gesso-secondary-soft);
   border-color: var(--gesso-secondary-line);
 }
@@ -647,7 +675,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   letter-spacing: -0.01em; margin: 0 0 var(--gesso-space-3);
 }
 .card-title a { color: var(--gesso-fg); }
-.card-title a:hover { color: var(--gesso-primary); }
+.card-title a:hover { color: var(--gesso-accent-text); }
 
 .spec-pills-wrap {
   display: flex; flex-direction: column;
@@ -708,7 +736,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   display: flex; justify-content: space-between; align-items: flex-end;
   gap: var(--gesso-space-6); margin-bottom: var(--gesso-space-8); flex-wrap: wrap;
 }
-.catalog-head-left h1 { margin-bottom: var(--gesso-space-2); }
+.catalog-head-left h1 { margin-bottom: var(--gesso-space-2); overflow-wrap: anywhere; }
 .catalog-head-left p { margin: 0; max-width: 60ch; font-size: var(--gesso-text-sm); }
 
 .catalog-category-pills { display: flex; flex-wrap: wrap; gap: var(--gesso-space-2); }
@@ -720,7 +748,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 }
 .cat-pill:hover { border-color: var(--gesso-neutral-400); color: var(--gesso-fg); }
 .cat-pill.active {
-  background: var(--gesso-fg); border-color: var(--gesso-fg);
+  background: var(--gesso-primary); border-color: var(--gesso-primary);
   color: var(--gesso-on-accent); font-weight: 600;
 }
 
@@ -744,7 +772,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   border-bottom: 1px solid var(--gesso-divider);
 }
 .filters-header h3 { margin: 0; font-size: var(--gesso-text-sm); letter-spacing: 0; }
-.filters-reset-link { font-size: var(--gesso-text-2xs); font-weight: 500; color: var(--gesso-primary); }
+.filters-reset-link { font-size: var(--gesso-text-2xs); font-weight: 500; color: var(--gesso-accent-text); }
 
 /* The groups live inside the form, so the form owns the vertical rhythm */
 #filter-form { display: flex; flex-direction: column; gap: var(--gesso-space-6); }
@@ -759,9 +787,9 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 .price-inputs .field { padding: 9px 10px; font-size: var(--gesso-text-xs); }
 
 .field {
-  width: 100%; padding: 10px 12px;
+  width: 100%; padding: 12px 16px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--gesso-neutral-200);
+  border: 1px solid var(--gesso-neutral-300);
   background: var(--gesso-surface-recessed);
   color: var(--gesso-fg);
   font: inherit; font-size: var(--gesso-text-sm);
@@ -811,7 +839,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 .switch-row input[type="checkbox"]:checked {
   background-color: var(--gesso-primary);
   border-color: var(--gesso-primary);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.4 4.7 8.8 9.8 3.4' fill='none' stroke='%2305080f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.2 6.4 4.7 8.8 9.8 3.4' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 .checkbox-item:hover { color: var(--gesso-fg); }
 
@@ -850,10 +878,10 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 }
 .pager a:hover { border-color: var(--gesso-neutral-400); color: var(--gesso-fg); }
 .pager .current {
-  background: var(--gesso-fg); color: var(--gesso-on-accent);
-  border-color: var(--gesso-fg); font-weight: 600;
+  background: var(--gesso-primary); color: var(--gesso-on-accent);
+  border-color: var(--gesso-primary); font-weight: 600;
 }
-.pager a.pager-arrow { color: var(--gesso-primary); }
+.pager a.pager-arrow { color: var(--gesso-accent-text); }
 
 .empty {
   text-align: center;
@@ -867,7 +895,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   color: var(--gesso-fg-muted); margin-bottom: var(--gesso-space-6);
   max-width: 46ch; margin-inline: auto; font-size: var(--gesso-text-sm);
 }
-.empty .btn { margin: 0 4px; }
+.empty .btn { margin: 0 4px; max-width: calc(100% - 8px); white-space: normal; }
 
 /* ==========================================================================
    PRODUCT DETAIL
@@ -904,7 +932,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 .product-cat-tag {
   font-family: var(--gesso-font-mono);
   font-size: var(--gesso-text-2xs); font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--gesso-primary);
+  text-transform: uppercase; color: var(--gesso-fg-muted);
 }
 .product-brand-tag {
   font-family: var(--gesso-font-mono);
@@ -1041,7 +1069,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 .step-num {
   font-family: var(--gesso-font-display);
   font-size: var(--gesso-text-xl); font-weight: 500; letter-spacing: -0.03em;
-  color: var(--gesso-secondary); margin-bottom: var(--gesso-space-3); line-height: 1;
+  color: var(--gesso-fg-muted); margin-bottom: var(--gesso-space-3); line-height: 1;
 }
 .step-card h3 { font-size: var(--gesso-text-base); margin-bottom: var(--gesso-space-1); }
 .step-card p { font-size: var(--gesso-text-xs); line-height: 1.55; color: var(--gesso-fg-muted); margin: 0; }
@@ -1080,7 +1108,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
 .delivery-card h2 { font-size: var(--gesso-text-xl); margin: 0; }
 .delivery-time {
   font-family: var(--gesso-font-mono);
-  font-size: var(--gesso-text-2xs); letter-spacing: 0.04em; color: var(--gesso-primary);
+  font-size: var(--gesso-text-2xs); letter-spacing: 0.04em; color: var(--gesso-fg-muted);
 }
 .delivery-cost { font-size: var(--gesso-text-xs); color: var(--gesso-fg-muted); margin: 0; }
 .delivery-cost strong { color: var(--gesso-fg); font-weight: 500; }
@@ -1146,7 +1174,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   font-size: var(--gesso-text-base); font-weight: 500; color: var(--gesso-fg);
   line-height: 1.4; letter-spacing: -0.01em;
 }
-.contact-main-text a:hover { color: var(--gesso-primary); }
+.contact-main-text a:hover { color: var(--gesso-accent-text); }
 .contact-sub-text { font-size: var(--gesso-text-xs); color: var(--gesso-fg-muted); margin-top: 4px; }
 .contact-live-status {
   display: inline-flex; align-items: center; gap: var(--gesso-space-2);
@@ -1164,7 +1192,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   border: 1px solid var(--gesso-divider);
 }
 .contact-top-link svg { width: 10px; height: 10px; stroke: currentColor; }
-.contact-top-link:hover { color: var(--gesso-primary); border-color: var(--gesso-primary); }
+.contact-top-link:hover { color: var(--gesso-accent-text); border-color: var(--gesso-primary); }
 
 .contact-social-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gesso-space-3); }
 .social-box {
@@ -1184,7 +1212,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   color: var(--gesso-fg-muted);
 }
 .social-box-icon svg { width: 16px; height: 16px; fill: currentColor; }
-.social-box:hover .social-box-icon { color: var(--gesso-primary); }
+.social-box:hover .social-box-icon { color: var(--gesso-accent-text); }
 
 .contacts-map-wrap {
   position: relative; min-height: 500px;
@@ -1203,7 +1231,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
   color: var(--gesso-fg); font-size: var(--gesso-text-xs); font-weight: 500;
 }
 .map-overlay-btn svg { width: 12px; height: 12px; }
-.map-overlay-btn:hover { border-color: var(--gesso-primary); color: var(--gesso-primary); }
+.map-overlay-btn:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-text); }
 
 .contacts-map-iframe {
   width: 100%; height: 100%; min-height: 500px;
@@ -1343,6 +1371,10 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
    RESPONSIVE
    ========================================================================== */
 
+@media (min-width: 1440px) {
+  .hero-main-title { font-size: var(--gesso-text-display); }
+}
+
 @media (max-width: 1440px) {
   .header-phone span { display: none; }
 }
@@ -1375,7 +1407,13 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-primary)
     border-bottom: 1px solid var(--gesso-divider);
     gap: 2px;
   }
-  .nav.open { display: flex; }
+  .nav.open {
+    display: flex;
+    height: calc(100vh - 72px);
+    height: calc(100dvh - 72px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
   .nav a { padding: 10px 0; font-size: var(--gesso-text-base); }
   .header-wa-btn { display: none; }
 

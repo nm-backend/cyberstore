@@ -18,7 +18,7 @@
     --primary: #4d9dff;
     --secondary: #0c1422;
     --accent: #4d9dff;
-    --primary-fg: #05080f;
+    --primary-fg: #000000;
 
     --header-color: #e6f4ff;
     --header-branding-color: #ff2e88;
@@ -34,7 +34,7 @@
     --link-selected-fg: #ff2e88;
 
     --button-bg: #4d9dff;
-    --button-fg: #05080f;
+    --button-fg: #000000;
     --button-hover-bg: #6aacff;
     --default-button-bg: #4d9dff;
     --default-button-hover-bg: #6aacff;
@@ -50,11 +50,11 @@
     --body-fg: #e6f4ff;
     --body-quiet-color: #9aacc4;
     --body-medium-color: #b2c4d7;
-    --body-loud-color: #ffffff;
+    --body-loud-color: #e6f4ff;
     --darkened-bg: #0c1422;
     --selected-bg: #182236;
     --selected-row: #14202f;
-    --hairline-color: rgba(255, 255, 255, .08);
+    --hairline-color: rgba(255, 255, 255, .04);
     --border-color: rgba(255, 255, 255, .16);
     --font-family-primary: "Geist", "Segoe UI", system-ui, Roboto, Arial, sans-serif;
     --font-family-monospace: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -63,7 +63,7 @@
 {% endblock %}
 
 {% block extrahead %}{{ block.super }}
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
   // Match the storefront: dark unless the operator explicitly picks light.
   (function () {
