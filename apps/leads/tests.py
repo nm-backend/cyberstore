@@ -8,8 +8,9 @@ from apps.leads.models import Lead
 class LeadTests(TestCase):
     @classmethod
     def setUpTestData(cls):
+        category = Category.objects.create(name="Ноутбуки", slug="laptops")
         cls.product = Product.objects.create(
-            title="Dell Test", category=Category.objects.get(slug="laptops"), price=99000
+            title="Dell Test", category=category, price=99000
         )
 
     def post(self, **extra):

@@ -2,7 +2,8 @@ from django.contrib import admin, messages
 from django.utils.html import format_html
 
 from .models import (
-    Brand, Category, Product, ProductImage, ProductSpec, SpecType, UseCase, make_unique_slug,
+    Brand, Category, CategoryFilter, CategoryQuickLink, Product, ProductImage, ProductSpec,
+    SpecType, UseCase, make_unique_slug,
 )
 
 
@@ -15,7 +16,21 @@ class ProductImageInline(admin.TabularInline):
 class ProductSpecInline(admin.TabularInline):
     model = ProductSpec
     extra = 8
-    fields = ("spec_type", "value", "order")
+    fields = ("spec_type", "value", "filter_value", "order")
+
+
+class CategoryFilterInline(admin.TabularInline):
+    model = CategoryFilter
+    extra = 1
+    fields = ("source", "spec_type", "title", "order", "is_active")
+    autocomplete_fields = ("spec_type",)
+
+
+class CategoryQuickLinkInline(admin.TabularInline):
+    model = CategoryQuickLink
+    extra = 1
+    fields = ("label", "use_cases", "order", "is_active")
+    autocomplete_fields = ("use_cases",)
 
 
 @admin.register(Product)
@@ -36,7 +51,8 @@ class ProductAdmin(admin.ModelAdmin):
     actions = ["duplicate", "publish", "unpublish"]
     fieldsets = (
         ("Основное", {"fields": ("title", "slug", "category", "brand", "short_description")}),
-        ("Цена и наличие", {"fields": ("price", "old_price", "status", "installment_available", "warranty")}),
+        ("Цена и наличие", {"fields": ("price", "old_price", "status", "installment_available")}),
+        ("Состояние и доставка", {"fields": ("condition", "delivery", "location", "warranty")}),
         ("Описание", {"fields": ("description", "use_cases")}),
         ("Публикация", {"fields": ("is_published", "is_featured", "is_demo")}),
     )
@@ -80,9 +96,22 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("name", "parent", "order", "is_active")
+    list_display = ("name", "parent", "display_mode", "order", "is_active")
     list_editable = ("order", "is_active")
+    list_filter = ("is_active", "display_mode", "parent")
+    search_fields = ("name",)
     prepopulated_fields = {"slug": ("name",)}
+    inlines = [CategoryFilterInline, CategoryQuickLinkInline]
+    fieldsets = (
+        ("Раздел", {"fields": ("name", "slug", "parent", "icon", "image", "description")}),
+        (
+            "Что показывать на странице",
+            {
+                "fields": ("display_mode", "quick_links_title", "order", "is_active"),
+                "description": "Подраздел без своих фильтров использует фильтры ближайшего родителя.",
+            },
+        ),
+    )
 
 
 @admin.register(Brand)
@@ -97,6 +126,7 @@ class UseCaseAdmin(admin.ModelAdmin):
     list_display = ("name", "icon", "order")
     list_editable = ("icon", "order")
     prepopulated_fields = {"slug": ("name",)}
+    search_fields = ("name",)
 
 
 @admin.register(SpecType)

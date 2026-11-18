@@ -51,10 +51,10 @@
     </a>
 
     <nav class="nav" data-nav aria-label="Основное меню">
-      <a href="{% url 'catalog:list' %}"{% if request.path == '/catalog/' %} class="active"{% endif %}>Каталог</a>
-      <a href="/catalog/c/pc/"{% if '/catalog/c/pc/' in request.path %} class="active"{% endif %}>Готовые ПК</a>
-      <a href="/catalog/c/laptops/"{% if '/catalog/c/laptops/' in request.path %} class="active"{% endif %}>Ноутбуки</a>
-      <a href="/catalog/c/components/"{% if '/catalog/c/components/' in request.path %} class="active"{% endif %}>Комплектующие</a>
+      <a href="{% url 'catalog:list' %}"{% if request.path == '/catalog/' %} class="active"{% endif %}>{{ site.catalog_title }}</a>
+      {% for c in nav_categories %}
+        <a href="{{ c.get_absolute_url }}"{% if request.path == c.get_absolute_url %} class="active"{% endif %}>{{ c.name }}</a>
+      {% endfor %}
       <a href="{% url 'core:installment' %}"{% if request.path == '/installment/' %} class="active"{% endif %}>Рассрочка</a>
       <a href="{% url 'core:delivery' %}"{% if request.path == '/delivery/' %} class="active"{% endif %}>Доставка</a>
       <a href="{% url 'core:contacts' %}"{% if request.path == '/contacts/' %} class="active"{% endif %}>Контакты</a>
@@ -106,7 +106,6 @@
         </a>
         <p class="muted footer-desc">Магазин современных ноутбуков, готовых игровых компьютеров и комплектующих в Бишкеке.</p>
         <div class="footer-badges">
-          <span class="f-badge">⭐ 500+ отзывов</span>
           <span class="f-badge">🏦 Рассрочка 18+</span>
           <span class="f-badge">🚚 Доставка по КР</span>
         </div>
@@ -115,9 +114,9 @@
       <div class="footer-col">
         <h3>Каталог</h3>
         <ul>
-          <li><a href="/catalog/c/pc/">Готовые игровые ПК</a></li>
-          <li><a href="/catalog/c/laptops/">Ноутбуки</a></li>
-          <li><a href="/catalog/c/components/">Комплектующие</a></li>
+          {% for c in nav_categories %}
+            <li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
+          {% endfor %}
           <li><a href="{% url 'catalog:list' %}">Все товары</a></li>
         </ul>
       </div>
@@ -152,7 +151,7 @@
       <p>© {% now "Y" %} {{ site.shop_name }}. Все права защищены. Цены и наличие уточняйте у менеджеров.</p>
       <div class="footer-bottom-links">
         <a href="{% url 'core:contacts' %}">Бишкек, {{ site.address }}</a>
-        <a href="{% url 'core:installment' %}">Рассрочка без банка</a>
+        <a href="{% url 'core:installment' %}">Рассрочка</a>
       </div>
     </div>
   </div>

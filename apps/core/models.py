@@ -33,8 +33,8 @@ class SiteSettings(models.Model):
         help_text="Если вы переезжаете, смените адрес здесь (например, «Айни 31»). Адрес, подвал и интерактивная карта обновятся на всём сайте автоматически.",
     )
     address_note = models.CharField(
-        "Уточнение к адресу", max_length=100, blank=True, default="Цокольный этаж",
-        help_text="Например: «Цокольный этаж» или «1 этаж, вход с торца».",
+        "Уточнение к адресу", max_length=100, blank=True, default="",
+        help_text="Например: «Цокольный этаж» или «1 этаж, вход с торца». Пусто — не показывается.",
     )
     work_hours = models.CharField(
         "Часы работы", max_length=120, default="09:00 – 22:00"
@@ -44,12 +44,21 @@ class SiteSettings(models.Model):
         help_text="Например: «Ежедневно» или «Пн-Сб».",
     )
     telegram_url = models.URLField(
-        "Telegram", blank=True, default="https://t.me/cyberstore_kg",
-        help_text="Ссылка на Telegram аккаунт или канал магазина.",
+        "Telegram", blank=True, default="",
+        help_text="Ссылка на Telegram аккаунт или канал магазина. Пусто — значок не показывается.",
     )
     gis_url = models.URLField(
-        "Ссылка на 2GIS", blank=True, default="https://2gis.kg/bishkek",
-        help_text="Прямая ссылка на филиал в 2GIS.",
+        "Ссылка на 2GIS", blank=True, default="",
+        help_text="Прямая ссылка на филиал в 2GIS. Пусто — кнопка карты не показывается.",
+    )
+
+    catalog_title = models.CharField(
+        "Название каталога", max_length=80, default="Каталог",
+        help_text="Заголовок страницы /catalog/ и ссылки в меню.",
+    )
+    usd_rate = models.DecimalField(
+        "Курс доллара, сом за 1 USD", max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Необязательно. Пока пусто — переключателя KGS/USD на сайте нет. Курс не придумывается автоматически.",
     )
 
     hero_title = models.CharField(
@@ -60,11 +69,9 @@ class SiteSettings(models.Model):
     hero_subtitle = models.CharField(
         "Подзаголовок на главной",
         max_length=250,
-        default=(
-            "Сборки любой сложности на RTX 40-й серии, проверенные ноутбуки с гарантией, "
-            "выгодная рассрочка с банком и без банка, бесплатная доставка по всему Кыргызстану."
-        ),
-        help_text="Показывается под главным заголовком на первом экране.",
+        blank=True,
+        default="",
+        help_text="Показывается под главным заголовком на первом экране. Пусто — не показывается.",
     )
     hero_video = models.FileField(
         "Видео на главной", upload_to="hero/", storage=video_storage, blank=True,

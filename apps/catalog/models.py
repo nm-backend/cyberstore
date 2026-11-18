@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
@@ -24,6 +25,11 @@ def make_unique_slug(model, base, max_length=200):
 
 
 class Category(models.Model):
+    class DisplayMode(models.TextChoices):
+        TILES = "tiles", "Плитки подразделов"
+        PRODUCTS = "products", "Товары с фильтром"
+        BOTH = "both", "И плитки, и товары"
+
     name = models.CharField("Название", max_length=100)
     slug = models.SlugField("Адрес (slug)", unique=True, max_length=120)
     parent = models.ForeignKey(
@@ -32,7 +38,19 @@ class Category(models.Model):
         help_text="Например: «Видеокарты» внутри «Комплектующие». Для основных разделов оставьте пустым.",
     )
     icon = models.CharField("Иконка (эмодзи)", max_length=8, blank=True)
+    image = models.ImageField(
+        "Картинка для плитки", upload_to="categories/", blank=True,
+        help_text="Необязательно. Без картинки на плитке будет иконка или аккуратная заглушка.",
+    )
     description = models.CharField("Короткое описание", max_length=200, blank=True)
+    display_mode = models.CharField(
+        "Что показывать", max_length=10, choices=DisplayMode.choices, default=DisplayMode.BOTH,
+        help_text="«Плитки подразделов» — только дочерние разделы. «Товары с фильтром» — сразу товары. «И плитки, и товары» — сначала подразделы, ниже товары.",
+    )
+    quick_links_title = models.CharField(
+        "Заголовок быстрых ссылок", max_length=100, blank=True,
+        help_text="Например: «ПК для любых задач». Пусто — блок быстрых ссылок не показывается.",
+    )
     order = models.PositiveSmallIntegerField("Порядок", default=0)
     is_active = models.BooleanField("Показывать", default=True)
 
@@ -44,8 +62,25 @@ class Category(models.Model):
     def __str__(self):
         return f"{self.parent.name} / {self.name}" if self.parent_id else self.name
 
+    def clean(self):
+        node = self.parent
+        while node:
+            if node.pk == self.pk:
+                raise ValidationError({"parent": "Нельзя вложить категорию в саму себя или в её подраздел."})
+            node = node.parent
+
     def get_absolute_url(self):
         return reverse("catalog:category", args=[self.slug])
+
+    def descendant_ids(self):
+        """Own pk plus all nested subcategory pks, for product lookups."""
+        ids, frontier = [self.pk], [self.pk]
+        while frontier:
+            frontier = list(
+                Category.objects.filter(parent_id__in=frontier).values_list("pk", flat=True)
+            )
+            ids.extend(frontier)
+        return ids
 
 
 class Brand(models.Model):
@@ -71,8 +106,8 @@ class UseCase(models.Model):
 
     class Meta:
         ordering = ["order", "name"]
-        verbose_name = "Для чего подходит"
-        verbose_name_plural = "Для чего подходит"
+        verbose_name = "Назначение"
+        verbose_name_plural = "Назначение"
 
     def __str__(self):
         return self.name
@@ -93,6 +128,82 @@ class SpecType(models.Model):
         return self.name
 
 
+class CategoryFilter(models.Model):
+    """One filter block on a category page. Subcategories inherit the nearest parent's rows."""
+
+    class Source(models.TextChoices):
+        PRICE = "price", "Цена"
+        BRAND = "brand", "Бренд"
+        SPEC = "spec", "Характеристика"
+        USE_CASE = "use_case", "Назначение"
+        INSTALLMENT = "installment", "Рассрочка"
+        DELIVERY = "delivery", "Доставка"
+        CONDITION = "condition", "Состояние"
+        LOCATION = "location", "Местоположение"
+        STOCK = "stock", "Наличие"
+
+    category = models.ForeignKey(Category, verbose_name="Категория", on_delete=models.CASCADE, related_name="filters")
+    source = models.CharField("Источник", max_length=20, choices=Source.choices, default=Source.SPEC)
+    spec_type = models.ForeignKey(
+        SpecType, verbose_name="Характеристика", null=True, blank=True,
+        on_delete=models.CASCADE, related_name="category_filters",
+        help_text="Только для источника «Характеристика». Например: Процессор, Оперативная память.",
+    )
+    title = models.CharField(
+        "Название фильтра", max_length=60, blank=True,
+        help_text="Пусто — возьмём название источника или характеристики.",
+    )
+    order = models.PositiveSmallIntegerField("Порядок", default=0)
+    is_active = models.BooleanField("Показывать", default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Фильтр раздела"
+        verbose_name_plural = "Фильтры раздела"
+
+    def __str__(self):
+        return f"{self.category.name}: {self.display_title}"
+
+    def clean(self):
+        if self.source == self.Source.SPEC and not self.spec_type:
+            raise ValidationError({"spec_type": "Выберите характеристику для этого фильтра."})
+        if self.source != self.Source.SPEC and self.spec_type:
+            raise ValidationError({"spec_type": "Характеристика нужна только для источника «Характеристика»."})
+
+    @property
+    def display_title(self):
+        if self.title:
+            return self.title
+        if self.source == self.Source.SPEC and self.spec_type:
+            return self.spec_type.name
+        return self.get_source_display()
+
+
+class CategoryQuickLink(models.Model):
+    """Tile above the products that turns on the «Назначение» filter."""
+
+    category = models.ForeignKey(Category, verbose_name="Категория", on_delete=models.CASCADE, related_name="quick_links")
+    label = models.CharField("Подпись", max_length=60)
+    use_cases = models.ManyToManyField(
+        UseCase, verbose_name="Назначение", blank=True,
+        help_text="Товары с любым из выбранных назначений. Например: «Игры».",
+    )
+    order = models.PositiveSmallIntegerField("Порядок", default=0)
+    is_active = models.BooleanField("Показывать", default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Быстрая ссылка"
+        verbose_name_plural = "Быстрые ссылки"
+
+    def __str__(self):
+        return f"{self.category.name}: {self.label}"
+
+    def url_params(self):
+        slugs = ",".join(self.use_cases.values_list("slug", flat=True))
+        return f"use_case={slugs}" if slugs else ""
+
+
 class ProductQuerySet(models.QuerySet):
     def published(self):
         return self.filter(is_published=True, category__is_active=True)
@@ -108,6 +219,17 @@ class Product(models.Model):
         IN_STOCK = "in_stock", "В наличии"
         PREORDER = "preorder", "Под заказ"
         OUT_OF_STOCK = "out", "Нет в наличии"
+
+    class Condition(models.TextChoices):
+        UNSET = "", "Не указано"
+        NEW = "new", "Новый"
+        USED = "used", "Б/у"
+
+    class Delivery(models.TextChoices):
+        UNSET = "", "Не указано"
+        FREE = "free", "Бесплатная"
+        PAID = "paid", "Платная"
+        PICKUP = "pickup", "Самовывоз"
 
     category = models.ForeignKey(
         Category, verbose_name="Категория", on_delete=models.PROTECT, related_name="products"
@@ -130,7 +252,22 @@ class Product(models.Model):
         "Старая цена, сом", null=True, blank=True, help_text="Если заполнить, покажем скидку."
     )
     status = models.CharField("Наличие", max_length=10, choices=Status.choices, default=Status.IN_STOCK)
-    installment_available = models.BooleanField("Можно в рассрочку", default=True)
+    installment_available = models.BooleanField(
+        "Можно в рассрочку", default=False,
+        help_text="Ставьте галочку, только если рассрочка действительно доступна для этого товара.",
+    )
+    condition = models.CharField(
+        "Состояние", max_length=10, choices=Condition.choices, blank=True, default="",
+        help_text="Новый или Б/у. Пусто — фильтр и карточка не показывают состояние.",
+    )
+    delivery = models.CharField(
+        "Доставка", max_length=10, choices=Delivery.choices, blank=True, default="",
+        help_text="Как доставляется именно этот товар. Пусто — не показываем.",
+    )
+    location = models.CharField(
+        "Местоположение", max_length=80, blank=True,
+        help_text="Город, например «Бишкек». Пусто — не показываем.",
+    )
     warranty = models.CharField("Гарантия", max_length=100, blank=True, help_text="Например: 12 месяцев. Пусто — не показываем.")
 
     use_cases = models.ManyToManyField(UseCase, verbose_name="Подходит для", blank=True, related_name="products")
@@ -201,6 +338,10 @@ class ProductSpec(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="specs")
     spec_type = models.ForeignKey(SpecType, verbose_name="Характеристика", on_delete=models.PROTECT)
     value = models.CharField("Значение", max_length=200)
+    filter_value = models.CharField(
+        "Значение для фильтра", max_length=200, blank=True,
+        help_text="Необязательно. Короткое общее значение, чтобы «16 ГБ» и «16GB» не дублировались. Пусто — берётся значение выше.",
+    )
     order = models.PositiveSmallIntegerField("Порядок", default=0, help_text="Первые 4 строки видны в карточке товара.")
 
     class Meta:

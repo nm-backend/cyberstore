@@ -36,9 +36,9 @@
     <!-- Quick filter pill bar -->
     <div class="hero-quick-categories">
       <span class="quick-cat-label">Быстрый переход:</span>
-      <a class="quick-cat-pill" href="/catalog/c/pc/">🖥️ Готовые ПК</a>
-      <a class="quick-cat-pill" href="/catalog/c/laptops/">💻 Ноутбуки</a>
-      <a class="quick-cat-pill" href="/catalog/c/components/">🔧 Комплектующие</a>
+      {% for c in categories %}
+        <a class="quick-cat-pill" href="{{ c.get_absolute_url }}">{{ c.icon|default:"🗂" }} {{ c.name }}</a>
+      {% endfor %}
       <a class="quick-cat-pill" href="{% url 'core:installment' %}">🏦 Рассрочка 18+</a>
     </div>
   </div>
@@ -92,29 +92,15 @@
     </div>
 
     <div class="cat-grid-modern">
-      <a class="cat-box" href="/catalog/c/pc/">
-        <div class="cat-box-bg"></div>
-        <div class="cat-box-icon">🖥️</div>
-        <h3>Готовые ПК</h3>
-        <p>Игровые и рабочие сборки под любые задачи с аккуратным кабель-менеджментом</p>
-        <span class="cat-box-action">Выбрать сборку →</span>
-      </a>
-
-      <a class="cat-box" href="/catalog/c/laptops/">
-        <div class="cat-box-bg"></div>
-        <div class="cat-box-icon">💻</div>
-        <h3>Ноутбуки</h3>
-        <p>Игровые монстры Dell Alienware, HP Omen, Acer Extensa и доступные модели от 29 500 сом</p>
-        <span class="cat-box-action">Смотреть ноутбуки →</span>
-      </a>
-
-      <a class="cat-box" href="/catalog/c/components/">
-        <div class="cat-box-bg"></div>
-        <div class="cat-box-icon">🔧</div>
-        <h3>Комплектующие</h3>
-        <p>Видеокарты GeForce RTX, процессоры Ryzen и Intel, скоростные NVMe SSD и память</p>
-        <span class="cat-box-action">Выбрать детали →</span>
-      </a>
+      {% for c in categories %}
+        <a class="cat-box" href="{{ c.get_absolute_url }}">
+          <div class="cat-box-bg"></div>
+          <div class="cat-box-icon">{{ c.icon|default:"🗂" }}</div>
+          <h3>{{ c.name }}</h3>
+          <p>{{ c.description }}</p>
+          <span class="cat-box-action">Смотреть →</span>
+        </a>
+      {% endfor %}
     </div>
   </div>
 </section>

@@ -529,7 +529,7 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
    ========================================================================== */
 
 .cat-grid-modern {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--grid-gutter);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--grid-gutter);
 }
 .cat-box {
   position: relative; overflow: hidden;
@@ -896,6 +896,64 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
   max-width: 46ch; margin-inline: auto; font-size: var(--gesso-text-sm);
 }
 .empty .btn { margin: 0 4px; max-width: calc(100% - 8px); white-space: normal; }
+
+/* Category tiles (catalog root and subcategories) */
+.category-tiles-section { margin-bottom: var(--gesso-space-10); }
+.category-tiles {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: var(--gesso-space-4);
+}
+.category-tile {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: var(--gesso-surface);
+  border: 1px solid var(--gesso-divider);
+  border-radius: var(--radius-md);
+  transition: border-color .18s ease, background-color .18s ease;
+}
+.category-tile:hover { border-color: var(--gesso-primary-line); background: var(--gesso-surface-hover); }
+.category-tile-img {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--gesso-surface-recessed);
+  font-size: 3rem; line-height: 1;
+}
+.category-tile-body {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: var(--gesso-space-4) var(--gesso-space-5) var(--gesso-space-5);
+}
+.category-tile-name { font-size: var(--gesso-text-sm); font-weight: 600; color: var(--gesso-fg); }
+.category-tile-desc { font-size: var(--gesso-text-xs); line-height: 1.5; color: var(--gesso-fg-muted); }
+
+/* Quick links above products */
+.quick-links { margin-bottom: var(--gesso-space-6); }
+.quick-links-title { margin-bottom: var(--gesso-space-3); font-size: var(--gesso-text-lg); }
+.quick-links-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--gesso-space-3);
+}
+.quick-link-card {
+  padding: var(--gesso-space-4) var(--gesso-space-5);
+  border: 1px solid var(--gesso-divider); border-radius: var(--radius-md);
+  background: var(--gesso-surface);
+  font-size: var(--gesso-text-sm); font-weight: 500; color: var(--gesso-fg);
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.quick-link-card:hover { border-color: var(--gesso-primary-line); background: var(--gesso-surface-hover); color: var(--gesso-accent-text); }
+
+/* Filter accordions and counters */
+.filter-group summary {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--gesso-space-2);
+  cursor: pointer; list-style: none;
+}
+.filter-group summary::-webkit-details-marker { display: none; }
+.filter-group summary::after { content: "+"; font-size: var(--gesso-text-sm); color: var(--gesso-neutral-500); }
+.filter-group[open] summary::after { content: "−"; }
+.filter-count { margin-left: auto; font-size: var(--gesso-text-2xs); color: var(--gesso-neutral-500); font-variant-numeric: tabular-nums; }
+.filter-option-label { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.filter-empty { margin: 0; font-size: var(--gesso-text-xs); color: var(--gesso-neutral-500); }
+.filter-currency { display: flex; flex-direction: column; gap: 4px; font-size: var(--gesso-text-2xs); color: var(--gesso-neutral-500); }
+.filter-currency .field { padding: 8px 10px; font-size: var(--gesso-text-xs); }
+.catalog-layout-full { grid-template-columns: 1fr; }
 
 /* ==========================================================================
    PRODUCT DETAIL

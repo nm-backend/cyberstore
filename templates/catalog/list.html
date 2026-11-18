@@ -1,159 +1,175 @@
 {% extends "base.html" %}
 {% load shop_tags %}
-{% block title %}{% if category %}{{ category.name }}{% else %}Каталог товаров{% endif %} — {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}Купить {% if category %}{{ category.name|lower }}{% else %}компьютеры и ноутбуки{% endif %} в Бишкеке. Большой выбор, официальная гарантия, рассрочка без банка и доставка по КР.{% endblock %}
+{% block title %}{% if category %}{{ category.name }}{% elif query %}Поиск: {{ query }}{% else %}{{ site.catalog_title }}{% endif %} — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block description %}{% if category and category.description %}{{ category.description }}{% elif query %}Результаты поиска по запросу «{{ query }}» в {{ site.shop_name }}.{% else %}{{ site.shop_name }}: {{ site.catalog_title|lower }}, {{ site.city }}. WhatsApp {{ site.phone }}.{% endif %}{% endblock %}
 {% block content %}
 <div class="wrap">
-  <!-- Breadcrumbs -->
   <nav class="crumbs" aria-label="Путь">
     <a href="{% url 'core:home' %}">Главная</a>
     <span class="crumb-sep">/</span>
+    <a href="{% url 'catalog:list' %}">{{ site.catalog_title }}</a>
+    {% for parent in ancestors %}
+      <span class="crumb-sep">/</span>
+      <a href="{{ parent.get_absolute_url }}">{{ parent.name }}</a>
+    {% endfor %}
     {% if category %}
-      <a href="{% url 'catalog:list' %}">Каталог</a>
       <span class="crumb-sep">/</span>
       <span class="crumb-current">{{ category.name }}</span>
-    {% else %}
-      <span class="crumb-current">Каталог</span>
     {% endif %}
   </nav>
 
-  <!-- Page Header -->
   <div class="catalog-page-head">
     <div class="catalog-head-left">
-      <h1>{% if category %}{{ category.name }}{% elif query %}Поиск: «{{ query }}»{% else %}Каталог компьютерной техники{% endif %}</h1>
-      <p class="muted">
-        {% if category.description %}{{ category.description }}
-        {% else %}Все компьютеры, ноутбуки и комплектующие с проверенными характеристиками и официальной гарантией.{% endif %}
-      </p>
-    </div>
-
-    <!-- Quick Category Switcher Pills -->
-    <div class="catalog-category-pills">
-      <a class="cat-pill{% if not category %} active{% endif %}" href="{% url 'catalog:list' %}">Все товары</a>
-      <a class="cat-pill{% if category.slug == 'pc' %} active{% endif %}" href="/catalog/c/pc/">🖥️ Готовые ПК</a>
-      <a class="cat-pill{% if category.slug == 'laptops' %} active{% endif %}" href="/catalog/c/laptops/">💻 Ноутбуки</a>
-      <a class="cat-pill{% if category.slug == 'components' %} active{% endif %}" href="/catalog/c/components/">🔧 Комплектующие</a>
+      <h1>{% if category %}{{ category.name }}{% elif query %}Поиск: «{{ query }}»{% else %}{{ site.catalog_title }}{% endif %}</h1>
+      {% if category.description %}<p class="muted">{{ category.description }}</p>{% endif %}
     </div>
   </div>
 
-  <div class="catalog-layout">
-    <!-- Filter Sidebar -->
-    <aside class="filters" data-filters>
-      <div class="filters-header">
-        <h3>Фильтры</h3>
-        {% if has_filters %}<a class="filters-reset-link" href="{{ request.path }}">Сбросить</a>{% endif %}
-      </div>
+  {% if show_tiles %}
+    {% if root_categories %}
+      {% include "partials/_category_tiles.html" with categories=root_categories title="" %}
+    {% elif subcategories %}
+      {% include "partials/_category_tiles.html" with categories=subcategories title="Подразделы" %}
+    {% endif %}
+  {% endif %}
 
-      <form id="filter-form" data-filter-form method="get">
-        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
-
-        <!-- Filter: In Stock -->
-        <div class="filter-group">
-          <label class="switch-row">
-            <span class="switch-label">Только в наличии</span>
-            <input type="checkbox" name="in_stock" value="1"{% if in_stock %} checked{% endif %}>
-          </label>
-        </div>
-
-        <!-- Filter: Price -->
-        <div class="filter-group">
-          <label class="filter-group-title">Цена, сом</label>
-          <div class="price-inputs">
-            <input class="field" type="number" min="0" step="1000" name="price_min" placeholder="От 0" value="{{ price_min|default_if_none:'' }}" aria-label="Цена от">
-            <input class="field" type="number" min="0" step="1000" name="price_max" placeholder="До 200 000" value="{{ price_max|default_if_none:'' }}" aria-label="Цена до">
-          </div>
-        </div>
-
-        <!-- Filter: Brands -->
-        {% if brands %}
-        <div class="filter-group">
-          <label class="filter-group-title">Бренд</label>
-          <div class="filter-checkbox-list">
-            {% for b in brands %}
-              <label class="checkbox-item">
-                <input type="checkbox" name="brand" value="{{ b.slug }}"{% if b.slug in selected_brands %} checked{% endif %}>
-                <span>{{ b.name }}</span>
-              </label>
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
-
-        <!-- Filter: Use Case -->
-        {% if use_cases %}
-        <div class="filter-group">
-          <label class="filter-group-title">Подходит для</label>
-          <select class="field" name="use_case" aria-label="Подходит для">
-            <option value="">Все задачи</option>
-            {% for u in use_cases %}
-              <option value="{{ u.slug }}"{% if u.slug == use_case %} selected{% endif %}>{{ u.icon }} {{ u.name }}</option>
-            {% endfor %}
-          </select>
-        </div>
-        {% endif %}
-
-        <div class="filter-actions">
-          <button class="btn btn-primary btn-block" type="submit">Применить фильтры</button>
-        </div>
-      </form>
-    </aside>
-
-    <!-- Products Grid Section -->
-    <section class="catalog-results">
-      <!-- Toolbar -->
-      <div class="catalog-toolbar">
-        <div class="catalog-count">Найдено: <strong>{{ page.paginator.count }}</strong> товаров</div>
-        <div class="catalog-sort-wrap">
-          <button class="btn filter-toggle-btn" type="button" data-filter-toggle aria-expanded="false">
-            Фильтры
-          </button>
-          <div class="select-wrap">
-            <select class="field field-sort" name="sort" form="filter-form" aria-label="Сортировка" onchange="this.form.submit()">
-              {% for key, label in sorts %}
-                <option value="{{ key }}"{% if key == sort %} selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {% if page.object_list %}
-        <div class="grid in-list">
-          {% for p in page.object_list %}{% include "partials/_card.html" %}{% endfor %}
-        </div>
-
-        {% if page.has_other_pages %}
-        <nav class="pager" aria-label="Страницы">
-          {% if page.has_previous %}
-            <a class="pager-arrow" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.previous_page_number }}">← Назад</a>
-          {% endif %}
-          {% for n in page.paginator.page_range %}
-            {% if n == page.number %}
-              <span class="current" aria-current="page">{{ n }}</span>
-            {% else %}
-              <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ n }}">{{ n }}</a>
-            {% endif %}
+  {% if show_products %}
+    {% if quick_links %}
+      <section class="quick-links">
+        <h2 class="quick-links-title">{{ category.quick_links_title|default:"Подберите под задачу" }}</h2>
+        <div class="quick-links-grid">
+          {% for link in quick_links %}
+            <a class="quick-link-card" href="?{{ link.url_params }}">{{ link.label }}</a>
           {% endfor %}
-          {% if page.has_next %}
-            <a class="pager-arrow" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.next_page_number }}">Вперёд →</a>
-          {% endif %}
-        </nav>
-        {% endif %}
-      {% else %}
-        <div class="empty">
-          <div class="empty-icon">🔍</div>
-          <h3>По вашему запросу ничего не найдено</h3>
-          <p>{% if has_filters %}Попробуйте изменить параметры или сбросить фильтры.{% else %}В этом разделе пока нет товаров.{% endif %}</p>
-          {% if has_filters %}
-            <a class="btn btn-primary" href="{{ request.path }}">Сбросить фильтры</a>
-          {% endif %}
-          <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Ищу определённый ПК или ноутбук, помогите подобрать.' %}" target="_blank" rel="noopener">
-            <svg><use href="#i-wa"/></svg>
-            Спросить у менеджера в WhatsApp
-          </a>
         </div>
+      </section>
+    {% endif %}
+
+    <div class="catalog-layout{% if not filter_groups %} catalog-layout-full{% endif %}">
+      {% if filter_groups %}
+        <aside class="filters" data-filters>
+          <div class="filters-header">
+            <h3>Фильтры</h3>
+            {% if has_filters %}<a class="filters-reset-link" href="{{ request.path }}">Сбросить</a>{% endif %}
+          </div>
+
+          <form id="filter-form" data-filter-form method="get">
+            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+            {% if sort and sort != "new" %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+            {% if selected_use_case and not has_use_case_group %}<input type="hidden" name="use_case" value="{{ selected_use_case }}">{% endif %}
+
+            {% for group in filter_groups %}
+              <details class="filter-group" open>
+                <summary class="filter-group-title">{{ group.title }}</summary>
+                {% if group.type == "price" %}
+                  {% if price_low or price_high %}
+                    <div class="price-inputs">
+                      <input class="field" type="number" min="0" step="1" name="price_min" placeholder="От {{ price_low|default_if_none:'' }}" value="{{ price_min|default_if_none:'' }}" aria-label="Цена от">
+                      <input class="field" type="number" min="0" step="1" name="price_max" placeholder="До {{ price_high|default_if_none:'' }}" value="{{ price_max|default_if_none:'' }}" aria-label="Цена до">
+                    </div>
+                    {% if usd_rate %}
+                      <label class="filter-currency">
+                        <span>Валюта</span>
+                        <select class="field" name="currency">
+                          <option value="kgs"{% if currency == "kgs" %} selected{% endif %}>Сом (KGS)</option>
+                          <option value="usd"{% if currency == "usd" %} selected{% endif %}>Доллар (USD)</option>
+                        </select>
+                      </label>
+                    {% endif %}
+                  {% else %}
+                    <p class="filter-empty">Пока нет вариантов</p>
+                  {% endif %}
+                {% elif group.options %}
+                  <div class="filter-checkbox-list">
+                    {% for option in group.options %}
+                      <label class="checkbox-item">
+                        <input type="checkbox" name="{{ group.key }}" value="{{ option.value }}"{% if option.checked %} checked{% endif %}>
+                        <span class="filter-option-label">{{ option.label }}</span>
+                        <span class="filter-count">{{ option.count }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <p class="filter-empty">Пока нет вариантов</p>
+                {% endif %}
+              </details>
+            {% endfor %}
+
+            <div class="filter-actions">
+              <button class="btn btn-primary btn-block" type="submit">Применить фильтры</button>
+            </div>
+          </form>
+        </aside>
       {% endif %}
-    </section>
-  </div>
+
+      <section class="catalog-results">
+        <div class="catalog-toolbar">
+          <div class="catalog-count">
+            {% if query %}Найдено: {% else %}Товаров: {% endif %}<strong>{{ page.paginator.count }}</strong>
+          </div>
+          <div class="catalog-sort-wrap">
+            {% if filter_groups %}
+              <button class="btn filter-toggle-btn" type="button" data-filter-toggle aria-expanded="false">Фильтры</button>
+            {% endif %}
+            <form method="get">
+              {% for key, values in request.GET.lists %}
+                {% if key != "sort" and key != "page" %}
+                  {% for value in values %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
+                {% endif %}
+              {% endfor %}
+              <select class="field field-sort" name="sort" aria-label="Сортировка" onchange="this.form.submit()">
+                {% for key, label in sorts %}
+                  <option value="{{ key }}"{% if key == sort %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
+        </div>
+
+        {% if page.object_list %}
+          <div class="grid in-list">
+            {% for p in page.object_list %}{% include "partials/_card.html" %}{% endfor %}
+          </div>
+
+          {% if page.has_other_pages %}
+            <nav class="pager" aria-label="Страницы">
+              {% if page.has_previous %}
+                <a class="pager-arrow" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.previous_page_number }}">← Назад</a>
+              {% endif %}
+              {% for n in page.paginator.page_range %}
+                {% if n == page.number %}
+                  <span class="current" aria-current="page">{{ n }}</span>
+                {% else %}
+                  <a href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ n }}">{{ n }}</a>
+                {% endif %}
+              {% endfor %}
+              {% if page.has_next %}
+                <a class="pager-arrow" href="?{% if querystring %}{{ querystring }}&{% endif %}page={{ page.next_page_number }}">Вперёд →</a>
+              {% endif %}
+            </nav>
+          {% endif %}
+        {% else %}
+          <div class="empty">
+            <div class="empty-icon">🔍</div>
+            <h3>{% if has_filters %}Ничего не найдено{% else %}Пока нет товаров{% endif %}</h3>
+            <p>{% if has_filters %}Попробуйте изменить параметры или сбросить фильтры.{% else %}В этом разделе товары появятся позже.{% endif %}</p>
+            {% if has_filters %}
+              <a class="btn btn-primary" href="{{ request.path }}">Сбросить фильтры</a>
+            {% endif %}
+            <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Помогите подобрать технику.' %}" target="_blank" rel="noopener">
+              <svg><use href="#i-wa"/></svg>
+              Спросить в WhatsApp
+            </a>
+          </div>
+        {% endif %}
+      </section>
+    </div>
+  {% elif not show_tiles %}
+    <div class="empty">
+      <div class="empty-icon">🗂</div>
+      <h3>В этом разделе пока нет товаров</h3>
+      <p>Товары появятся позже.</p>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}
