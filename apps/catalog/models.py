@@ -24,6 +24,30 @@ def make_unique_slug(model, base, max_length=200):
     return slug
 
 
+class IconKey(models.TextChoices):
+    """Keys of the stroke icons available in the storefront sprite (base.html)."""
+
+    LAPTOP = "laptop", "Ноутбук"
+    DESKTOP = "desktop", "Монитор / ПК"
+    CHIP = "chip", "Комплектующие"
+    GAMEPAD = "gamepad", "Игры"
+    BOOK = "book", "Учёба"
+    BRIEFCASE = "briefcase", "Офис и работа"
+    PALETTE = "palette", "Дизайн и графика"
+    FILM = "film", "Видео"
+    CODE = "code", "Код и разработка"
+    CART = "cart", "Корзина"
+    GRID = "grid", "Папка"
+    TAG = "tag", "Тег"
+    CARD = "card", "Рассрочка"
+    TRUCK = "truck", "Доставка"
+    SHIELD = "shield", "Гарантия"
+    STORE = "store", "Магазин"
+    PIN = "pin", "Адрес"
+    CLOCK = "clock", "Часы работы"
+    PHONE = "phone", "Телефон"
+
+
 class Category(models.Model):
     class DisplayMode(models.TextChoices):
         TILES = "tiles", "Плитки подразделов"
@@ -37,7 +61,10 @@ class Category(models.Model):
         on_delete=models.CASCADE, related_name="children",
         help_text="Например: «Видеокарты» внутри «Комплектующие». Для основных разделов оставьте пустым.",
     )
-    icon = models.CharField("Иконка (эмодзи)", max_length=8, blank=True)
+    icon = models.CharField(
+        "Иконка", max_length=20, blank=True, choices=IconKey.choices,
+        help_text="Значок на плитке раздела. Пусто — покажем папку.",
+    )
     image = models.ImageField(
         "Картинка для плитки", upload_to="categories/", blank=True,
         help_text="Необязательно. Без картинки на плитке будет иконка или аккуратная заглушка.",
@@ -101,7 +128,10 @@ class UseCase(models.Model):
 
     name = models.CharField("Название", max_length=60, unique=True)
     slug = models.SlugField("Адрес (slug)", unique=True, max_length=80)
-    icon = models.CharField("Иконка (эмодзи)", max_length=8, blank=True)
+    icon = models.CharField(
+        "Иконка", max_length=20, blank=True, choices=IconKey.choices,
+        help_text="Значок на плитке назначения. Пусто — покажем тег.",
+    )
     order = models.PositiveSmallIntegerField("Порядок", default=0)
 
     class Meta:

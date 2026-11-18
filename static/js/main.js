@@ -3,9 +3,21 @@
   var burger = document.querySelector("[data-burger]");
   var nav = document.querySelector("[data-nav]");
   if (burger && nav) {
-    burger.addEventListener("click", function () {
-      var open = nav.classList.toggle("open");
+    var setMenu = function (open) {
+      nav.classList.toggle("open", open);
       burger.setAttribute("aria-expanded", String(open));
+      burger.setAttribute("aria-label", open ? "Закрыть меню" : "Открыть меню");
+    };
+    burger.addEventListener("click", function () {
+      setMenu(!nav.classList.contains("open"));
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") setMenu(false);
+    });
+    document.addEventListener("click", function (event) {
+      if (!nav.classList.contains("open")) return;
+      if (nav.contains(event.target) || burger.contains(event.target)) return;
+      setMenu(false);
     });
   }
 

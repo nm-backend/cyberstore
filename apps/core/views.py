@@ -26,6 +26,7 @@ def home(request):
             "total": products.count(),
             "categories": categories,
             "use_cases": UseCase.objects.all(),
+            "installment_options": InstallmentOption.objects.filter(is_active=True),
         },
     )
 

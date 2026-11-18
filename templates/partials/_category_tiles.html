@@ -1,4 +1,4 @@
-{% if categories %}
+{% load shop_tags %}{% if categories %}
 <section class="category-tiles-section">
   {% if title %}<div class="section-head"><h2>{{ title }}</h2></div>{% endif %}
   <div class="category-tiles">
@@ -7,7 +7,7 @@
         {% if c.image %}
           <img class="category-tile-img" src="{{ c.image.url }}" alt="{{ c.name }}" loading="lazy" width="480" height="300">
         {% else %}
-          <span class="category-tile-img" aria-hidden="true">{{ c.icon|default:"🗂" }}</span>
+          <span class="category-tile-img" aria-hidden="true">{% category_icon c "ic" %}</span>
         {% endif %}
         <span class="category-tile-body">
           <span class="category-tile-name">{{ c.name }}</span>

@@ -1,7 +1,31 @@
 from django import template
-from django.urls import reverse
+from django.utils.html import format_html
+
+from apps.catalog.models import IconKey
 
 register = template.Library()
+
+# The icon comes from the admin picker (IconKey); a blank value gets a neutral one.
+def _section_icon(icon, fallback):
+    return icon if icon in IconKey.values else fallback
+
+
+def _icon_svg(key, css):
+    return format_html(
+        '<svg class="{}" aria-hidden="true" focusable="false"><use href="#i-{}"/></svg>',
+        css,
+        key,
+    )
+
+
+@register.simple_tag
+def category_icon(category, css="ic"):
+    return _icon_svg(_section_icon(category.icon, IconKey.GRID), css)
+
+
+@register.simple_tag
+def use_case_icon(use_case, css="ic"):
+    return _icon_svg(_section_icon(use_case.icon, IconKey.TAG), css)
 
 
 @register.filter

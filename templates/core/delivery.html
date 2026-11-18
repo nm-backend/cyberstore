@@ -1,77 +1,32 @@
 {% extends "base.html" %}
 {% load shop_tags %}
-{% block title %}Бесплатная доставка техники по Кыргызстану — {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}Бесплатная доставка компьютеров и ноутбуков по Бишкеку за 2 часа и по всему Кыргызстану. Страховка, проверка перед оплатой.{% endblock %}
+{% block title %}Доставка — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block description %}Доставка техники по Кыргызстану. Условия и сроки уточняйте у менеджера.{% endblock %}
 {% block content %}
 <section class="info-page">
   <div class="wrap">
-    <!-- Centered Header -->
     <div class="contacts-head">
-      <h1>Доставка по Кыргызстану</h1>
-      <p>Быстрая и бережная доставка компьютерной техники до двери в любой город и регион страны.</p>
+      <h1>Доставка</h1>
+      {% for p in site.delivery_paragraphs %}<p>{{ p }}</p>{% endfor %}
     </div>
 
-    <!-- 3 Delivery Options Grid -->
     <div class="delivery-grid">
-      <!-- Option 1 -->
       <div class="delivery-card">
-        <div class="delivery-card-icon">⚡</div>
-        <span class="plan-pill">День в день</span>
-        <h2>По Бишкеку</h2>
-        <div class="delivery-time">2–3 часа с момента заказа</div>
-        <p class="delivery-cost">Стоимость: <strong>Бесплатно</strong></p>
-        <ul class="plan-features">
-          <li>Курьер привезёт компьютер прямо к вам домой или в офис</li>
-          <li>Распаковка и проверка работоспособности при получении</li>
-          <li>Оплата наличными, переводом (MBank, О!Деньги) или в рассрочку</li>
-        </ul>
-      </div>
-
-      <!-- Option 2 -->
-      <div class="delivery-card delivery-card-featured">
-        <div class="delivery-card-icon">🚚</div>
-        <span class="plan-pill plan-pill-accent">По всей стране</span>
-        <h2>По регионам КР</h2>
-        <div class="delivery-time">24–48 часов до вашего города</div>
-        <p class="delivery-cost">Стоимость: <strong>Бесплатно</strong></p>
-        <ul class="plan-features">
-          <li>Отправляем в Ош, Джалал-Абад, Каракол, Нарын, Талас, Баткен и сёла</li>
-          <li>Усиленная защитная упаковка (пупырчатая плёнка + жёсткая фиксация)</li>
-          <li>Трек-номер для отслеживания движения посылки</li>
-          <li>100% страховка груза во время транспортировки</li>
-        </ul>
-      </div>
-
-      <!-- Option 3 -->
-      <div class="delivery-card">
-        <div class="delivery-card-icon">🏬</div>
+        <div class="delivery-card-icon"><svg class="ic ic-lg" aria-hidden="true"><use href="#i-store"/></svg></div>
         <span class="plan-pill">Самовывоз</span>
-        <h2>Из магазина в Бишкеке</h2>
-        <div class="delivery-time">Готово к выдаче сегодня</div>
-        <p class="delivery-cost">Стоимость: <strong>Бесплатно</strong></p>
+        <h2>Из магазина в {{ site.city }}</h2>
         <ul class="plan-features">
-          <li>Адрес: <strong>{{ site.city }}, ул. {{ site.address }}</strong> ({{ site.address_note }})</li>
-          <li>График: <strong>{{ site.work_days }} {{ site.work_hours }}</strong></li>
-          <li>Тестирование ПК на стенде в вашем присутствии</li>
-          <li>Установка необходимых игр и программ в подарок</li>
+          <li>Адрес: <strong>{{ site.city }}, ул. {{ site.address }}</strong>{% if site.address_note %} ({{ site.address_note }}){% endif %}</li>
+          <li>График: <strong>{{ site.work_days }}, {{ site.work_hours }}</strong></li>
+          <li>Телефон: <a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></li>
         </ul>
       </div>
     </div>
 
-    <!-- Guarantee Banner -->
-    <div class="delivery-security-box">
-      <div class="sec-icon">🛡️</div>
-      <div>
-        <h3>100% сохранность техники при доставке</h3>
-        <p class="muted">Каждый готовый компьютер перед отправкой пломбируется, видеокарта и кулер дополнительно фиксируются внутри корпуса специальной пеной Instapak, а коробка помещается в противоударный транспортировочный кейс.</p>
-      </div>
-    </div>
-
-    <!-- Bottom CTA Banner -->
     <div class="bottom-cta-banner">
       <div>
-        <h2>Хотите заказать доставку в свой город?</h2>
-        <p class="muted">Напишите менеджеру в WhatsApp — назовём точный срок прибытия курьера по вашему адресу.</p>
+        <h2>Хотите заказать доставку?</h2>
+        <p class="muted">Напишите менеджеру в WhatsApp — уточним условия по вашему адресу.</p>
       </div>
       <div style="flex:none">
         <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить сроки и условия доставки по моему адресу.' %}" target="_blank" rel="noopener">

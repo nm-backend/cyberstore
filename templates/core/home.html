@@ -3,7 +3,7 @@
 {% block title %}{{ site.shop_name }} — Ноутбуки и готовые игровые ПК в Бишкеке | Каталог, рассрочка, доставка{% endblock %}
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-compshop">
+<section class="hero-home">
   {% if site.hero_video %}
     <div class="hero-media">
       <video autoplay muted loop playsinline preload="metadata"{% if site.hero_poster %} poster="{{ site.hero_poster.url }}"{% endif %}>
@@ -16,9 +16,10 @@
   <div class="hero-overlay"></div>
 
   <div class="wrap hero-content-box">
+   <div class="hero-copy">
     <div class="hero-badge">
       <span class="pulse-dot"></span>
-      <span>Официальный магазин техники в Бишкеке</span>
+      <span>Магазин техники в {{ site.city }}</span>
     </div>
     <h1 class="hero-main-title">{{ site.hero_title }}</h1>
     <p class="hero-subtitle">{{ site.hero_subtitle }}</p>
@@ -32,14 +33,32 @@
         <span>Подобрать в WhatsApp</span>
       </a>
     </div>
+   </div>
+
+   <!-- HUD: the avatar's ring and labels, made informative -->
+   <aside class="hero-hud" aria-label="Коротко о магазине">
+     <span class="hero-hud-ring" aria-hidden="true"></span>
+     <div class="hud-panel">
+       <div class="hud-head">
+         <span>CyberStore · {{ site.city }}</span>
+         <span class="hud-dot" aria-hidden="true"></span>
+       </div>
+       <ul class="hud-list">
+         <li><svg class="ic" aria-hidden="true"><use href="#i-cart"/></svg><span>Товаров в каталоге</span><strong>{{ total }}</strong></li>
+         <li><svg class="ic" aria-hidden="true"><use href="#i-card"/></svg><span>Рассрочка</span><strong>18+ · паспорт</strong></li>
+         <li><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg><span>Доставка</span><strong>по Кыргызстану</strong></li>
+         <li><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><span>{{ site.work_days }}</span><strong>{{ site.work_hours }}</strong></li>
+       </ul>
+     </div>
+   </aside>
 
     <!-- Quick filter pill bar -->
     <div class="hero-quick-categories">
       <span class="quick-cat-label">Быстрый переход:</span>
       {% for c in categories %}
-        <a class="quick-cat-pill" href="{{ c.get_absolute_url }}">{{ c.icon|default:"🗂" }} {{ c.name }}</a>
+        <a class="quick-cat-pill" href="{{ c.get_absolute_url }}">{% category_icon c "ic ic-sm" %}{{ c.name }}</a>
       {% endfor %}
-      <a class="quick-cat-pill" href="{% url 'core:installment' %}">🏦 Рассрочка 18+</a>
+      <a class="quick-cat-pill" href="{% url 'core:installment' %}"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-card"/></svg>Рассрочка 18+</a>
     </div>
   </div>
 </section>
@@ -49,31 +68,24 @@
   <div class="wrap">
     <div class="trust-grid-modern">
       <div class="trust-card-m">
-        <div class="trust-icon-wrap">⭐</div>
+        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-card"/></svg></div>
         <div>
-          <h4>500+ отзывов</h4>
-          <p>Реальные покупатели и видео-отзывы в Instagram</p>
+          <h4>Рассрочка 18+</h4>
+          <p>С банком и без банка. Нужен паспорт.</p>
         </div>
       </div>
       <div class="trust-card-m">
-        <div class="trust-icon-wrap">🏦</div>
+        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg></div>
         <div>
-          <h4>Рассрочка без банка</h4>
-          <p>Оформление от 18 лет, нужен только паспорт КР</p>
+          <h4>Доставка по Кыргызстану</h4>
+          <p>{{ site.delivery_paragraphs|join:" " }}</p>
         </div>
       </div>
       <div class="trust-card-m">
-        <div class="trust-icon-wrap">🚚</div>
+        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></div>
         <div>
-          <h4>Бесплатная доставка</h4>
-          <p>2–3 часа по Бишкеку и до 48 ч во все регионы КР</p>
-        </div>
-      </div>
-      <div class="trust-card-m">
-        <div class="trust-icon-wrap">🛡️</div>
-        <div>
-          <h4>Гарантия и стресс-тесты</h4>
-          <p>100% проверка стабильности перед выдачей клиенту</p>
+          <h4>{{ site.city }}, {{ site.address }}</h4>
+          <p>{{ site.work_days }}, {{ site.work_hours }}</p>
         </div>
       </div>
     </div>
@@ -95,7 +107,7 @@
       {% for c in categories %}
         <a class="cat-box" href="{{ c.get_absolute_url }}">
           <div class="cat-box-bg"></div>
-          <div class="cat-box-icon">{{ c.icon|default:"🗂" }}</div>
+          <div class="cat-box-icon">{% category_icon c "ic ic-lg" %}</div>
           <h3>{{ c.name }}</h3>
           <p>{{ c.description }}</p>
           <span class="cat-box-action">Смотреть →</span>
@@ -110,8 +122,8 @@
   <div class="wrap">
     <div class="section-head">
       <div>
-        <span class="section-kicker">Хиты продаж</span>
-        <h2>Популярные модели</h2>
+        <span class="section-kicker">Витрина</span>
+        <h2>Товары каталога</h2>
       </div>
       <a class="section-link" href="{% url 'catalog:list' %}">Весь каталог ({{ total }}) →</a>
     </div>
@@ -142,7 +154,7 @@
     <div class="use-cases-grid">
       {% for u in use_cases %}
         <a class="use-case-card" href="{% url 'catalog:list' %}?use_case={{ u.slug }}">
-          <span class="use-case-icon">{{ u.icon }}</span>
+          <span class="use-case-icon">{% use_case_icon u "ic" %}</span>
           <span class="use-case-name">{{ u.name }}</span>
         </a>
       {% endfor %}
@@ -156,15 +168,13 @@
   <div class="wrap">
     <div class="modern-banner">
       <div class="modern-banner-content">
-        <span class="plan-pill plan-pill-accent">Рассрочка без банка и с банком</span>
-        <h2>Заберите ноутбук или ПК сегодня, платите потом</h2>
-        <p>Нужен только один документ — ID-паспорт гражданина Кыргызстана. Возраст от 18 лет. Оформление за 15 минут в магазине или дистанционно онлайн.</p>
+        <span class="plan-pill plan-pill-accent">Рассрочка 18+</span>
+        <h2>Рассрочка на технику</h2>
+        {% for p in site.installment_paragraphs %}<p>{{ p }}</p>{% endfor %}
         <div class="banner-banks-row">
-          <span class="bank-chip">Айыл Банк</span>
-          <span class="bank-chip">MBank</span>
-          <span class="bank-chip">Doscredobank</span>
-          <span class="bank-chip">О!Деньги</span>
-          <span class="bank-chip highlight">Без банка (18+)</span>
+          {% for o in installment_options %}
+            <span class="bank-chip{% if forloop.first %} highlight{% endif %}">{{ o.title }}{% if o.badge %} ({{ o.badge }}){% endif %}</span>
+          {% endfor %}
         </div>
         <div class="banner-btn-row">
           <a class="btn btn-primary" href="{% url 'core:installment' %}">Условия рассрочки</a>
@@ -207,7 +217,7 @@
         <div class="contact-card-content">
           <span class="contact-label">Телефон</span>
           <div class="contact-main-text"><a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></div>
-          <div class="contact-sub-text">Звонки и WhatsApp 24/7</div>
+          <div class="contact-sub-text">Звонки и WhatsApp</div>
         </div>
       </div>
 

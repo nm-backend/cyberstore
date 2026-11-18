@@ -1,121 +1,38 @@
 {% extends "base.html" %}
 {% load shop_tags %}
-{% block title %}Рассрочка на ноутбуки и готовые ПК — {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}Рассрочка на ноутбуки и компьютеры в Бишкеке с банком и без банка. Без справок, нужен только паспорт. Одобрение за 15 минут.{% endblock %}
+{% block title %}Рассрочка на технику — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block description %}Рассрочка на ноутбуки и компьютеры в {{ site.city }}. Условия уточняйте у менеджера.{% endblock %}
 {% block content %}
 <section class="info-page">
   <div class="wrap">
-    <!-- Centered Header -->
     <div class="contacts-head">
       <h1>Рассрочка на технику</h1>
-      <p>Оформите любой ПК или ноутбук без первого взноса. Нужен только паспорт гражданина КР.</p>
+      {% for p in site.installment_paragraphs %}<p>{{ p }}</p>{% endfor %}
     </div>
 
-    <!-- Main Comparison Options -->
+    {% if options %}
     <div class="plans-grid">
-      <!-- Plan 1 -->
-      <div class="plan-card">
+      {% for o in options %}
+      <div class="plan-card{% if forloop.first %} plan-card-featured{% endif %}">
         <div class="plan-header">
-          <span class="plan-pill">Партнёрские банки</span>
-          <span class="plan-badge">18+</span>
+          <span class="plan-pill{% if forloop.first %} plan-pill-accent{% endif %}">{{ o.title }}</span>
+          {% if o.badge %}<span class="plan-badge">{{ o.badge }}</span>{% endif %}
         </div>
-        <h2>Рассрочка с банком</h2>
-        <p class="plan-lead">Оформление через крупнейшие банки Кыргызстана прямо в нашем магазине или онлайн.</p>
-        <ul class="plan-features">
-          <li><strong>Банки-партнёры:</strong> Айыл Банк, Doscredobank, MBank, О!Деньги</li>
-          <li><strong>Первоначальный взнос:</strong> от 0 сом</li>
-          <li><strong>Срок рассрочки:</strong> 3, 6, 9, 12 или 24 месяца</li>
-          <li><strong>Документы:</strong> Только ID-паспорт гражданина КР</li>
-          <li><strong>Одобрение:</strong> В течение 10–15 минут онлайн</li>
-        </ul>
-        <a class="btn btn-outline btn-block" href="{% whatsapp_generic 'Здравствуйте! Хочу оформить рассрочку с банком на ноутбук или ПК. Подскажите условия.' %}" target="_blank" rel="noopener">
+        <h2>{{ o.title }}</h2>
+        {% if o.description %}<p class="plan-lead">{{ o.description|linebreaksbr }}</p>{% endif %}
+        <a class="btn {% if forloop.first %}btn-primary{% else %}btn-outline{% endif %} btn-block" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить условия рассрочки.' %}" target="_blank" rel="noopener">
           <svg><use href="#i-wa"/></svg>
-          Оформить через банк
+          Уточнить в WhatsApp
         </a>
       </div>
-
-      <!-- Plan 2 -->
-      <div class="plan-card plan-card-featured">
-        <div class="plan-header">
-          <span class="plan-pill plan-pill-accent">Без участия банка</span>
-          <span class="plan-badge">Хит</span>
-        </div>
-        <h2>Рассрочка без банка</h2>
-        <p class="plan-lead">Фирменная рассрочка напрямую от магазина CyberStore без банковских проволочек.</p>
-        <ul class="plan-features">
-          <li><strong>Оформление:</strong> Напрямую через магазин CyberStore</li>
-          <li><strong>Кредитная история:</strong> Лояльные условия без сложных проверок</li>
-          <li><strong>Возраст:</strong> От 18 лет</li>
-          <li><strong>Документы:</strong> Только паспорт (без справок о доходах)</li>
-          <li><strong>Решение:</strong> Моментально на месте в магазине на ул. Айни, 31</li>
-        </ul>
-        <a class="btn btn-primary btn-block" href="{% whatsapp_generic 'Здравствуйте! Интересует рассрочка без банка от магазина CyberStore. Какие условия?' %}" target="_blank" rel="noopener">
-          Оформить без банка
-        </a>
-      </div>
+      {% endfor %}
     </div>
+    {% endif %}
 
-    <!-- 4 Steps Flow -->
-    <div class="steps-section">
-      <div class="section-head" style="justify-content:center;text-align:center;margin-bottom:32px">
-        <h2>Как получить технику за 4 простых шага</h2>
-      </div>
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-num">01</div>
-          <h3>Выберите товар</h3>
-          <p>Подберите подходящий ПК или ноутбук в каталоге или напишите менеджеру для подбора под ваш бюджет.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">02</div>
-          <h3>Отправьте заявку</h3>
-          <p>Нажмите «Заказать в WhatsApp» на карточке товара или приезжайте к нам в магазин на ул. Айни, 31.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">03</div>
-          <h3>Одобрение за 15 мин</h3>
-          <p>Менеджер поможет заполнить заявку только по паспорту. Ответ приходит за 10–15 минут.</p>
-        </div>
-        <div class="step-card">
-          <div class="step-num">04</div>
-          <h3>Заберите заказ</h3>
-          <p>Заберите протестированный ПК сразу из магазина или мы бесплатно доставим его к вам домой по КР.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- FAQ -->
-    <div class="faq-section">
-      <div class="section-head" style="justify-content:center;margin-bottom:28px">
-        <h2>Частые вопросы</h2>
-      </div>
-      <div class="faq-list">
-        <details class="faq-item" open>
-          <summary>Какие документы требуются для оформления?</summary>
-          <div class="faq-answer">
-            <p>Нужен только один документ — оригинал ID-паспорта гражданина Кыргызской Республики. Справки с места работы, выписки о доходах и поручители не требуются.</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Можно ли оформить рассрочку без первоначального взноса?</summary>
-          <div class="faq-answer">
-            <p>Да, вы можете забрать выбранный ПК или ноутбук сразу с 0% первоначального взноса, а первый ежемесячный платёж внести только через месяц.</p>
-          </div>
-        </details>
-        <details class="faq-item">
-          <summary>Действует ли рассрочка на доставку в другие города (Ош, Джалал-Абад и др.)?</summary>
-          <div class="faq-answer">
-            <p>Да! Оформление можно пройти дистанционно онлайн через WhatsApp, после чего мы бесплатно отправим технику в ваш город надёжной курьерской службой.</p>
-          </div>
-        </details>
-      </div>
-    </div>
-
-    <!-- Bottom CTA Banner -->
     <div class="bottom-cta-banner">
       <div>
-        <h2>Хотите рассчитать ежемесячный платёж?</h2>
-        <p class="muted">Напишите нам название товара и желаемый срок — менеджер моментально рассчитает график платежей.</p>
+        <h2>Остались вопросы по рассрочке?</h2>
+        <p class="muted">Напишите нам в WhatsApp — менеджер ответит на вопросы.</p>
       </div>
       <div style="flex:none">
         <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Хочу рассчитать ежемесячный платёж по рассрочке.' %}" target="_blank" rel="noopener">

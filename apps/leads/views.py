@@ -40,10 +40,12 @@ def create_lead(request):
         return _back(request)
 
     lead = form.save(commit=False)
-    product = Product.objects.filter(pk=request.POST.get("product_id")).first()
-    if product:
-        lead.product = product
-        lead.product_title = product.title
+    product_id = request.POST.get("product_id", "")
+    if product_id.isdigit():
+        product = Product.objects.published().filter(pk=product_id).first()
+        if product:
+            lead.product = product
+            lead.product_title = product.title
     lead.save()
 
     request.session["last_lead_ts"] = time.time()

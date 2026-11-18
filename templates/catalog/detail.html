@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load shop_tags %}
 {% block title %}{{ product.title }} — {{ product.price|price }} | {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description }} Официальная гарантия, рассрочка без банка, доставка по Кыргызстану.{% endblock %}
+{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description }} {{ site.shop_name }}, {{ site.city }}.{% endblock %}
 {% block og_title %}{{ product.title }}{% endblock %}
 {% block head_extra %}
 <script type="application/ld+json">
@@ -30,7 +30,7 @@
         {% if images %}
           <img data-gallery-main src="{{ images.0.image.url }}" alt="{{ images.0.alt|default:product.title }}" width="900" height="675">
         {% else %}
-          <div class="ph"><div><b>{{ product.category.icon|default:"💻" }}</b>{% firstof product.brand.name product.category.name %}</div></div>
+          <div class="ph"><div>{% category_icon product.category "ic ic-xl" %}{% firstof product.brand.name product.category.name %}</div></div>
         {% endif %}
       </div>
       {% if images|length > 1 %}
@@ -61,8 +61,8 @@
         {% else %}
           <span class="badge badge-bad">Нет в наличии</span>
         {% endif %}
-        {% if product.installment_available %}<span class="chip-m">🏦 Рассрочка 18+</span>{% endif %}
-        {% if product.warranty %}<span class="chip-m">🛡️ Гарантия {{ product.warranty }}</span>{% endif %}
+        {% if product.installment_available %}<span class="chip-m"><svg class="ic" aria-hidden="true"><use href="#i-card"/></svg>Рассрочка 18+</span>{% endif %}
+        {% if product.warranty %}<span class="chip-m"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg>Гарантия {{ product.warranty }}</span>{% endif %}
       </div>
 
       {% if product.short_description %}
@@ -76,11 +76,6 @@
           {% if product.discount_percent %}
             <span class="price-old">{{ product.old_price|price }}</span>
             <span class="badge badge-sale">−{{ product.discount_percent }}%</span>
-          {% endif %}
-        </div>
-        <div class="price-installment-hint">
-          {% if product.price %}
-            от <strong>{% widthratio product.price 12 1 %}&nbsp;сом/мес</strong> в рассрочку без банка
           {% endif %}
         </div>
       </div>
@@ -97,37 +92,12 @@
         </button>
       </div>
 
-      <!-- Value Props Micro-Cards -->
-      <div class="product-perks-box">
-        <div class="perk-item">
-          <span class="perk-icon">🚚</span>
-          <div>
-            <strong>Бесплатная доставка</strong>
-            <span>2–3 часа по Бишкеку, 24–48 ч по Кыргызстану</span>
-          </div>
-        </div>
-        <div class="perk-item">
-          <span class="perk-icon">🏦</span>
-          <div>
-            <strong>Рассрочка без банка</strong>
-            <span>Оформление за 15 минут по паспорту (18+)</span>
-          </div>
-        </div>
-        <div class="perk-item">
-          <span class="perk-icon">🛡️</span>
-          <div>
-            <strong>Проверка перед оплатой</strong>
-            <span>Осмотр техники при получении, официальная гарантия</span>
-          </div>
-        </div>
-      </div>
-
       {% if use_cases %}
       <div class="product-use-cases">
         <span class="use-case-label">Подходит для задач:</span>
         <div class="use-case-chips-row">
           {% for u in use_cases %}
-            <a class="chip-m" href="{% url 'catalog:list' %}?use_case={{ u.slug }}">{{ u.icon }} {{ u.name }}</a>
+            <a class="chip-m" href="{% url 'catalog:list' %}?use_case={{ u.slug }}">{% use_case_icon u "ic" %}{{ u.name }}</a>
           {% endfor %}
         </div>
       </div>
@@ -196,9 +166,9 @@
     {% csrf_token %}
     <div class="dialog-head">
       <h3 id="lead-title">Заявка на {{ product.title }}</h3>
-      <button class="dialog-close-btn" type="button" data-close-lead aria-label="Закрыть">✕</button>
+      <button class="dialog-close-btn" type="button" data-close-lead aria-label="Закрыть"><svg class="ic" aria-hidden="true"><use href="#i-close"/></svg></button>
     </div>
-    <p class="dialog-sub">Оставьте контакты — менеджер свяжется с вами в течение 5 минут для уточнения заказа.</p>
+    <p class="dialog-sub">Оставьте контакты — менеджер свяжется с вами для уточнения заказа.</p>
 
     <input type="hidden" name="product_id" value="{{ product.pk }}">
     <input type="hidden" name="next" value="{{ request.path }}">

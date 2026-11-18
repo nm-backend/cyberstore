@@ -30,11 +30,10 @@ Copy-Item .env.example .env
 # 5. Применение миграций и создание начальных данных
 python manage.py migrate
 
-# 6. Создание администратора (по умолчанию логин/пароль admin/admin из .env)
+# 6. Создание администратора (логин/пароль из .env; без пароля админ не создаётся)
 python manage.py bootstrap_site
 
-# 7. Заполнение каталога реалистичными товарами (ноутбуки, ПК, комплектующие, фото)
-python manage.py seed_demo
+# 7. Каталог наполняется через админку /admin/ — демо-товары не входят в репозиторий
 
 # 8. Запуск сервера разработки
 python manage.py runserver
@@ -43,7 +42,7 @@ python manage.py runserver
 - **Сайт:** [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 - **Панель администратора:** [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/)
   - Логин: `admin`
-  - Пароль: `admin` (или заданный вами в `.env`)
+  - Пароль: `DJANGO_SUPERUSER_PASSWORD` из `.env`
 - **Запуск тестов:** `python manage.py test`
 
 ---
@@ -128,8 +127,7 @@ git push -u origin main
    - Установит зависимости (`pip install -r requirements.txt`).
    - Соберёт статику (`collectstatic`).
    - Применит миграции (`migrate`).
-   - Автоматически создаст админа (`bootstrap_site`).
-   - Наполнит каталог товарами и фото (`seed_demo`).
+   - Автоматически создаст админа (`bootstrap_site`), если заданы логин и пароль.
 7. Через пару минут сайт будет доступен по адресу `https://<ваше-имя>.onrender.com`.
 
 ### 💡 Постоянное хранение медиа-файлов (Cloudinary)
@@ -148,7 +146,7 @@ git push -u origin main
 cyberstore/
 ├── apps/
 │   ├── catalog/              # Каталог: Товары, Категории, Бренды, Характеристики, Фото
-│   │   ├── management/       # Команда seed_demo для наполнения каталога
+│   │   ├── management/       # Служебные команды приложения
 │   │   ├── migrations/       # Миграции базы данных
 │   │   ├── admin.py          # Настройки админки товаров, фильтры, дублирование
 │   │   ├── models.py         # Модели Product, Category, Brand, ProductSpec, SpecType, UseCase

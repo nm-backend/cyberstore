@@ -150,7 +150,7 @@
           {% endif %}
         {% else %}
           <div class="empty">
-            <div class="empty-icon">🔍</div>
+            <div class="empty-icon"><svg class="ic ic-xl" aria-hidden="true"><use href="#i-search"/></svg></div>
             <h3>{% if has_filters %}Ничего не найдено{% else %}Пока нет товаров{% endif %}</h3>
             <p>{% if has_filters %}Попробуйте изменить параметры или сбросить фильтры.{% else %}В этом разделе товары появятся позже.{% endif %}</p>
             {% if has_filters %}
@@ -166,7 +166,7 @@
     </div>
   {% elif not show_tiles %}
     <div class="empty">
-      <div class="empty-icon">🗂</div>
+      <div class="empty-icon"><svg class="ic ic-xl" aria-hidden="true"><use href="#i-grid"/></svg></div>
       <h3>В этом разделе пока нет товаров</h3>
       <p>Товары появятся позже.</p>
     </div>

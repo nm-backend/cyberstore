@@ -1,5 +1,7 @@
+from django.core.cache import cache
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework.test import APIClient
 
 from apps.catalog.models import Category, Product
 from apps.leads.models import Lead
@@ -43,9 +45,27 @@ class LeadTests(TestCase):
     def test_get_not_allowed(self):
         self.assertEqual(self.client.get(reverse("leads:create")).status_code, 405)
 
+    def test_bad_product_id_is_ignored(self):
+        response = self.post(product_id="abc")
+        self.assertContains(response, "Заявка принята")
+        self.assertIsNone(Lead.objects.get().product)
+
     def test_open_redirect_is_blocked(self):
         response = self.client.post(
             reverse("leads:create"),
             {"name": "A", "phone": "+996555123456", "next": "https://evil.example/"},
         )
         self.assertEqual(response["Location"], "/")
+
+
+class LeadApiThrottleTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.client = APIClient(enforce_csrf_checks=False)
+
+    def test_sixth_request_per_minute_is_rejected(self):
+        data = {"name": "Азиз", "phone": "+996 555 123 456"}
+        for _ in range(5):
+            response = self.client.post("/api/leads/", data, format="json")
+            self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.client.post("/api/leads/", data, format="json").status_code, 429)
