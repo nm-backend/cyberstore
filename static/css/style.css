@@ -269,11 +269,12 @@ h4 { font-size: var(--gesso-text-base); }
   background: rgba(9, 14, 23, .55);
 }
 .nav-inner {
-  display: flex; align-items: center; gap: 2px;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 2px;
   min-height: 46px;
-  overflow-x: auto; scrollbar-width: none;
+  /* Меню «Каталог» позиционируется абсолютно внутри навбара: любой
+     overflow здесь обрезал бы его до высоты строки. */
+  overflow: visible;
 }
-.nav-inner::-webkit-scrollbar { display: none; }
 .nav a {
   position: relative; padding: 13px 14px;
   color: var(--gesso-neutral-600);
@@ -1655,4 +1656,223 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
   .hero-cta-row .btn { width: 100%; }
   .trust-grid-modern { grid-template-columns: 1fr; }
   .contacts-head { margin-bottom: var(--gesso-space-8); }
+}
+/* ==========================================================================
+   CATALOG 2.0: NAV DROPDOWN, TILES, BRANDS, FACET FILTERS
+   ========================================================================== */
+
+/* Catalog dropdown in the second header tier */
+.nav-drop { position: relative; flex: none; }
+.nav-drop-toggle {
+  position: relative; display: inline-flex; align-items: center; gap: 6px;
+  padding: 13px 14px; border: 0; background: transparent; cursor: pointer;
+  color: var(--gesso-neutral-600); font: inherit; font-size: var(--gesso-text-sm);
+  white-space: nowrap;
+}
+.nav-drop-toggle::after {
+  content: ""; position: absolute; left: 14px; right: 14px; bottom: 0;
+  height: 2px; border-radius: 2px; background: transparent;
+  transition: background-color .15s ease;
+}
+.nav-drop-toggle:hover { color: var(--gesso-fg); }
+.nav-drop-toggle:hover::after { background: var(--gesso-primary-line); }
+.nav-drop-toggle.active { color: var(--gesso-fg); font-weight: 500; }
+.nav-drop-toggle.active::after { background: var(--gesso-neon); box-shadow: 0 0 12px var(--gesso-neon-glow); }
+.nav-caret { transition: transform .18s ease; color: var(--gesso-neutral-500); }
+.nav-drop.open .nav-caret { transform: rotate(180deg); }
+
+.nav-drop-menu {
+  position: absolute; left: 0; top: calc(100% + 1px); z-index: 120;
+  width: min(920px, calc(100vw - 48px));
+  padding: var(--gesso-space-4);
+  background: var(--gesso-surface);
+  border: 1px solid var(--gesso-neutral-200);
+  border-radius: var(--radius-md);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .55);
+  display: none;
+}
+.nav-drop.open .nav-drop-menu { display: block; }
+.nav-menu-all {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; margin-bottom: var(--gesso-space-2);
+  border: 1px solid var(--gesso-primary-line);
+  border-radius: var(--radius-sm);
+  background: var(--gesso-primary-tint);
+  color: var(--gesso-fg); font-weight: 600; font-size: var(--gesso-text-sm);
+}
+.nav-menu-all:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-text); }
+.nav-menu-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gesso-space-3); }
+.nav-menu-col { min-width: 0; }
+.nav-menu-root {
+  display: flex !important; align-items: center; gap: 8px;
+  padding: 8px 10px !important; border-radius: var(--radius-sm);
+  color: var(--gesso-fg) !important; font-weight: 600 !important; font-size: var(--gesso-text-sm) !important;
+}
+.nav-menu-root:hover { background: var(--gesso-surface-hover); }
+.nav-menu-root .ic { color: var(--gesso-neon); flex: none; }
+.nav-menu-count {
+  margin-left: auto; font-family: var(--gesso-font-mono); font-size: var(--gesso-text-2xs);
+  color: var(--gesso-neutral-500); font-variant-numeric: tabular-nums;
+}
+.nav-menu-sub { display: flex; flex-direction: column; gap: 1px; margin-top: 2px; }
+.nav-menu-sub a {
+  display: flex !important; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 6px 10px !important; border: 0 !important; border-radius: var(--radius-sm);
+  color: var(--gesso-neutral-600) !important; font-size: var(--gesso-text-xs) !important;
+  white-space: normal;
+}
+.nav-menu-sub a:hover { background: var(--gesso-surface-hover); color: var(--gesso-fg) !important; }
+.nav-menu-sub a::after { display: none; }
+.nav-menu-foot {
+  display: block; margin-top: var(--gesso-space-3); padding-top: var(--gesso-space-3);
+  border-top: 1px solid var(--gesso-divider);
+  font-size: var(--gesso-text-xs); color: var(--gesso-accent-text);
+}
+
+/* Hover is a desktop convenience; touch devices use the button + JS. */
+@media (min-width: 1025px) {
+  .nav-drop:hover .nav-drop-menu { display: block; }
+}
+
+/* Category tiles: count, search, current state */
+.category-tiles-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gesso-space-4); flex-wrap: wrap; margin-bottom: var(--gesso-space-4);
+}
+.category-tiles-head .section-head { margin-bottom: 0; }
+.category-search { position: relative; width: min(340px, 100%); }
+.category-search .ic {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--gesso-neutral-500); pointer-events: none;
+}
+.category-search .field { padding: 9px 12px 9px 36px; font-size: var(--gesso-text-xs); }
+.category-tile.is-current { border-color: var(--gesso-primary-line); }
+.category-tile-all .category-tile-img { background: var(--gesso-primary-tint); }
+.category-tile-count {
+  margin-top: var(--gesso-space-2);
+  font-family: var(--gesso-font-mono); font-size: var(--gesso-text-2xs);
+  color: var(--gesso-neutral-500);
+}
+.category-search-empty { margin: var(--gesso-space-3) 0 0; font-size: var(--gesso-text-sm); color: var(--gesso-fg-muted); }
+
+/* Category index page */
+.category-index-group { margin-bottom: var(--gesso-space-10); }
+.category-index-group .section-head { margin-bottom: var(--gesso-space-4); }
+.category-index-group .section-head h2 { font-size: var(--gesso-text-xl); }
+.category-index-group .section-head h2 a { color: var(--gesso-fg); }
+.category-index-group .section-head h2 a:hover { color: var(--gesso-accent-text); }
+.category-tile-sub .category-tile-name { color: var(--gesso-neutral-700); }
+.catalog-cat-search { display: flex; align-items: center; gap: var(--gesso-space-2); margin-bottom: var(--gesso-space-8); flex-wrap: wrap; }
+.catalog-cat-search .field { flex: 1 1 260px; }
+
+/* Page head extras */
+.catalog-head-right { display: flex; align-items: center; gap: var(--gesso-space-3); flex-wrap: wrap; }
+.catalog-head-count { font-family: var(--gesso-font-mono); font-size: var(--gesso-text-xs); color: var(--gesso-neutral-500); }
+
+/* Brand tiles */
+.brand-tiles-section { margin-bottom: var(--gesso-space-10); }
+.brand-tiles-hint { font-size: var(--gesso-text-xs); }
+.brand-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: var(--gesso-space-3); }
+.brand-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: var(--gesso-space-4) var(--gesso-space-3);
+  border: 1px solid var(--gesso-divider); border-radius: var(--radius-md);
+  background: var(--gesso-surface); text-align: center;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.brand-tile:hover { border-color: var(--gesso-primary-line); background: var(--gesso-surface-hover); }
+.brand-logo { height: 34px; max-width: 100%; object-fit: contain; }
+.brand-monogram {
+  width: 38px; height: 38px; display: grid; place-items: center;
+  border-radius: var(--radius-full); border: 1px solid var(--gesso-primary-line);
+  color: var(--gesso-neon); font-family: var(--gesso-font-mono); font-weight: 600;
+}
+.brand-tile-name { font-size: var(--gesso-text-sm); font-weight: 600; color: var(--gesso-fg); }
+.brand-tile-count { font-size: var(--gesso-text-2xs); color: var(--gesso-neutral-500); }
+
+/* Facet filters */
+.filters { min-width: 0; }
+.catalog-results { min-width: 0; }
+.filters-header-actions { display: flex; align-items: center; gap: var(--gesso-space-2); }
+.filters-close-btn {
+  display: none; width: 32px; height: 32px; padding: 0;
+  align-items: center; justify-content: center; cursor: pointer;
+  border: 1px solid var(--gesso-divider); border-radius: var(--radius-sm);
+  background: transparent; color: var(--gesso-neutral-600);
+}
+.filters-close-btn:hover { color: var(--gesso-fg); border-color: var(--gesso-neutral-400); }
+.filter-search { padding: 8px 10px; font-size: var(--gesso-text-xs); }
+.filter-actions { display: flex; flex-direction: column; gap: var(--gesso-space-2); }
+.filter-apply { min-height: 44px; }
+.filter-clear { text-align: center; font-size: var(--gesso-text-xs); color: var(--gesso-accent-text); }
+.filter-clear:hover { color: var(--gesso-primary-hover); }
+.active-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--gesso-space-2); margin-bottom: var(--gesso-space-5); }
+.filter-chip {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  padding: 5px 10px; border-radius: var(--radius-full);
+  border: 1px solid var(--gesso-primary-line); background: var(--gesso-primary-tint);
+  color: var(--gesso-neutral-700); font-size: var(--gesso-text-2xs);
+}
+.filter-chip span { color: var(--gesso-fg-muted); font-size: 14px; line-height: 1; }
+.filter-chip:hover { border-color: var(--gesso-primary); color: var(--gesso-fg); }
+.filter-clear-link { font-size: var(--gesso-text-2xs); color: var(--gesso-accent-text); white-space: nowrap; }
+
+@media (min-width: 1025px) {
+  .filters { max-height: calc(100dvh - 110px); overflow-y: auto; overscroll-behavior: contain; }
+}
+
+/* Mobile: the filters become a full-height drawer with a pinned apply button */
+@media (max-width: 1024px) {
+  .nav-drop { width: 100%; }
+  .nav-drop-toggle {
+    width: 100%; justify-content: space-between; padding: 12px 0;
+    font-size: var(--gesso-text-base); border-bottom: 1px solid var(--gesso-divider);
+  }
+  .nav-drop-toggle::after { display: none; }
+  .nav-drop-toggle.active { color: var(--gesso-neon); }
+  .nav-drop-menu {
+    position: static; width: auto; display: none;
+    opacity: 1; visibility: visible; transform: none;
+    box-shadow: none; border: 0; border-radius: 0;
+    padding: var(--gesso-space-2) 0 0 var(--gesso-space-3);
+    background: transparent;
+  }
+  .nav-drop.open .nav-drop-menu { display: block; }
+  .nav-menu-grid { grid-template-columns: 1fr; gap: var(--gesso-space-2); }
+  .nav-menu-all { margin-bottom: var(--gesso-space-3); }
+  .nav-menu-sub { padding-left: var(--gesso-space-3); }
+
+  .filters {
+    position: fixed; inset: 0; z-index: 160;
+    display: none; flex-direction: column;
+    margin: 0; padding: 0 var(--outer-margin) 0;
+    border: 0; border-radius: 0;
+    background: var(--gesso-canvas);
+    overflow-y: auto; overscroll-behavior: contain;
+    max-height: none;
+  }
+  .filters.open { display: flex; }
+  .filters-header {
+    position: sticky; top: 0; z-index: 2;
+    padding: var(--gesso-space-4) 0;
+    background: var(--gesso-canvas);
+  }
+  .filters-reset-link { font-size: var(--gesso-text-xs); }
+  .filters-close-btn { display: inline-flex; }
+  #filter-form { padding-bottom: var(--gesso-space-4); }
+  .filter-actions {
+    position: sticky; bottom: 0; z-index: 2;
+    margin-top: auto;
+    padding: var(--gesso-space-3) 0 calc(var(--gesso-space-4) + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(5, 8, 15, 0), var(--gesso-canvas) 28%);
+  }
+  .filter-checkbox-list { max-height: none; }
+  body.filters-open { overflow: hidden; }
+}
+
+@media (max-width: 520px) {
+  .category-tiles { grid-template-columns: 1fr; }
+  .category-tiles-head { align-items: stretch; }
+  .category-search { width: 100%; }
+  .catalog-head-right { width: 100%; justify-content: space-between; }
 }

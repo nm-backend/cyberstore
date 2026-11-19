@@ -1,20 +1,30 @@
-{% load shop_tags %}{% if categories %}
-<section class="category-tiles-section">
-  {% if title %}<div class="section-head"><h2>{{ title }}</h2></div>{% endif %}
+{% load shop_tags %}{% if tiles %}
+<section class="category-tiles-section" data-cat-section>
+  <div class="category-tiles-head">
+    {% if title %}<div class="section-head"><h2>{{ title }}</h2></div>{% endif %}
+    {% if searchable %}
+      <div class="category-search">
+        <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+        <input class="field" type="search" data-cat-search placeholder="Поиск по разделам" aria-label="Поиск по разделам">
+      </div>
+    {% endif %}
+  </div>
   <div class="category-tiles">
-    {% for c in categories %}
-      <a class="category-tile" href="{{ c.get_absolute_url }}">
-        {% if c.image %}
-          <img class="category-tile-img" src="{{ c.image.url }}" alt="{{ c.name }}" loading="lazy" width="480" height="300">
+    {% for t in tiles %}
+      <a class="category-tile{% if t.is_all %} category-tile-all{% endif %}{% if t.is_current %} is-current{% endif %}" href="{{ t.url }}" data-tile-name="{{ t.name|lower }}">
+        {% if t.image %}
+          <img class="category-tile-img" src="{{ t.image.url }}" alt="{{ t.name }}" loading="lazy" width="480" height="270">
         {% else %}
-          <span class="category-tile-img" aria-hidden="true">{% category_icon c "ic" %}</span>
+          <span class="category-tile-img" aria-hidden="true">{% category_icon t.category "ic" %}</span>
         {% endif %}
         <span class="category-tile-body">
-          <span class="category-tile-name">{{ c.name }}</span>
-          {% if c.description %}<span class="category-tile-desc">{{ c.description }}</span>{% endif %}
+          <span class="category-tile-name">{{ t.name }}</span>
+          {% if t.description %}<span class="category-tile-desc">{{ t.description }}</span>{% endif %}
+          <span class="category-tile-count">{{ t.count|items }}</span>
         </span>
       </a>
     {% endfor %}
   </div>
+  <p class="category-search-empty" data-cat-search-empty hidden>Ничего не найдено — попробуйте другой запрос.</p>
 </section>
 {% endif %}

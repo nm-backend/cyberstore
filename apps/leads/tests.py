@@ -1,5 +1,9 @@
+import json
+from unittest.mock import MagicMock, patch
+from urllib.error import URLError
+
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
@@ -10,7 +14,7 @@ from apps.leads.models import Lead
 class LeadTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        category = Category.objects.create(name="Ноутбуки", slug="laptops")
+        category = Category.objects.create(name="Ноутбуки для заявок", slug="lead-test-laptops")
         cls.product = Product.objects.create(
             title="Dell Test", category=category, price=99000
         )
@@ -69,3 +73,49 @@ class LeadApiThrottleTests(TestCase):
             response = self.client.post("/api/leads/", data, format="json")
             self.assertEqual(response.status_code, 201)
         self.assertEqual(self.client.post("/api/leads/", data, format="json").status_code, 429)
+
+
+@override_settings(TELEGRAM_BOT_TOKEN="123:abc", TELEGRAM_CHAT_ID="-100500")
+class LeadNotificationTests(TestCase):
+    def post(self):
+        data = {"name": "Азиз", "phone": "+996 555 123 456", "comment": "Позвонить после 18:00", "next": "/"}
+        return self.client.post(reverse("leads:create"), data, follow=True)
+
+    def test_telegram_message_sent_for_new_lead(self):
+        with patch("apps.leads.notifications.request.urlopen") as urlopen:
+            self.post()
+        urlopen.assert_called_once()
+        telegram_request = urlopen.call_args[0][0]
+        self.assertIn("123:abc", telegram_request.full_url)
+        body = json.loads(telegram_request.data.decode("utf-8"))
+        self.assertEqual(body["chat_id"], "-100500")
+        self.assertEqual(body["parse_mode"], "HTML")
+        self.assertIn("+996 555 123 456", body["text"])
+        self.assertIn("Позвонить после 18:00", body["text"])
+
+    @override_settings(TELEGRAM_BOT_TOKEN="123:abc", TELEGRAM_CHAT_ID="111, -222")
+    def test_message_sent_to_each_recipient(self):
+        with patch("apps.leads.notifications.request.urlopen") as urlopen:
+            self.post()
+        self.assertEqual(urlopen.call_count, 2)
+        sent = [json.loads(call[0][0].data.decode("utf-8"))["chat_id"] for call in urlopen.call_args_list]
+        self.assertEqual(sent, ["111", "-222"])
+
+    @override_settings(TELEGRAM_BOT_TOKEN="123:abc", TELEGRAM_CHAT_ID="bad, -222")
+    def test_one_broken_recipient_does_not_block_others(self):
+        with patch("apps.leads.notifications.request.urlopen", side_effect=[URLError("boom"), MagicMock()]):
+            self.post()
+        self.assertEqual(Lead.objects.count(), 1)
+
+    def test_failed_telegram_request_does_not_break_lead(self):
+        with patch("apps.leads.notifications.request.urlopen", side_effect=URLError("boom")):
+            response = self.post()
+        self.assertEqual(Lead.objects.count(), 1)
+        self.assertContains(response, "Заявка принята")
+
+    @override_settings(TELEGRAM_BOT_TOKEN="", TELEGRAM_CHAT_ID="")
+    def test_no_request_without_settings(self):
+        with patch("apps.leads.notifications.request.urlopen") as urlopen:
+            self.post()
+        urlopen.assert_not_called()
+        self.assertEqual(Lead.objects.count(), 1)

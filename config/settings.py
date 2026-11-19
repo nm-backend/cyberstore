@@ -151,6 +151,10 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Уведомления менеджеру о новой заявке в Telegram. Пусто — уведомления выключены.
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+
 # Change the admin path in production, e.g. ADMIN_URL=panel-x7k2/
 ADMIN_URL = os.environ.get("ADMIN_URL", "admin/").lstrip("/")
 if not ADMIN_URL.endswith("/"):

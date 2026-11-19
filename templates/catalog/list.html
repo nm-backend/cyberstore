@@ -20,17 +20,30 @@
 
   <div class="catalog-page-head">
     <div class="catalog-head-left">
+      <span class="section-kicker">Каталог</span>
       <h1>{% if category %}{{ category.name }}{% elif query %}Поиск: «{{ query }}»{% else %}{{ site.catalog_title }}{% endif %}</h1>
-      {% if category.description %}<p class="muted">{{ category.description }}</p>{% endif %}
+      <p class="muted">
+        {% if category and category.description %}{{ category.description }}
+        {% elif query %}Найдено по запросу с учётом фильтров.
+        {% else %}Выберите раздел или воспользуйтесь поиском и фильтрами.{% endif %}
+      </p>
+    </div>
+    <div class="catalog-head-right">
+      <span class="catalog-head-count">{{ result_count|items }}</span>
+      <a class="btn" href="{% url 'catalog:categories' %}">Все категории</a>
     </div>
   </div>
 
   {% if show_tiles %}
-    {% if root_categories %}
-      {% include "partials/_category_tiles.html" with categories=root_categories title="" %}
-    {% elif subcategories %}
-      {% include "partials/_category_tiles.html" with categories=subcategories title="Подразделы" %}
+    {% if root_tiles %}
+      {% include "partials/_category_tiles.html" with tiles=root_tiles title="Разделы каталога" searchable=True %}
+    {% elif subcategory_tiles %}
+      {% include "partials/_category_tiles.html" with tiles=subcategory_tiles title="Подразделы" searchable=True %}
     {% endif %}
+  {% endif %}
+
+  {% if brand_tiles %}
+    {% include "partials/_brand_tiles.html" %}
   {% endif %}
 
   {% if show_products %}
@@ -46,40 +59,57 @@
     {% endif %}
 
     <div class="catalog-layout{% if not filter_groups %} catalog-layout-full{% endif %}">
-      {% if filter_groups %}
-        <aside class="filters" data-filters>
+      {% if filter_groups or category_options %}
+        <aside class="filters" data-filters aria-label="Фильтры каталога">
           <div class="filters-header">
             <h3>Фильтры</h3>
-            {% if has_filters %}<a class="filters-reset-link" href="{{ request.path }}">Сбросить</a>{% endif %}
+            <div class="filters-header-actions">
+              {% if has_filters %}<a class="filters-reset-link" href="{{ request.path }}">Очистить</a>{% endif %}
+              <button class="filters-close-btn" type="button" data-filter-close aria-label="Закрыть фильтры">
+                <svg class="ic" aria-hidden="true"><use href="#i-close"/></svg>
+              </button>
+            </div>
           </div>
 
           <form id="filter-form" data-filter-form method="get">
             {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
-            {% if sort and sort != "new" %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
+            {% if sort and sort != "default" %}<input type="hidden" name="sort" value="{{ sort }}">{% endif %}
             {% if selected_use_case and not has_use_case_group %}<input type="hidden" name="use_case" value="{{ selected_use_case }}">{% endif %}
 
+            <details class="filter-group" open>
+              <summary class="filter-group-title">Категория</summary>
+              <select class="field" name="category" data-auto-submit aria-label="Категория">
+                <option value="">Все категории</option>
+                {% for option in category_options %}
+                  <option value="{{ option.slug }}"{% if option.selected %} selected{% endif %}>{{ option.name }} ({{ option.count }})</option>
+                {% endfor %}
+              </select>
+            </details>
+
             {% for group in filter_groups %}
-              <details class="filter-group" open>
-                <summary class="filter-group-title">{{ group.title }}</summary>
-                {% if group.type == "price" %}
-                  {% if price_low or price_high %}
-                    <div class="price-inputs">
-                      <input class="field" type="number" min="0" step="1" name="price_min" placeholder="От {{ price_low|default_if_none:'' }}" value="{{ price_min|default_if_none:'' }}" aria-label="Цена от">
-                      <input class="field" type="number" min="0" step="1" name="price_max" placeholder="До {{ price_high|default_if_none:'' }}" value="{{ price_max|default_if_none:'' }}" aria-label="Цена до">
-                    </div>
-                    {% if usd_rate %}
-                      <label class="filter-currency">
-                        <span>Валюта</span>
-                        <select class="field" name="currency">
-                          <option value="kgs"{% if currency == "kgs" %} selected{% endif %}>Сом (KGS)</option>
-                          <option value="usd"{% if currency == "usd" %} selected{% endif %}>Доллар (USD)</option>
-                        </select>
-                      </label>
-                    {% endif %}
-                  {% else %}
-                    <p class="filter-empty">Пока нет вариантов</p>
+              {% if group.type == "price" %}
+                <details class="filter-group" open>
+                  <summary class="filter-group-title">{{ group.title }}</summary>
+                  <div class="price-inputs">
+                    <input class="field" type="number" min="0" step="1" name="price_min" placeholder="От {{ group.low|default_if_none:'' }}" value="{{ price_min|default_if_none:'' }}" aria-label="Цена от">
+                    <input class="field" type="number" min="0" step="1" name="price_max" placeholder="До {{ group.high|default_if_none:'' }}" value="{{ price_max|default_if_none:'' }}" aria-label="Цена до">
+                  </div>
+                  {% if usd_rate %}
+                    <label class="filter-currency">
+                      <span>Валюта</span>
+                      <select class="field" name="currency" data-auto-submit>
+                        <option value="kgs"{% if currency == "kgs" %} selected{% endif %}>Сом (KGS)</option>
+                        <option value="usd"{% if currency == "usd" %} selected{% endif %}>Доллар (USD)</option>
+                      </select>
+                    </label>
                   {% endif %}
-                {% elif group.options %}
+                </details>
+              {% else %}
+                <details class="filter-group" open>
+                  <summary class="filter-group-title">{{ group.title }}</summary>
+                  {% if group.searchable %}
+                    <input class="field filter-search" type="search" data-filter-search placeholder="Поиск по вариантам" aria-label="Поиск по вариантам «{{ group.title }}»">
+                  {% endif %}
                   <div class="filter-checkbox-list">
                     {% for option in group.options %}
                       <label class="checkbox-item">
@@ -89,14 +119,13 @@
                       </label>
                     {% endfor %}
                   </div>
-                {% else %}
-                  <p class="filter-empty">Пока нет вариантов</p>
-                {% endif %}
-              </details>
+                </details>
+              {% endif %}
             {% endfor %}
 
             <div class="filter-actions">
-              <button class="btn btn-primary btn-block" type="submit">Применить фильтры</button>
+              <button class="btn btn-primary btn-block filter-apply" type="submit">Показать ({{ result_count }})</button>
+              <a class="filter-clear" href="{{ request.path }}">Очистить фильтры</a>
             </div>
           </form>
         </aside>
@@ -126,6 +155,15 @@
           </div>
         </div>
 
+        {% if active_filters %}
+          <div class="active-filters" aria-label="Выбранные фильтры">
+            {% for chip in active_filters %}
+              <a class="filter-chip" href="{{ chip.url }}">{{ chip.label }} <span aria-hidden="true">×</span></a>
+            {% endfor %}
+            <a class="filter-clear-link" href="{{ request.path }}">Очистить всё</a>
+          </div>
+        {% endif %}
+
         {% if page.object_list %}
           <div class="grid in-list">
             {% for p in page.object_list %}{% include "partials/_card.html" %}{% endfor %}
@@ -154,7 +192,7 @@
             <h3>{% if has_filters %}Ничего не найдено{% else %}Пока нет товаров{% endif %}</h3>
             <p>{% if has_filters %}Попробуйте изменить параметры или сбросить фильтры.{% else %}В этом разделе товары появятся позже.{% endif %}</p>
             {% if has_filters %}
-              <a class="btn btn-primary" href="{{ request.path }}">Сбросить фильтры</a>
+              <a class="btn btn-primary" href="{{ request.path }}">Очистить фильтры</a>
             {% endif %}
             <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Помогите подобрать технику.' %}" target="_blank" rel="noopener">
               <svg><use href="#i-wa"/></svg>

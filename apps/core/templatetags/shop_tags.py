@@ -29,6 +29,25 @@ def use_case_icon(use_case, css="ic"):
 
 
 @register.filter
+def items(value):
+    """12 -> '12 товаров', 1 -> '1 товар'. Counts in category tiles."""
+    try:
+        count = int(value)
+    except (TypeError, ValueError):
+        return ""
+    tail, last = count % 100, count % 10
+    if 11 <= tail <= 14:
+        word = "товаров"
+    elif last == 1:
+        word = "товар"
+    elif 2 <= last <= 4:
+        word = "товара"
+    else:
+        word = "товаров"
+    return f"{count} {word}"
+
+
+@register.filter
 def price(value):
     """113000 -> '113 000 сом'. Empty price -> 'Цена по запросу'."""
     if value in (None, ""):

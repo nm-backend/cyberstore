@@ -13,9 +13,11 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class BrandSerializer(serializers.ModelSerializer):
+    logo = serializers.ImageField(use_url=True, allow_null=True)
+
     class Meta:
         model = Brand
-        fields = ["id", "name", "slug"]
+        fields = ["id", "name", "slug", "logo", "is_active"]
 
 
 class UseCaseSerializer(serializers.ModelSerializer):

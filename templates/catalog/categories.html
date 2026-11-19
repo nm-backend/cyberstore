@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load shop_tags %}
+{% block title %}Все категории — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block description %}Категории и подразделы каталога {{ site.shop_name }}: {{ site.tagline|lower }}.{% endblock %}
+{% block content %}
+<div class="wrap">
+  <nav class="crumbs" aria-label="Путь">
+    <a href="{% url 'core:home' %}">Главная</a>
+    <span class="crumb-sep">/</span>
+    <a href="{% url 'catalog:list' %}">{{ site.catalog_title }}</a>
+    <span class="crumb-sep">/</span>
+    <span class="crumb-current">Все категории</span>
+  </nav>
+
+  <div class="catalog-page-head">
+    <div class="catalog-head-left">
+      <span class="section-kicker">Каталог</span>
+      <h1>Все категории</h1>
+      <p class="muted">Найдите нужный раздел или подраздел — количество товаров считается автоматически.</p>
+    </div>
+  </div>
+
+  <form class="catalog-cat-search" method="get" role="search">
+    <svg class="ic" aria-hidden="true"><use href="#i-search"/></svg>
+    <input class="field" type="search" name="q" value="{{ query }}" placeholder="Поиск по категориям и подкатегориям" aria-label="Поиск по категориям и подкатегориям">
+    <button class="btn btn-primary" type="submit">Найти</button>
+    {% if query %}<a class="btn" href="{% url 'catalog:categories' %}">Сбросить</a>{% endif %}
+  </form>
+
+  {% for group in groups %}
+    <section class="category-index-group">
+      <div class="section-head">
+        <h2><a href="{{ group.root.get_absolute_url }}">{{ group.root.name }}</a></h2>
+        <span class="muted">{{ group.count|items }}</span>
+      </div>
+      <div class="category-tiles">
+        {% for item in group.items %}
+          <a class="category-tile{% if item.depth %} category-tile-sub{% endif %}" href="{{ item.category.get_absolute_url }}">
+            <span class="category-tile-img" aria-hidden="true">{% category_icon item.category "ic" %}</span>
+            <span class="category-tile-body">
+              <span class="category-tile-name">{{ item.category.name }}</span>
+              <span class="category-tile-count">{{ item.count|items }}</span>
+            </span>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% empty %}
+    <div class="empty">
+      <div class="empty-icon"><svg class="ic ic-xl" aria-hidden="true"><use href="#i-search"/></svg></div>
+      <h3>Категории не найдены</h3>
+      <p>Попробуйте другой запрос или откройте весь каталог.</p>
+      <a class="btn btn-primary" href="{% url 'catalog:list' %}">Открыть каталог</a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

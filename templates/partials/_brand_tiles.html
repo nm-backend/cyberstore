@@ -1,0 +1,21 @@
+{% load shop_tags %}{% if brand_tiles %}
+<section class="brand-tiles-section">
+  <div class="section-head">
+    <h2>Бренды</h2>
+    <span class="muted brand-tiles-hint">Выберите производителя</span>
+  </div>
+  <div class="brand-tiles">
+    {% for item in brand_tiles %}
+      <a class="brand-tile" href="?brand={{ item.brand.slug }}">
+        {% if item.brand.logo %}
+          <img class="brand-logo" src="{{ item.brand.logo.url }}" alt="{{ item.brand.name }}" loading="lazy">
+        {% else %}
+          <span class="brand-monogram" aria-hidden="true">{{ item.brand.name|first|upper }}</span>
+        {% endif %}
+        <span class="brand-tile-name">{{ item.brand.name }}</span>
+        <span class="brand-tile-count">{{ item.count|items }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

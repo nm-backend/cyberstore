@@ -74,6 +74,10 @@ class Category(models.Model):
         "Что показывать", max_length=10, choices=DisplayMode.choices, default=DisplayMode.BOTH,
         help_text="«Плитки подразделов» — только дочерние разделы. «Товары с фильтром» — сразу товары. «И плитки, и товары» — сначала подразделы, ниже товары.",
     )
+    show_brand_tiles = models.BooleanField(
+        "Плитки брендов", default=False,
+        help_text="Показывать на странице раздела плитки производителей с количеством товаров. Бренды берутся из товаров раздела.",
+    )
     quick_links_title = models.CharField(
         "Заголовок быстрых ссылок", max_length=100, blank=True,
         help_text="Например: «ПК для любых задач». Пусто — блок быстрых ссылок не показывается.",
@@ -85,6 +89,7 @@ class Category(models.Model):
         ordering = ["order", "name"]
         verbose_name = "Категория"
         verbose_name_plural = "Категории"
+        indexes = [models.Index(fields=["parent", "is_active"], name="catalog_cat_parent_active")]
 
     def __str__(self):
         return f"{self.parent.name} / {self.name}" if self.parent_id else self.name
@@ -113,6 +118,18 @@ class Category(models.Model):
 class Brand(models.Model):
     name = models.CharField("Название", max_length=80, unique=True)
     slug = models.SlugField("Адрес (slug)", unique=True, max_length=100)
+    logo = models.ImageField(
+        "Логотип", upload_to="brands/", blank=True,
+        help_text="Необязательно. Показывается на плитке бренда в каталоге.",
+    )
+    is_active = models.BooleanField(
+        "Показывать", default=True,
+        help_text="Отключённый бренд пропадает из фильтров, но остаётся у старых товаров.",
+    )
+    categories = models.ManyToManyField(
+        Category, verbose_name="Категории", blank=True, related_name="brands",
+        help_text="Где показывать бренд. Пусто — во всех категориях, где есть его товары.",
+    )
 
     class Meta:
         ordering = ["name"]
@@ -146,8 +163,33 @@ class UseCase(models.Model):
 class SpecType(models.Model):
     """Dictionary of characteristic names: Процессор, Видеокарта, ОЗУ, ..."""
 
+    class DataType(models.TextChoices):
+        TEXT = "text", "Строка"
+        NUMBER = "number", "Число"
+        NUMBER_UNIT = "number_unit", "Число с единицей измерения"
+        CHOICE = "choice", "Выбор одного значения"
+        MULTI_CHOICE = "multi_choice", "Выбор нескольких значений"
+        BOOLEAN = "boolean", "Да / Нет"
+        RANGE = "range", "Диапазон значений"
+
     name = models.CharField("Название характеристики", max_length=80, unique=True)
+    data_type = models.CharField(
+        "Тип данных", max_length=20, choices=DataType.choices, default=DataType.CHOICE,
+        help_text="Подсказывает администратору, как заполнять значение. Фильтр строится по значениям из справочника.",
+    )
+    unit = models.CharField(
+        "Единица измерения", max_length=20, blank=True,
+        help_text="Например: ГБ, Гц, ″. Необязательно.",
+    )
+    categories = models.ManyToManyField(
+        Category, verbose_name="Категории", blank=True, related_name="spec_types",
+        help_text="В каких разделах доступна характеристика. Пусто — во всех разделах.",
+    )
     order = models.PositiveSmallIntegerField("Порядок", default=0)
+    is_active = models.BooleanField(
+        "Показывать", default=True,
+        help_text="Отключённая характеристика не предлагается в фильтрах каталога.",
+    )
 
     class Meta:
         ordering = ["order", "name"]
@@ -156,6 +198,44 @@ class SpecType(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def categories_label(self):
+        names = [category.name for category in self.categories.all()]
+        return ", ".join(names) if names else "Все разделы"
+
+
+class SpecOption(models.Model):
+    """One manageable filter value, e.g. «Intel Core i5» for «Процессор»."""
+
+    spec_type = models.ForeignKey(
+        SpecType, verbose_name="Характеристика", on_delete=models.CASCADE, related_name="options"
+    )
+    name = models.CharField("Значение", max_length=120)
+    order = models.PositiveSmallIntegerField("Порядок", default=0)
+    is_active = models.BooleanField(
+        "Показывать в фильтре", default=True,
+        help_text="Отключённое значение исчезает из фильтров, но остаётся в характеристиках старых товаров.",
+    )
+
+    class Meta:
+        ordering = ["order", "name"]
+        verbose_name = "Значение характеристики"
+        verbose_name_plural = "Значения характеристик"
+        constraints = [
+            models.UniqueConstraint(fields=["spec_type", "name"], name="uniq_spec_option_name"),
+        ]
+        indexes = [models.Index(fields=["spec_type", "is_active"], name="catalog_option_type_active")]
+
+    def __str__(self):
+        return f"{self.spec_type.name}: {self.name}"
+
+    @property
+    def product_count(self):
+        return (
+            ProductSpec.objects.filter(models.Q(option=self) | models.Q(option__isnull=True, filter_value=self.name))
+            .values("product_id").distinct().count()
+        )
 
 
 class CategoryFilter(models.Model):
@@ -317,6 +397,11 @@ class Product(models.Model):
         ordering = ["-created_at"]
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
+        indexes = [
+            models.Index(fields=["is_published", "category"], name="catalog_prod_pub_cat"),
+            models.Index(fields=["brand", "is_published"], name="catalog_prod_brand_pub"),
+            models.Index(fields=["price"], name="catalog_prod_price"),
+        ]
 
     def __str__(self):
         return self.title
@@ -367,6 +452,11 @@ class ProductImage(models.Model):
 class ProductSpec(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="specs")
     spec_type = models.ForeignKey(SpecType, verbose_name="Характеристика", on_delete=models.PROTECT)
+    option = models.ForeignKey(
+        SpecOption, verbose_name="Значение из справочника", null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="product_specs",
+        help_text="Значение, которое попадает в фильтр. Если нужного нет — добавьте его в «Значения характеристик».",
+    )
     value = models.CharField("Значение", max_length=200)
     filter_value = models.CharField(
         "Значение для фильтра", max_length=200, blank=True,
@@ -378,6 +468,23 @@ class ProductSpec(models.Model):
         ordering = ["order", "id"]
         verbose_name = "Характеристика"
         verbose_name_plural = "Характеристики"
+        indexes = [
+            models.Index(fields=["spec_type", "filter_value"], name="catalog_spec_type_filter"),
+            models.Index(fields=["product", "spec_type"], name="catalog_spec_product_type"),
+        ]
 
     def __str__(self):
         return f"{self.spec_type.name}: {self.value}"
+
+    def clean(self):
+        if self.option_id and self.spec_type_id and self.option.spec_type_id != self.spec_type_id:
+            raise ValidationError({"option": "Выбранное значение относится к другой характеристике."})
+
+    def save(self, *args, **kwargs):
+        if self.option_id is None and self.spec_type_id:
+            label = (self.filter_value or "").strip() or (self.value or "").strip()
+            if label:
+                self.option = SpecOption.objects.filter(
+                    spec_type_id=self.spec_type_id, name__iexact=label[:120]
+                ).first()
+        super().save(*args, **kwargs)
