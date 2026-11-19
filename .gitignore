@@ -12,3 +12,6 @@ staticfiles/
 dev-server.log
 .DS_Store
 _audit/
+
+.audit/
+.tmp_lalafo/

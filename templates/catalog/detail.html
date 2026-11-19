@@ -160,6 +160,21 @@
   {% endif %}
 </div>
 
+<!-- Sticky purchase bar (phones): price and the two order actions always at hand -->
+<div class="buy-bar" data-buy-bar>
+  <div class="buy-bar-price">
+    <span class="buy-bar-value">{{ product.price|price }}</span>
+    {% if product.installment_available %}<span class="buy-bar-note">Рассрочка 18+</span>{% endif %}
+  </div>
+  <div class="buy-bar-actions">
+    <a class="btn btn-wa" href="{{ wa }}" target="_blank" rel="noopener">
+      <svg><use href="#i-wa"/></svg>
+      <span>Заказать</span>
+    </a>
+    <button class="btn btn-outline" type="button" data-open-lead aria-label="Оставить заявку">Заявка</button>
+  </div>
+</div>
+
 <!-- Lead Request Modal Dialog -->
 <dialog class="lead-modal" data-lead-dialog aria-labelledby="lead-title">
   <form class="dialog-body-modern" method="post" action="{% url 'leads:create' %}">

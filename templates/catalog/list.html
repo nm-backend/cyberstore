@@ -29,7 +29,6 @@
       </p>
     </div>
     <div class="catalog-head-right">
-      <span class="catalog-head-count">{{ result_count|items }}</span>
       <a class="btn" href="{% url 'catalog:categories' %}">Все категории</a>
     </div>
   </div>
@@ -38,7 +37,7 @@
     {% if root_tiles %}
       {% include "partials/_category_tiles.html" with tiles=root_tiles title="Разделы каталога" searchable=True %}
     {% elif subcategory_tiles %}
-      {% include "partials/_category_tiles.html" with tiles=subcategory_tiles title="Подразделы" searchable=True %}
+      {% include "partials/_category_tiles.html" with tiles=subcategory_tiles title="Подразделы" searchable=True compact=True %}
     {% endif %}
   {% endif %}
 
@@ -62,7 +61,7 @@
       {% if filter_groups or category_options %}
         <aside class="filters" data-filters aria-label="Фильтры каталога">
           <div class="filters-header">
-            <h3>Фильтры</h3>
+            <h2 class="filters-title">Фильтры</h2>
             <div class="filters-header-actions">
               {% if has_filters %}<a class="filters-reset-link" href="{{ request.path }}">Очистить</a>{% endif %}
               <button class="filters-close-btn" type="button" data-filter-close aria-label="Закрыть фильтры">
@@ -131,7 +130,8 @@
         </aside>
       {% endif %}
 
-      <section class="catalog-results">
+      <section class="catalog-results" aria-labelledby="catalog-results-title">
+        <h2 class="sr-only" id="catalog-results-title">{% if query %}Результаты поиска{% else %}Товары{% endif %}</h2>
         <div class="catalog-toolbar">
           <div class="catalog-count">
             {% if query %}Найдено: {% else %}Товаров: {% endif %}<strong>{{ page.paginator.count }}</strong>
@@ -197,6 +197,9 @@
             <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Помогите подобрать технику.' %}" target="_blank" rel="noopener">
               <svg><use href="#i-wa"/></svg>
               Спросить в WhatsApp
+            </a>
+            <a class="btn" href="{% whatsapp_generic 'Здравствуйте! Сообщите, пожалуйста, когда появится товар в этом разделе.' %}" target="_blank" rel="noopener">
+              Сообщить о поступлении
             </a>
           </div>
         {% endif %}

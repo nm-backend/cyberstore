@@ -15,11 +15,13 @@
   <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Unbounded:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cyberpunk.css' %}">
   {% block head_extra %}{% endblock %}
 </head>
 <body>
+<a class="skip-link" href="#main">Перейти к содержанию</a>
 <svg width="0" height="0" style="position:absolute;display:none" aria-hidden="true">
   <!-- WhatsApp -->
   <symbol id="i-wa" viewBox="0 0 24 24"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></symbol>
@@ -34,6 +36,19 @@
   <symbol id="i-laptop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="11" rx="1.6"/><path d="M2 19h20"/></symbol>
   <symbol id="i-desktop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.6"/><path d="M9 20h6M12 16v4"/></symbol>
   <symbol id="i-chip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="7" width="10" height="10" rx="1.5"/><rect x="10.2" y="10.2" width="3.6" height="3.6" rx=".6"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12" rx="1.8"/><path d="M9 20h6M12 16v4"/></symbol>
+  <symbol id="i-gpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6.5" width="17" height="9" rx="1.6"/><circle cx="7.2" cy="11" r="2.3"/><circle cx="13.2" cy="11" r="2.3"/><path d="M19.5 9.3h2v4h-2M5 15.5v2.5M9 15.5v2.5"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="5.5" width="13" height="13" rx="1.6"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 3v2.5M12 3v2.5M15 3v2.5M9 18.5V21M12 18.5V21M15 18.5V21M3 9h2.5M3 12h2.5M3 15h2.5M18.5 9H21M18.5 12H21M18.5 15H21"/></symbol>
+  <symbol id="i-ram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="7.5" rx="1.4"/><path d="M6.5 14.5V17M9.5 14.5V17M12.5 14.5V17M15.5 14.5V17M18.5 14.5V17M7 10.5h10"/></symbol>
+  <symbol id="i-storage" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2"/><circle cx="16.8" cy="12" r="2.1"/><path d="M6.5 9.5h6M6.5 12h4.5M6.5 14.5h3.5"/></symbol>
+  <symbol id="i-motherboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3.5" width="18" height="17" rx="1.8"/><rect x="6" y="6.5" width="5.5" height="5.5" rx="1"/><path d="M14.5 7H18M14.5 10H18M14.5 13H18M6 15.5h12M6 18h7"/></symbol>
+  <symbol id="i-psu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="8.5" cy="12" r="3.1"/><circle cx="8.5" cy="12" r="0.6" fill="currentColor"/><path d="M14 9.5h4M14 14.5h4"/></symbol>
+  <symbol id="i-case" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5.5" y="2.5" width="13" height="19" rx="2"/><circle cx="12" cy="7" r="2.2"/><path d="M8.5 12.5h7M8.5 15.5h7M8.5 18.5h4"/></symbol>
+  <symbol id="i-kit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8 21 7l-9 4.2L3 7l9-4.2Z"/><path d="M3 7v9l9 4.2 9-4.2V7"/><path d="M12 11.2v9"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 9.5h4L13 5.5v13L7.5 14.5h-4z"/><path d="M16 9.2a4 4 0 0 1 0 5.6M18.5 6.7a7.5 7.5 0 0 1 0 10.6"/></symbol>
+  <symbol id="i-disc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.3"/><path d="M16.5 5.6a8.5 8.5 0 0 1 3.4 6.1"/></symbol>
+  <symbol id="i-capture" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="7.8" cy="12" r="2"/><path d="M12.5 9.5H19M12.5 12H19M12.5 14.5h4"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5V7M15 2.5V7M6 7h12v2.5a6 6 0 0 1-12 0V7ZM12 15.5V21"/></symbol>
   <symbol id="i-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 8h9a5 5 0 0 1 4.9 5.9l-.6 3.4A2.6 2.6 0 0 1 16 18.6L14.6 17H9.4L8 18.6a2.6 2.6 0 0 1-4.8-1.3l-.6-3.4A5 5 0 0 1 7.5 8Z"/><path d="M8 11.5v3M6.5 13h3M15.5 12h.01M17.5 14h.01"/></symbol>
   <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h5.5a2.5 2.5 0 0 1 2.5 2.5v13a1.8 1.8 0 0 0-1.8-1.8H4Z"/><path d="M20 4.5h-5.5A2.5 2.5 0 0 0 12 7v13a1.8 1.8 0 0 1 1.8-1.8H20Z"/></symbol>
   <symbol id="i-briefcase" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7.5" width="18" height="12" rx="2"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3 12.5h18"/></symbol>
@@ -72,6 +87,14 @@
     </form>
 
     <div class="header-actions">
+      <button class="header-icon-btn header-search-toggle" type="button" data-search-toggle aria-label="Открыть поиск" aria-expanded="false" aria-controls="mobile-search">
+        <svg><use href="#i-search"/></svg>
+      </button>
+
+      <a class="header-icon-btn header-wa-icon" href="{% whatsapp_generic %}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">
+        <svg><use href="#i-wa"/></svg>
+      </a>
+
       <a class="header-phone" href="tel:{{ site.phone_tel }}" aria-label="Позвонить {{ site.phone }}" title="{{ site.phone }}">
         <svg><use href="#i-phone"/></svg>
         <span>{{ site.phone }}</span>
@@ -87,6 +110,14 @@
         <span></span><span></span><span></span>
       </button>
     </div>
+  </div>
+
+  <div class="mobile-search" id="mobile-search" data-mobile-search hidden>
+    <form class="wrap" action="{% url 'catalog:list' %}" role="search">
+      <svg class="search-icon" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="mobile-q" type="search" name="q" placeholder="Найти товар, бренд или модель" aria-label="Поиск товаров" autocomplete="off">
+      <button class="btn btn-primary" type="submit">Найти</button>
+    </form>
   </div>
 
   <nav class="nav" data-nav aria-label="Основное меню">
@@ -125,6 +156,9 @@
           <a class="nav-menu-foot" href="{% url 'catalog:categories' %}">Все категории и подразделы →</a>
         </div>
       </div>
+      {% for item in nav_menu %}
+        <a class="nav-root-link" href="{{ item.category.get_absolute_url }}">{{ item.category.name }}</a>
+      {% endfor %}
       <a href="{% url 'core:installment' %}"{% if request.path == '/installment/' %} class="active"{% endif %}>Рассрочка</a>
       <a href="{% url 'core:delivery' %}"{% if request.path == '/delivery/' %} class="active"{% endif %}>Доставка</a>
       <a href="{% url 'core:contacts' %}"{% if request.path == '/contacts/' %} class="active"{% endif %}>Контакты</a>
@@ -138,7 +172,7 @@
 </div>
 {% endif %}
 
-<main>{% block content %}{% endblock %}</main>
+<main id="main">{% block content %}{% endblock %}</main>
 
 <!-- High-end dark footer -->
 <footer class="site-footer">
@@ -160,7 +194,7 @@
       </div>
 
       <div class="footer-col">
-        <h3>Каталог</h3>
+        <h2 class="footer-col-title">Каталог</h2>
         <ul>
           {% for c in nav_categories %}
             <li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
@@ -170,7 +204,7 @@
       </div>
 
       <div class="footer-col">
-        <h3>Покупателям</h3>
+        <h2 class="footer-col-title">Покупателям</h2>
         <ul>
           <li><a href="{% url 'core:installment' %}">Условия рассрочки</a></li>
           <li><a href="{% url 'core:delivery' %}">Доставка по КР</a></li>
@@ -180,7 +214,7 @@
       </div>
 
       <div class="footer-col">
-        <h3>Связь с нами</h3>
+        <h2 class="footer-col-title">Связь с нами</h2>
         <ul class="footer-contacts-list">
           <li><a class="footer-tel" href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></li>
           <li class="footer-work">{{ site.work_days }}: {{ site.work_hours }}</li>
@@ -211,5 +245,6 @@
 </a>
 
 <script src="{% static 'js/main.js' %}" defer></script>
+<script src="{% static 'js/cyberpunk.js' %}" defer></script>
 </body>
 </html>

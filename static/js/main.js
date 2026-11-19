@@ -62,6 +62,13 @@
     btn.addEventListener("click", function () { setFilters(false); });
   });
 
+  // Escape closes the mobile menu and the filter drawer (search has its own handler)
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") return;
+    if (nav && nav.classList.contains("open")) setMenu(false);
+    if (filters && filters.classList.contains("open")) setFilters(false);
+  });
+
   // catalog: only selects explicitly marked as auto-submit reload the page
   var filterForm = document.querySelector("[data-filter-form]");
   if (filterForm) {

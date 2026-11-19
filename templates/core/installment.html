@@ -5,6 +5,11 @@
 {% block content %}
 <section class="info-page">
   <div class="wrap">
+    <nav class="crumbs" aria-label="Путь">
+      <a href="{% url 'core:home' %}">Главная</a>
+      <span class="crumb-sep">/</span>
+      <span class="crumb-current">Рассрочка</span>
+    </nav>
     <div class="contacts-head">
       <h1>Рассрочка на технику</h1>
       {% for p in site.installment_paragraphs %}<p>{{ p }}</p>{% endfor %}
@@ -28,6 +33,54 @@
       {% endfor %}
     </div>
     {% endif %}
+
+    <section class="flow-steps" aria-labelledby="installment-steps">
+      <div class="section-head">
+        <div>
+          <span class="section-kicker">Порядок</span>
+          <h2 id="installment-steps">Как оформить рассрочку</h2>
+        </div>
+      </div>
+      <ol class="flow-steps-grid">
+        <li class="flow-step"><span class="flow-step-num">01</span><h3>Выберите технику</h3><p>Найдите товар в каталоге и проверьте отметку «Рассрочка 18+» на карточке.</p></li>
+        <li class="flow-step"><span class="flow-step-num">02</span><h3>Оставьте заявку</h3><p>Напишите в WhatsApp или оставьте номер — менеджер подтвердит наличие и условия.</p></li>
+        <li class="flow-step"><span class="flow-step-num">03</span><h3>Подпишите договор</h3><p>Нужен только паспорт. Возраст от 18 лет, без справок и поручителей.</p></li>
+        <li class="flow-step"><span class="flow-step-num">04</span><h3>Заберите технику</h3><p>Самовывоз из магазина в {{ site.city }} или доставка по Кыргызстану.</p></li>
+      </ol>
+    </section>
+
+    <section class="calc-box" data-calculator aria-labelledby="calc-title">
+      <div class="calc-copy">
+        <span class="section-kicker">Калькулятор</span>
+        <h2 id="calc-title">Платёж в месяц</h2>
+        <p>Предварительный расчёт: сумма делится на срок без процентов. Точные условия подтверждает менеджер.</p>
+      </div>
+      <div class="calc-form">
+        <label class="calc-field">
+          <span>Цена, сом</span>
+          <input class="field" type="number" min="0" step="100" value="50000" inputmode="numeric" data-calc-price>
+        </label>
+        <label class="calc-field">
+          <span>Срок</span>
+          <select class="field" data-calc-term>
+            <option value="3">3 месяца</option>
+            <option value="6">6 месяцев</option>
+            <option value="9">9 месяцев</option>
+            <option value="12" selected>12 месяцев</option>
+            <option value="18">18 месяцев</option>
+            <option value="24">24 месяца</option>
+          </select>
+        </label>
+        <div class="calc-result" aria-live="polite">
+          <span>В месяц</span>
+          <strong data-calc-monthly>4 167 сом</strong>
+        </div>
+        <a class="btn btn-wa btn-block" data-calc-wa href="{% whatsapp_generic 'Здравствуйте! Хочу оформить рассрочку.' %}" target="_blank" rel="noopener">
+          <svg><use href="#i-wa"/></svg>
+          Оформить в WhatsApp
+        </a>
+      </div>
+    </section>
 
     <div class="bottom-cta-banner">
       <div>

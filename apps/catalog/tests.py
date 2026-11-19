@@ -200,8 +200,8 @@ class CatalogStructureTests(TestCase):
         roots = Category.objects.filter(parent__isnull=True, is_active=True)
         self.assertEqual(roots.count(), 4)
         self.assertEqual(
-            set(roots.values_list("name", flat=True)),
-            {"Настольные ПК", "Комплектующие для ПК", "Мониторы", "Ноутбуки и аксессуары"},
+            list(roots.order_by("order").values_list("name", flat=True)),
+            ["Настольные ПК", "Комплектующие для ПК", "Мониторы", "Ноутбуки"],
         )
         for category in Category.objects.filter(is_active=True):
             response = self.client.get(category.get_absolute_url())
@@ -211,7 +211,7 @@ class CatalogStructureTests(TestCase):
     def test_nav_has_catalog_menu_with_four_categories(self):
         response = self.client.get(reverse("core:home"))
         self.assertContains(response, "nav-drop-menu")
-        for name in ("Настольные ПК", "Комплектующие для ПК", "Мониторы", "Ноутбуки и аксессуары"):
+        for name in ("Настольные ПК", "Комплектующие для ПК", "Мониторы", "Ноутбуки"):
             self.assertContains(response, name)
 
     def test_category_counts_are_real(self):

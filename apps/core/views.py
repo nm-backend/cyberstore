@@ -11,12 +11,17 @@ def home(request):
     featured = list(products.filter(is_featured=True)[:8])
     if not featured:
         featured = list(products[:8])
-    categories = Category.objects.filter(is_active=True, parent__isnull=True).annotate(
-        total=Count(
-            "products",
-            filter=Q(products__is_published=True),
-            distinct=True,
+    # Aggregation drops Meta.ordering, so the section order is set explicitly.
+    categories = (
+        Category.objects.filter(is_active=True, parent__isnull=True)
+        .annotate(
+            total=Count(
+                "products",
+                filter=Q(products__is_published=True),
+                distinct=True,
+            )
         )
+        .order_by("order", "name")
     )
     return render(
         request,

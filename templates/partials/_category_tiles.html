@@ -9,7 +9,7 @@
       </div>
     {% endif %}
   </div>
-  <div class="category-tiles">
+  <div class="category-tiles{% if compact %} category-tiles-compact{% endif %}">
     {% for t in tiles %}
       <a class="category-tile{% if t.is_all %} category-tile-all{% endif %}{% if t.is_current %} is-current{% endif %}" href="{{ t.url }}" data-tile-name="{{ t.name|lower }}">
         {% if t.image %}

@@ -1876,3 +1876,32 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
   .category-search { width: 100%; }
   .catalog-head-right { width: 100%; justify-content: space-between; }
 }
+
+/* Phone: subcategories read as a compact list (icon, name, count on the right),
+   the same way the section list looks in the store's app screenshots. */
+@media (max-width: 700px) {
+  .category-tiles {
+    grid-template-columns: 1fr; gap: 0;
+    border-top: 1px solid var(--gesso-divider);
+  }
+  .category-tile {
+    flex-direction: row; align-items: center; gap: var(--gesso-space-3);
+    padding: 10px 0;
+    border: 0; border-bottom: 1px solid var(--gesso-divider);
+    border-radius: 0; background: transparent;
+  }
+  .category-tile:hover { background: transparent; border-color: var(--gesso-divider); }
+  .category-tile-img {
+    width: 56px; height: 56px; aspect-ratio: auto; flex: none;
+    border-radius: var(--radius-md);
+  }
+  .category-tile-img .ic { width: 26px; height: 26px; }
+  .category-tile-body {
+    flex: 1; min-width: 0;
+    flex-direction: row; align-items: center; justify-content: space-between;
+    gap: var(--gesso-space-2); padding: 0;
+  }
+  .category-tile-name { font-size: var(--gesso-text-base); }
+  .category-tile-desc { display: none; }
+  .category-tile-count { margin-top: 0; white-space: nowrap; }
+}

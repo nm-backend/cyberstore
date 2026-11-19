@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from apps.core.models import SiteSettings
 
-from .models import Brand, Category, Product, ProductSpec, SpecOption
+from .models import Brand, Category, Product, ProductSpec, SpecOption, UseCase
 from .tree import CategoryTree
 
 PAGE_SIZE = 12
@@ -112,7 +112,12 @@ def _apply_filters(qs, request, rows, selected, rate, skip=None):
     if skip != "delivery" and selected["delivery"]:
         qs = qs.filter(delivery__in=selected["delivery"])
     if skip != "location" and selected["location"]:
-        qs = qs.filter(location__in=selected["location"])
+        city = SiteSettings.load().city.strip()
+        # Goods without a filled city belong to the shop's own city.
+        place = Q(location__in=selected["location"])
+        if city and city in selected["location"]:
+            place |= Q(location="")
+        qs = qs.filter(place)
     if skip != "installment":
         if selected["installment"] == {"1"}:
             qs = qs.filter(installment_available=True)
@@ -207,8 +212,7 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
 
         if row.source == "price":
             low, high = _price_bounds(facet_base, currency, rate)
-            if low is None and high is None:
-                continue
+            # Configured price filter stays visible even in an empty section.
             groups.append({
                 "key": "price", "title": row.display_title, "type": "price",
                 "low": low, "high": high,
@@ -231,28 +235,39 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
                 }
                 for item in stats
             ]
+            if not options:
+                # No goods yet: offer brands assigned to the section, then brands
+                # sold anywhere on the site, so the configured filter is not lost.
+                fallback = row.category.brands.filter(is_active=True)
+                if not fallback.exists():
+                    fallback = Brand.objects.filter(
+                        is_active=True, products__is_published=True
+                    ).distinct()
+                options = [
+                    {
+                        "value": brand.slug, "label": brand.name, "count": 0,
+                        "checked": brand.slug in selected["brand"],
+                    }
+                    for brand in fallback.order_by("name")
+                ]
         elif row.source == "use_case":
             stats = (
                 facet_base.filter(use_cases__isnull=False)
-                .values("use_cases__slug", "use_cases__name")
+                .values("use_cases__slug")
                 .annotate(n=Count("id", distinct=True))
-                .order_by("use_cases__name")
             )
+            counts = {item["use_cases__slug"]: item["n"] for item in stats}
+            # The block is configured in the admin, so every destination is listed;
+            # a zero means «пока нет товаров», not «фильтр сломан».
             options = [
                 {
-                    "value": item["use_cases__slug"], "label": item["use_cases__name"],
-                    "count": item["n"], "checked": item["use_cases__slug"] in selected["use_case"],
+                    "value": use_case.slug, "label": use_case.name,
+                    "count": counts.get(use_case.slug, 0), "checked": use_case.slug in selected["use_case"],
                 }
-                for item in stats
+                for use_case in UseCase.objects.all()
             ]
         elif row.source == "spec":
             if not row.spec_type_id:
-                continue
-            # Hide a characteristic the category never uses, so a fresh
-            # section is not flooded with empty filter groups.
-            if not ProductSpec.objects.filter(
-                product_id__in=base.values("pk"), spec_type_id=row.spec_type_id
-            ).exists():
                 continue
             options = _spec_options(
                 row.spec_type, facet_base, spec_selection.get(f"spec_{row.pk}", [])
@@ -261,22 +276,20 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
             for value, label in Product.Condition.choices:
                 if not value:
                     continue
-                count = facet_base.filter(condition=value).count()
-                if count or value in selected["condition"]:
-                    options.append({
-                        "value": value, "label": label, "count": count,
-                        "checked": value in selected["condition"],
-                    })
+                options.append({
+                    "value": value, "label": label,
+                    "count": facet_base.filter(condition=value).count(),
+                    "checked": value in selected["condition"],
+                })
         elif row.source == "delivery":
             for value, label in Product.Delivery.choices:
                 if not value:
                     continue
-                count = facet_base.filter(delivery=value).count()
-                if count or value in selected["delivery"]:
-                    options.append({
-                        "value": value, "label": label, "count": count,
-                        "checked": value in selected["delivery"],
-                    })
+                options.append({
+                    "value": value, "label": label,
+                    "count": facet_base.filter(delivery=value).count(),
+                    "checked": value in selected["delivery"],
+                })
         elif row.source == "location":
             stats = (
                 facet_base.exclude(location="")
@@ -291,6 +304,14 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
                 }
                 for item in stats
             ]
+            if not options:
+                # No goods with a city yet: everything is sold from the shop's city.
+                city = SiteSettings.load().city.strip()
+                if city:
+                    options = [{
+                        "value": city, "label": city, "count": facet_base.count(),
+                        "checked": city in selected["location"],
+                    }]
         elif row.source == "installment":
             yes = facet_base.filter(installment_available=True).count()
             no = facet_base.filter(installment_available=False).count()
@@ -361,7 +382,9 @@ def _active_filters(request, groups, category, currency):
         chips.append({"label": f"Цена до {request.GET['price_max']} {money}", "url": _url_without(request, "price_max")})
     if request.GET.get("q", "").strip():
         chips.append({"label": f"Поиск: {request.GET['q'].strip()}", "url": _url_without(request, "q")})
-    if category:
+    # The category chip is only useful when it narrows a broader page, not when
+    # the visitor is already inside that section.
+    if category and request.path != category.get_absolute_url():
         params = request.GET.copy()
         params.pop("category", None)
         params.pop("page", None)

@@ -4,6 +4,12 @@
 {% block content %}
 <section class="contacts-page">
   <div class="wrap">
+    <nav class="crumbs" aria-label="Путь">
+      <a href="{% url 'core:home' %}">Главная</a>
+      <span class="crumb-sep">/</span>
+      <span class="crumb-current">Контакты</span>
+    </nav>
+
     <!-- Centered Header -->
     <div class="contacts-head">
       <h1>Свяжитесь с нами</h1>

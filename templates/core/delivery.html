@@ -5,6 +5,11 @@
 {% block content %}
 <section class="info-page">
   <div class="wrap">
+    <nav class="crumbs" aria-label="Путь">
+      <a href="{% url 'core:home' %}">Главная</a>
+      <span class="crumb-sep">/</span>
+      <span class="crumb-current">Доставка</span>
+    </nav>
     <div class="contacts-head">
       <h1>Доставка</h1>
       {% for p in site.delivery_paragraphs %}<p>{{ p }}</p>{% endfor %}
@@ -20,6 +25,39 @@
           <li>График: <strong>{{ site.work_days }}, {{ site.work_hours }}</strong></li>
           <li>Телефон: <a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></li>
         </ul>
+      </div>
+    </div>
+
+    <section class="flow-steps" aria-labelledby="delivery-steps">
+      <div class="section-head">
+        <div>
+          <span class="section-kicker">Порядок</span>
+          <h2 id="delivery-steps">Как проходит доставка</h2>
+        </div>
+      </div>
+      <ol class="flow-steps-grid">
+        <li class="flow-step"><span class="flow-step-num">01</span><h3>Заявка</h3><p>Пишете в WhatsApp: товар и адрес. Менеджер подтверждает наличие.</p></li>
+        <li class="flow-step"><span class="flow-step-num">02</span><h3>Согласование</h3><p>Считаем стоимость доставки и называем точное время.</p></li>
+        <li class="flow-step"><span class="flow-step-num">03</span><h3>Отправка</h3><p>Упаковываем технику и передаём курьеру или в транспортную службу.</p></li>
+        <li class="flow-step"><span class="flow-step-num">04</span><h3>Получение</h3><p>Проверяете комплект при получении и подписываете документы.</p></li>
+      </ol>
+    </section>
+
+    <div class="delivery-zones">
+      <div class="zone-card">
+        <span class="plan-pill">{{ site.city }}</span>
+        <h3>По городу</h3>
+        <p>Курьером в день заказа или на следующий день. Самовывоз с {{ site.address }} — сразу после подтверждения.</p>
+      </div>
+      <div class="zone-card">
+        <span class="plan-pill">Кыргызстан</span>
+        <h3>По регионам</h3>
+        <p>Отправка транспортными службами. Срок и стоимость зависят от города — уточняет менеджер.</p>
+      </div>
+      <div class="zone-card">
+        <span class="plan-pill">Проверка</span>
+        <h3>При получении</h3>
+        <p>Включаем технику вместе с вами, проверяем комплект и внешний вид до подписания.</p>
       </div>
     </div>
 
