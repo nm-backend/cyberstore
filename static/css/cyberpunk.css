@@ -727,3 +727,11 @@ h3, h4, .card-title, .cat-box h3, .footer-col-title {
 
 /* The 404 page keeps one H1 but stays compact */
 .empty h1 { font-size: var(--gesso-text-2xl); letter-spacing: -0.03em; margin-bottom: var(--gesso-space-3); }
+
+/* Long opening-hours values wrap inside the hero HUD instead of running over the label */
+.hud-list li { grid-template-columns: 18px minmax(0, 1fr) minmax(0, 1.15fr); }
+.hud-list strong {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
+}
