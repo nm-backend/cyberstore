@@ -724,3 +724,6 @@ h3, h4, .card-title, .cat-box h3, .footer-col-title {
   .price-main { font-size: 28px; }
   .details-section-head h2 { font-size: 22px; }
 }
+
+/* The 404 page keeps one H1 but stays compact */
+.empty h1 { font-size: var(--gesso-text-2xl); letter-spacing: -0.03em; margin-bottom: var(--gesso-space-3); }
