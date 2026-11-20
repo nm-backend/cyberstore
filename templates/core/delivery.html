@@ -22,7 +22,7 @@
         <h2>Из магазина в {{ site.city }}</h2>
         <ul class="plan-features">
           <li>Адрес: <strong>{{ site.city }}, ул. {{ site.address }}</strong>{% if site.address_note %} ({{ site.address_note }}){% endif %}</li>
-          <li>График: <strong>{{ site.work_days }}, {{ site.work_hours }}</strong></li>
+          <li>График: <strong>{{ site.work_days }}, {{ site.hours_without_days }}</strong></li>
           <li>Телефон: <a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></li>
         </ul>
       </div>

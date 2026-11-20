@@ -47,7 +47,7 @@
          <li><svg class="ic" aria-hidden="true"><use href="#i-cart"/></svg><span>Товаров в каталоге</span><strong>{{ total }}</strong></li>
          <li><svg class="ic" aria-hidden="true"><use href="#i-card"/></svg><span>Рассрочка</span><strong>18+ · паспорт</strong></li>
          <li><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg><span>Доставка</span><strong>по Кыргызстану</strong></li>
-         <li><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><span>{{ site.work_days }}</span><strong>{{ site.work_hours }}</strong></li>
+         <li><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg><span>{{ site.work_days }}</span><strong>{{ site.hours_without_days }}</strong></li>
        </ul>
      </div>
    </aside>
@@ -85,7 +85,7 @@
         <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></div>
         <div>
           <p class="trust-card-title">{{ site.city }}, {{ site.address }}</p>
-          <p>{{ site.work_days }}, {{ site.work_hours }}</p>
+          <p>{{ site.work_days }}, {{ site.hours_without_days }}</p>
         </div>
       </div>
     </div>
@@ -226,7 +226,7 @@
         <div class="contact-card-content">
           <span class="contact-label">Время работы</span>
           <div class="contact-main-text">{{ site.work_days }}</div>
-          <div class="contact-live-status"><span class="pulse-dot"></span><span>{{ site.work_hours }}</span></div>
+          <div class="contact-live-status"><span class="pulse-dot"></span><span>{{ site.hours_without_days }}</span></div>
         </div>
       </div>
     </div>

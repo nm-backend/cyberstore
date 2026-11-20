@@ -128,6 +128,25 @@ class SiteSettings(models.Model):
         return f"{self.address}, {self.city}"
 
     @property
+    def hours_without_days(self):
+        """Часы работы без уже показанных дней недели.
+
+        Владелец может записать «Ежедневно с 9:00 до 22:00» в оба поля, тогда
+        подпись «Ежедневно» повторялась бы. Если часы начинаются с тех же дней,
+        что и подпись, лишний префикс убирается; иначе значение не меняется.
+        """
+        hours = re.sub(r"\s+", " ", self.work_hours or "").strip()
+        days = re.sub(r"\s+", " ", self.work_days or "").strip()
+        if not hours or not days:
+            return hours
+        days_pattern = re.escape(days).replace(r"\-", "[-–—]")
+        match = re.match(rf"^{days_pattern}\b", hours, flags=re.IGNORECASE)
+        if match is None:
+            return hours
+        tail = hours[match.end():].lstrip(" \t,.:;—-–—")
+        return tail or hours
+
+    @property
     def map_search_url(self):
         query = quote_plus(f"{self.full_address}, Кыргызстан")
         return f"https://www.google.com/maps/search/?api=1&query={query}"

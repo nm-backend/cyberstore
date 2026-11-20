@@ -41,3 +41,31 @@ class CoreTests(TestCase):
 
     def test_404_page(self):
         self.assertEqual(self.client.get("/no-such-page/").status_code, 404)
+
+    def test_hours_do_not_repeat_days(self):
+        site = SiteSettings.load()
+        site.work_days = "Ежедневно"
+        site.work_hours = "Ежедневно с 9:00 до 22:00, без выходных"
+        self.assertEqual(site.hours_without_days, "с 9:00 до 22:00, без выходных")
+
+        site.work_hours = "Ежедневно: 09:00 – 22:00"
+        self.assertEqual(site.hours_without_days, "09:00 – 22:00")
+
+        site.work_days = "Пн-Сб"
+        site.work_hours = "Пн–Сб 9:00–20:00"
+        self.assertEqual(site.hours_without_days, "9:00–20:00")
+
+        site.work_days = "Ежедневно"
+        site.work_hours = "09:00 – 22:00"
+        self.assertEqual(site.hours_without_days, "09:00 – 22:00")
+
+    def test_pages_show_schedule_once(self):
+        site = SiteSettings.load()
+        site.work_days = "Ежедневно"
+        site.work_hours = "Ежедневно с 9:00 до 22:00, без выходных"
+        site.save()
+        for name in ["core:home", "core:contacts", "core:delivery"]:
+            response = self.client.get(reverse(name))
+            self.assertNotContains(response, "Ежедневно, Ежедневно", msg_prefix=name)
+            self.assertNotContains(response, "Ежедневно: Ежедневно", msg_prefix=name)
+            self.assertContains(response, "с 9:00 до 22:00, без выходных", msg_prefix=name)
