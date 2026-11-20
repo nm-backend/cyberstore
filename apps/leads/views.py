@@ -22,6 +22,24 @@ def _back(request):
     return redirect(reverse("core:home"))
 
 
+def _remember_form(request, form, extra_error=""):
+    """Keep values and messages so the product page can reopen the modal."""
+    errors = {
+        field: [item["message"] for item in items]
+        for field, items in form.errors.get_json_data().items()
+    }
+    if extra_error:
+        errors.setdefault("nonfield", []).append(extra_error)
+    request.session["lead_form_state"] = {
+        "errors": errors,
+        "values": {
+            "name": request.POST.get("name", ""),
+            "phone": request.POST.get("phone", ""),
+            "wants_installment": request.POST.get("wants_installment") == "1",
+        },
+    }
+
+
 @require_POST
 def create_lead(request):
     form = LeadForm(request.POST)
@@ -29,14 +47,17 @@ def create_lead(request):
     if form.data.get("website"):  # bot filled the honeypot: pretend everything is fine
         return _back(request)
 
-    last = request.session.get("last_lead_ts", 0)
-    if time.time() - last < MIN_SECONDS_BETWEEN_LEADS:
-        messages.error(request, "Заявка уже отправлена. Подождите немного перед следующей.")
+    if not form.is_valid():
+        _remember_form(request, form)
+        messages.error(request, "Заявка не отправлена. Проверьте выделенные поля.")
         return _back(request)
 
-    if not form.is_valid():
-        errors = " ".join(error for errs in form.errors.values() for error in errs)
-        messages.error(request, f"Заявка не отправлена. {errors}")
+    last = request.session.get("last_lead_ts", 0)
+    if time.time() - last < MIN_SECONDS_BETWEEN_LEADS:
+        _remember_form(
+            request, form,
+            "Заявка уже отправлена. Подождите немного перед следующей.",
+        )
         return _back(request)
 
     lead = form.save(commit=False)
@@ -49,5 +70,6 @@ def create_lead(request):
     lead.save()
 
     request.session["last_lead_ts"] = time.time()
+    request.session.pop("lead_form_state", None)
     messages.success(request, "Спасибо! Заявка принята, менеджер свяжется с вами.")
     return _back(request)

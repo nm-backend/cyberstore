@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Страница не найдена — {{ site.shop_name }}{% endblock %}
+{% block description %}Страница не найдена. Откройте каталог {{ site.shop_name }} или свяжитесь с нами в WhatsApp.{% endblock %}
+{% block robots %}noindex, follow{% endblock %}
+{% block canonical_link %}{% endblock %}
+{% block og_title %}Страница не найдена — {{ site.shop_name }}{% endblock %}
 {% block content %}
 <section class="section"><div class="wrap">
   <div class="empty">

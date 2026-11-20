@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% load shop_tags %}
-{% block title %}Контакты — {{ site.shop_name }}, {{ site.city }}, {{ site.address }}{% endblock %}
+{% block title %}Контакты — {{ site.shop_name }}, {{ site.city }}{% endblock %}
+{% block description %}Адрес магазина {{ site.shop_name }}: {{ site.city }}, ул. {{ site.address }}. Телефон {{ site.phone }}, WhatsApp, часы работы {{ site.hours_without_days }}, карта проезда.{% endblock %}
+{% block og_title %}Контакты и адрес — {{ site.shop_name }}{% endblock %}
+{% block og_description %}{{ site.shop_name }}: {{ site.city }}, ул. {{ site.address }}. Телефон {{ site.phone }}, {{ site.work_days }}, {{ site.hours_without_days }}.{% endblock %}
 {% block content %}
 <section class="contacts-page">
   <div class="wrap">

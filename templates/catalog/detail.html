@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% load shop_tags %}
-{% block title %}{{ product.title }} — {{ product.price|price }} | {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description }} {{ site.shop_name }}, {{ site.city }}.{% endblock %}
+{% block title %}{{ product.title|truncatechars:62 }} — {{ site.shop_name }}{% endblock %}
+{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description|truncatechars:110 }} Купить в {{ site.city }}, рассрочка и доставка по КР.{% endblock %}
 {% block og_title %}{{ product.title }}{% endblock %}
+{% block og_description %}{{ product.title }}{% if product.price %} — {{ product.price|price }}{% endif %}. {{ product.short_description|truncatechars:140 }}{% endblock %}
 {% block head_extra %}
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Product","name":"{{ product.title|escapejs }}",
@@ -28,7 +29,14 @@
     <div class="product-gallery">
       <div class="gallery-main-card">
         {% if images %}
-          <img data-gallery-main src="{{ images.0.image.url }}" alt="{{ images.0.alt|default:product.title }}" width="900" height="675">
+          {% with main_image=images.0.image w480=images.0.image|webp_variant:480 w900=images.0.image|webp_variant:900 %}
+          <picture>
+            {% if w480 %}
+              <source type="image/webp" srcset="{{ w480 }} 480w{% if w900 %}, {{ w900 }} 900w{% endif %}" sizes="(max-width: 1024px) 100vw, 560px">
+            {% endif %}
+            <img data-gallery-main src="{{ main_image.url }}" alt="{{ images.0.alt|default:product.title }}" width="900" height="675" fetchpriority="high" decoding="async">
+          </picture>
+          {% endwith %}
         {% else %}
           <div class="ph"><div>{% category_icon product.category "ic ic-xl" %}{% firstof product.brand.name product.category.name %}</div></div>
         {% endif %}
@@ -176,8 +184,8 @@
 </div>
 
 <!-- Lead Request Modal Dialog -->
-<dialog class="lead-modal" data-lead-dialog aria-labelledby="lead-title">
-  <form class="dialog-body-modern" method="post" action="{% url 'leads:create' %}">
+<dialog class="lead-modal" data-lead-dialog aria-labelledby="lead-title"{% if lead_state %} data-open-on-load="1"{% endif %}>
+  <form class="dialog-body-modern" method="post" action="{% url 'leads:create' %}" data-lead-form>
     {% csrf_token %}
     <div class="dialog-head">
       <h3 id="lead-title">Заявка на {{ product.title }}</h3>
@@ -188,20 +196,41 @@
     <input type="hidden" name="product_id" value="{{ product.pk }}">
     <input type="hidden" name="next" value="{{ request.path }}">
 
+    {% if lead_state.errors.nonfield %}
+      <p class="form-alert" role="alert">{{ lead_state.errors.nonfield|join:" " }}</p>
+    {% endif %}
+
     <div class="form-field-group">
       <label for="lead_name">Ваше имя</label>
-      <input class="field" id="lead_name" name="name" type="text" placeholder="Например, Эрмек" required>
+      <input class="field" id="lead_name" name="name" type="text" placeholder="Например, Эрмек"
+             value="{% if lead_state %}{{ lead_state.values.name }}{% endif %}"
+             minlength="2" maxlength="100" autocomplete="name" required
+             {% if lead_state.errors.name %}aria-invalid="true" aria-describedby="lead_name_error"{% endif %}>
+      {% if lead_state.errors.name %}<span class="field-error" id="lead_name_error">{{ lead_state.errors.name|join:" " }}</span>{% endif %}
     </div>
 
     <div class="form-field-group">
       <label for="lead_phone">Номер телефона</label>
-      <input class="field" id="lead_phone" name="phone" type="tel" placeholder="+996 (___) __-__-__" required>
+      <input class="field" id="lead_phone" name="phone" type="tel" placeholder="+996 (___) __-__-__"
+             value="{% if lead_state %}{{ lead_state.values.phone }}{% endif %}"
+             pattern="[+0-9][0-9\s()\-]{6,29}" maxlength="30" inputmode="tel" autocomplete="tel" required
+             {% if lead_state.errors.phone %}aria-invalid="true" aria-describedby="lead_phone_error"{% endif %}>
+      {% if lead_state.errors.phone %}<span class="field-error" id="lead_phone_error">{{ lead_state.errors.phone|join:" " }}</span>{% endif %}
     </div>
 
     <label class="switch-row" style="margin-top:6px">
-      <input type="checkbox" name="wants_installment" value="1">
+      <input type="checkbox" name="wants_installment" value="1"{% if lead_state.values.wants_installment %} checked{% endif %}>
       <span>Интересует оформление в рассрочку</span>
     </label>
+
+    <div class="consent-field">
+      <label class="consent-row" for="lead_consent">
+        <input type="checkbox" id="lead_consent" name="consent" value="1" required
+               {% if lead_state.errors.consent %}aria-invalid="true" aria-describedby="lead_consent_error"{% endif %}>
+        <span>Согласен на обработку персональных данных в соответствии с <a href="{% url 'core:privacy' %}" target="_blank" rel="noopener">политикой конфиденциальности</a>.</span>
+      </label>
+      {% if lead_state.errors.consent %}<span class="field-error" id="lead_consent_error">{{ lead_state.errors.consent|join:" " }}</span>{% endif %}
+    </div>
 
     <div class="hp">
       <label>Не заполняйте это поле: <input type="text" name="website" tabindex="-1" autocomplete="off"></label>

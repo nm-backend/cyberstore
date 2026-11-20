@@ -41,11 +41,13 @@ class CatalogTests(TestCase):
         self.assertEqual(product.delivery, "")
         self.assertEqual(product.location, "")
 
-    def test_root_shows_category_tiles(self):
+    def test_root_shows_category_tiles_and_all_products(self):
         response = self.client.get(reverse("catalog:list"))
         self.assertContains(response, "Тестовые ноутбуки")
-        self.assertContains(response, "Тестовые ПК")
-        self.assertNotContains(response, "Gaming Pro")
+        # Empty sections are not advertised, and /catalog/ now lists the goods.
+        self.assertNotContains(response, "Тестовые ПК")
+        self.assertContains(response, "Gaming Pro")
+        self.assertContains(response, "Тестовый ноутбук")
 
     def test_category_shows_nested_products_and_subcategory_tiles(self):
         response = self.client.get(self.laptops.get_absolute_url())
@@ -65,6 +67,24 @@ class CatalogTests(TestCase):
 
     def test_search_by_spec_value(self):
         response = self.client.get(reverse("catalog:list"), {"q": "Ryzen 9"})
+        self.assertContains(response, "Gaming Pro")
+        self.assertNotContains(response, "Тестовый ноутбук")
+
+    def test_search_has_filters_and_noindex(self):
+        response = self.client.get(reverse("catalog:list"), {"q": "Ryzen 9"})
+        self.assertEqual(response.status_code, 200)
+        titles = [group["title"] for group in response.context["filter_groups"]]
+        self.assertIn("Бренд", titles)
+        self.assertIn("Цена", titles)
+        self.assertContains(response, "data-filter-toggle")
+        self.assertContains(response, "data-filter-backdrop")
+        self.assertContains(response, 'content="noindex, follow"')
+
+    def test_search_price_filter_narrows_results(self):
+        response = self.client.get(
+            reverse("catalog:list"), {"q": "Ryzen", "price_min": 100000}
+        )
+        self.assertEqual(response.context["result_count"], 1)
         self.assertContains(response, "Gaming Pro")
         self.assertNotContains(response, "Тестовый ноутбук")
 
@@ -208,17 +228,25 @@ class CatalogStructureTests(TestCase):
             self.assertEqual(response.status_code, 200, category.slug)
         self.assertEqual(self.client.get(reverse("catalog:categories")).status_code, 200)
 
-    def test_nav_has_catalog_menu_with_four_categories(self):
+    def test_nav_hides_empty_categories(self):
+        for slug in ("pcs", "components", "laptops"):
+            Product.objects.create(title=f"Товар {slug}", category=Category.objects.get(slug=slug))
         response = self.client.get(reverse("core:home"))
         self.assertContains(response, "nav-drop-menu")
-        for name in ("Настольные ПК", "Комплектующие для ПК", "Мониторы", "Ноутбуки"):
+        for name in ("Настольные ПК", "Комплектующие для ПК", "Ноутбуки"):
             self.assertContains(response, name)
+        self.assertNotContains(response, "Мониторы")
 
     def test_category_counts_are_real(self):
         laptops = Category.objects.get(slug="laptops")
-        self.assertEqual(laptops.products.count(), 0)
+        gaming = Category.objects.get(slug="gaming-laptops")
+        Product.objects.create(title="Игровой тест", category=gaming, price=1000)
         response = self.client.get(reverse("catalog:categories"))
-        self.assertContains(response, "0 товаров")
+        self.assertNotContains(response, "0 товаров")
+        self.assertContains(response, "Игровые ноутбуки")
+        self.assertContains(response, "1 товар")
+        listed = Product.objects.filter(category_id__in=laptops.descendant_ids()).count()
+        self.assertEqual(listed, 1)
 
 
 class CatalogFacetTests(TestCase):

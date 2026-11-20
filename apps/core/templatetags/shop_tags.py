@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from django import template
+from django.contrib.staticfiles import finders
+from django.templatetags.static import static
 from django.utils.html import format_html
 
 from apps.catalog.models import IconKey
@@ -56,6 +60,18 @@ def price(value):
         return f"{int(value):,}".replace(",", "\u00a0") + "\u00a0сом"
     except (TypeError, ValueError):
         return ""
+
+
+@register.filter
+def webp_variant(image, width):
+    """Static WebP next to the JPEG, when the build generated one."""
+    if not image:
+        return ""
+    name = getattr(image, "name", "")
+    if not name:
+        return ""
+    relative = f"img/products/{Path(name).stem}-{width}.webp"
+    return static(relative) if finders.find(relative) else ""
 
 
 @register.simple_tag(takes_context=True)

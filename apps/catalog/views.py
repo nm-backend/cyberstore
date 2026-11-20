@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from apps.core.models import SiteSettings
 
-from .models import Brand, Category, Product, ProductSpec, SpecOption, UseCase
+from .models import Brand, Category, CategoryFilter, Product, ProductSpec, SpecOption, UseCase
 from .tree import CategoryTree
 
 PAGE_SIZE = 12
@@ -48,6 +48,20 @@ def _filter_rows(category):
             return rows
         node = node.parent
     return []
+
+
+def _global_filter_rows():
+    """Useful filters for a search that spans every section."""
+    anchor = Category.objects.filter(is_active=True, parent__isnull=True).first()
+    if not anchor:
+        return []
+    return [
+        CategoryFilter(category=anchor, source="price", title="Цена"),
+        CategoryFilter(category=anchor, source="brand", title="Бренд"),
+        CategoryFilter(category=anchor, source="use_case", title="Назначение"),
+        CategoryFilter(category=anchor, source="installment", title="Рассрочка"),
+        CategoryFilter(category=anchor, source="condition", title="Состояние"),
+    ]
 
 
 def _selected(request):
@@ -436,7 +450,10 @@ def product_list(request, category_slug=None):
             node = node.parent
 
     current_path = request.path
-    root_tiles = _tiles(tree.roots, tree) if category is None else []
+    root_tiles = (
+        [tile for tile in _tiles(tree.roots, tree) if tile["count"]]
+        if category is None else []
+    )
     subcategory_tiles = []
     if category and tree.children[category.pk]:
         subcategory_tiles = [{
@@ -449,14 +466,21 @@ def product_list(request, category_slug=None):
             "count": tree.totals.get(category.pk, 0),
             "is_current": True,
             "is_all": True,
-        }] + _tiles(tree.children[category.pk], tree)
+        }] + [
+            tile for tile in _tiles(tree.children[category.pk], tree) if tile["count"]
+        ]
 
     currency = request.GET.get("currency", "kgs")
     if currency == "usd" and not rate:
         currency = "kgs"
 
     selected = _selected(request)
-    rows = _filter_rows(category) if category else []
+    if category:
+        rows = _filter_rows(category)
+    elif query_for_filters := request.GET.get("q", "").strip():
+        rows = _global_filter_rows() if query_for_filters else []
+    else:
+        rows = []
     groups = _build_filter_groups(rows, request, base, selected, rate, currency) if rows else []
 
     query = request.GET.get("q", "").strip()
@@ -468,8 +492,10 @@ def product_list(request, category_slug=None):
     )
 
     if category is None:
+        # /catalog/ is both the section index and the «Все товары» page:
+        # keep the section tiles and show every published product below them.
         show_tiles = not has_filters
-        show_products = has_filters
+        show_products = True
     else:
         show_tiles = (
             category.display_mode in (Category.DisplayMode.TILES, Category.DisplayMode.BOTH)
@@ -516,6 +542,8 @@ def product_list(request, category_slug=None):
 
     category_options = []
     for item, depth in tree.flat:
+        if not tree.totals.get(item.pk, 0):
+            continue
         category_options.append({
             "slug": item.slug,
             "name": f"{'— ' * depth}{item.name}",
@@ -569,8 +597,9 @@ def category_index(request):
 
         def collect(category, depth):
             matches = not needle or root_matches or needle in category.name.lower()
-            if matches:
-                items.append({"category": category, "depth": depth, "count": tree.totals.get(category.pk, 0)})
+            count = tree.totals.get(category.pk, 0)
+            if matches and count:
+                items.append({"category": category, "depth": depth, "count": count})
             for child in tree.children[category.pk]:
                 collect(child, depth + 1)
 
@@ -581,6 +610,13 @@ def category_index(request):
                 "count": tree.totals.get(root.pk, 0),
                 "items": items,
             })
+
+    # Empty sections stay reachable by direct URL for the manager, but they are
+    # not advertised in navigation, search or the category index.
+    groups = [
+        group for group in groups
+        if group["count"] or any(item["count"] for item in group["items"])
+    ]
 
     return render(
         request,
@@ -595,6 +631,7 @@ def product_detail(request, slug):
         Product.objects.published().with_cards()
         .filter(category=product.category).exclude(pk=product.pk)[:4]
     )
+    lead_state = request.session.pop("lead_form_state", None)
     return render(
         request,
         "catalog/detail.html",
@@ -604,5 +641,6 @@ def product_detail(request, slug):
             "specs": list(product.specs.all()),
             "use_cases": list(product.use_cases.all()),
             "related": related,
+            "lead_state": lead_state,
         },
     )

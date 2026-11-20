@@ -5,6 +5,7 @@ from .models import SiteSettings
 
 def site(request):
     tree = CategoryTree()
+    roots = [root for root in tree.roots if tree.totals.get(root.pk, 0)]
     nav_menu = [
         {
             "category": category,
@@ -19,13 +20,14 @@ def site(request):
                     ],
                 }
                 for child in tree.children[category.pk]
+                if tree.totals.get(child.pk, 0)
             ],
         }
-        for category in tree.roots
+        for category in roots
     ]
     return {
         "site": SiteSettings.load(),
-        "nav_categories": tree.roots,
+        "nav_categories": roots,
         "nav_menu": nav_menu,
-        "nav_total": sum(tree.totals[category.pk] for category in tree.roots),
+        "nav_total": sum(tree.totals[category.pk] for category in roots),
     }

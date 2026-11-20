@@ -3,7 +3,14 @@
   <a class="card-media" href="{{ p.get_absolute_url }}" aria-label="{{ p.title }}">
     {% with img=p.main_image %}
       {% if img %}
-        <img src="{{ img.image.url }}" alt="{{ img.alt|default:p.title }}" loading="lazy" width="640" height="480">
+        {% with w480=img.image|webp_variant:480 w900=img.image|webp_variant:900 %}
+        <picture>
+          {% if w480 %}
+            <source type="image/webp" srcset="{{ w480 }} 480w{% if w900 %}, {{ w900 }} 900w{% endif %}" sizes="(max-width: 520px) 100vw, (max-width: 768px) 50vw, 320px">
+          {% endif %}
+          <img src="{{ img.image.url }}" alt="{{ img.alt|default:p.title }}" loading="lazy" decoding="async" width="900" height="675">
+        </picture>
+        {% endwith %}
       {% else %}
         <div class="ph"><div>{% category_icon p.category "ic ic-xl" %}{% firstof p.brand.name p.category.name %}</div></div>
       {% endif %}

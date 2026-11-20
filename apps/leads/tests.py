@@ -20,7 +20,10 @@ class LeadTests(TestCase):
         )
 
     def post(self, **extra):
-        data = {"name": "Азиз", "phone": "+996 555 123 456", "product_id": self.product.pk, "next": "/"}
+        data = {
+            "name": "Азиз", "phone": "+996 555 123 456", "consent": "1",
+            "product_id": self.product.pk, "next": "/",
+        }
         data.update(extra)
         return self.client.post(reverse("leads:create"), data, follow=True)
 
@@ -48,6 +51,27 @@ class LeadTests(TestCase):
 
     def test_get_not_allowed(self):
         self.assertEqual(self.client.get(reverse("leads:create")).status_code, 405)
+
+    def test_consent_is_required(self):
+        response = self.client.post(
+            reverse("leads:create"),
+            {"name": "Азиз", "phone": "+996 555 123 456", "next": "/"},
+            follow=True,
+        )
+        self.assertContains(response, "Заявка не отправлена")
+        self.assertEqual(Lead.objects.count(), 0)
+
+    def test_invalid_form_keeps_values_for_modal(self):
+        response = self.client.post(
+            reverse("leads:create"),
+            {"name": "Азиз", "phone": "abc", "consent": "1", "next": self.product.get_absolute_url()},
+            follow=True,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "value=\"Азиз\"")
+        self.assertContains(response, "Введите номер телефона")
+        self.assertContains(response, "data-open-on-load")
+        self.assertEqual(Lead.objects.count(), 0)
 
     def test_bad_product_id_is_ignored(self):
         response = self.post(product_id="abc")
@@ -78,7 +102,10 @@ class LeadApiThrottleTests(TestCase):
 @override_settings(TELEGRAM_BOT_TOKEN="123:abc", TELEGRAM_CHAT_ID="-100500")
 class LeadNotificationTests(TestCase):
     def post(self):
-        data = {"name": "Азиз", "phone": "+996 555 123 456", "comment": "Позвонить после 18:00", "next": "/"}
+        data = {
+            "name": "Азиз", "phone": "+996 555 123 456", "consent": "1",
+            "comment": "Позвонить после 18:00", "next": "/",
+        }
         return self.client.post(reverse("leads:create"), data, follow=True)
 
     def test_telegram_message_sent_for_new_lead(self):

@@ -27,7 +27,7 @@ def _admin_url(lead):
 
 
 def build_message(lead):
-    lines = ["🔥 <b>Новая заявка с сайта</b>", ""]
+    lines = ["🔥 <b>@ заявка с сайта</b>", ""]
     if lead.product_title:
         lines.append(f"<b>Товар:</b> {escape(lead.product_title)}")
     lines.append(f"<b>Имя:</b> {escape(lead.name)}")

@@ -4,18 +4,23 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ site.shop_name }} — Ноутбуки, готовые ПК и комплектующие, {{ site.city }}{% endblock %}</title>
-  <meta name="description" content="{% block description %}{{ site.shop_name }}: {{ site.tagline|lower }}. Рассрочка, доставка по КР. {{ site.city }}, {{ site.address }}. WhatsApp {{ site.phone }}.{% endblock %}">
+  <meta name="description" content="{% block description %}{{ site.shop_name }}: {{ site.tagline }}. Рассрочка, доставка по КР. {{ site.city }}, {{ site.address }}. WhatsApp {{ site.phone }}.{% endblock %}">
+  <meta name="robots" content="{% block robots %}index, follow{% endblock %}">
   <meta name="theme-color" content="#05080f">
-  <link rel="canonical" href="{% canonical %}">
+  {% block canonical_link %}<link rel="canonical" href="{% canonical %}">{% endblock %}
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{{ site.shop_name }}">
   <meta property="og:title" content="{% block og_title %}{{ site.shop_name }} — {{ site.tagline }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ site.shop_name }}: {{ site.tagline }}. Рассрочка и доставка по Кыргызстану. {{ site.city }}, {{ site.address }}.{% endblock %}">
+  <meta property="og:url" content="{% block og_url %}{% canonical %}{% endblock %}">
+  <meta name="twitter:card" content="summary_large_image">
   {% static 'img/logo-og.jpg' as og_image %}<meta property="og:image" content="{% absolute og_image %}">
+  <meta name="twitter:image" content="{% absolute og_image %}">
   <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
   <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Unbounded:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" href="{% static 'fonts/unbounded-cyrillic.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'fonts/unbounded-latin.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/cyberpunk.css' %}">
   {% block head_extra %}{% endblock %}
@@ -74,7 +79,7 @@
 <header class="site-header">
   <div class="wrap header-row">
     <a class="brand" href="{% url 'core:home' %}" aria-label="{{ site.shop_name }} — на главную">
-      <img src="{% static 'img/logo.png' %}" alt="" width="42" height="42">
+      <img src="{% static 'img/logo-96.png' %}" alt="" width="42" height="42" decoding="async">
       <div class="brand-text">
         <span class="brand-name">CYBER<span>STORE</span></span>
         <span class="brand-city">BISHKEK</span>
@@ -180,7 +185,7 @@
     <div class="footer-grid">
       <div class="footer-col-brand">
         <a class="brand" href="{% url 'core:home' %}">
-          <img src="{% static 'img/logo.png' %}" alt="" width="40" height="40">
+          <img src="{% static 'img/logo-96.png' %}" alt="" width="40" height="40" loading="lazy" decoding="async">
           <div class="brand-text">
             <span class="brand-name">CYBER<span>STORE</span></span>
             <span class="brand-city">BISHKEK</span>
@@ -234,15 +239,18 @@
       <div class="footer-bottom-links">
         <a href="{% url 'core:contacts' %}">Бишкек, {{ site.address }}</a>
         <a href="{% url 'core:installment' %}">Рассрочка</a>
+        <a href="{% url 'core:privacy' %}">Политика конфиденциальности</a>
       </div>
     </div>
   </div>
 </footer>
 
 <!-- Floating WhatsApp Button -->
-<a class="wa-float" href="{% whatsapp_generic %}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">
-  <svg><use href="#i-wa"/></svg>
-</a>
+<aside aria-label="Быстрая связь с магазином">
+  <a class="wa-float" href="{% whatsapp_generic %}" target="_blank" rel="noopener" aria-label="Написать в WhatsApp">
+    <svg><use href="#i-wa"/></svg>
+  </a>
+</aside>
 
 <script src="{% static 'js/main.js' %}" defer></script>
 <script src="{% static 'js/cyberpunk.js' %}" defer></script>

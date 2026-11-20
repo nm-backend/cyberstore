@@ -40,7 +40,30 @@ class CoreTests(TestCase):
         self.assertContains(response, "Айни 31")
 
     def test_404_page(self):
-        self.assertEqual(self.client.get("/no-such-page/").status_code, 404)
+        response = self.client.get("/no-such-page/")
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, "noindex, follow", status_code=404)
+        self.assertNotContains(response, 'rel="canonical"', status_code=404)
+
+    def test_privacy_page_opens_and_is_linked(self):
+        response = self.client.get(reverse("core:privacy"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Политика конфиденциальности")
+        self.assertContains(self.client.get(reverse("core:home")), reverse("core:privacy"))
+
+    def test_robots_and_sitemap(self):
+        robots = self.client.get(reverse("core:robots"))
+        self.assertEqual(robots.status_code, 200)
+        self.assertEqual(robots["Content-Type"], "text/plain; charset=utf-8")
+        body = robots.content.decode()
+        self.assertIn("Disallow: /admin/", body)
+        self.assertIn("Sitemap: http://testserver/sitemap.xml", body)
+
+        sitemap = self.client.get(reverse("core:sitemap"))
+        self.assertEqual(sitemap.status_code, 200)
+        self.assertEqual(sitemap["Content-Type"], "application/xml; charset=utf-8")
+        self.assertContains(sitemap, "<urlset")
+        self.assertContains(sitemap, "/privacy/")
 
     def test_hours_do_not_repeat_days(self):
         site = SiteSettings.load()

@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% load shop_tags %}
-{% block title %}{% if category %}{{ category.name }}{% elif query %}Поиск: {{ query }}{% else %}{{ site.catalog_title }}{% endif %} — {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}{% if category and category.description %}{{ category.description }}{% elif query %}Результаты поиска по запросу «{{ query }}» в {{ site.shop_name }}.{% else %}{{ site.shop_name }}: {{ site.catalog_title|lower }}, {{ site.city }}. WhatsApp {{ site.phone }}.{% endif %}{% endblock %}
+{% block title %}{% if category %}{{ category.name }} — {{ site.shop_name }}{% elif query %}Поиск: {{ query }} — {{ site.shop_name }}{% else %}Все товары — {{ site.shop_name }}{% endif %}{% endblock %}
+{% block description %}{% if category %}{{ category.name }} в {{ site.shop_name }}{% if category.description %}: {{ category.description }}{% else %} — товары в наличии, цены и рассрочка в {{ site.city }}{% endif %}.{% elif query %}Результаты поиска по запросу «{{ query }}» в {{ site.shop_name }}: цены, наличие и рассрочка в {{ site.city }}.{% else %}Все товары {{ site.shop_name }}: ноутбуки, готовые ПК и комплектующие. Цены, наличие, рассрочка и доставка по Кыргызстану.{% endif %}{% endblock %}
+{% block og_title %}{% if category %}{{ category.name }} — {{ site.shop_name }}{% elif query %}Поиск: {{ query }} — {{ site.shop_name }}{% else %}Все товары — {{ site.shop_name }}{% endif %}{% endblock %}
+{% block og_description %}{{ block.super }}{% endblock %}
+{% block robots %}{% if query %}noindex, follow{% else %}index, follow{% endif %}{% endblock %}
 {% block content %}
 <div class="wrap">
   <nav class="crumbs" aria-label="Путь">
@@ -57,9 +60,10 @@
       </section>
     {% endif %}
 
-    <div class="catalog-layout{% if not filter_groups %} catalog-layout-full{% endif %}">
+    <div class="filters-backdrop" data-filter-backdrop hidden></div>
+    <div class="catalog-layout{% if not filter_groups and not category_options %} catalog-layout-full{% endif %}">
       {% if filter_groups or category_options %}
-        <aside class="filters" data-filters aria-label="Фильтры каталога">
+        <aside class="filters" id="catalog-filters" data-filters aria-label="Фильтры каталога">
           <div class="filters-header">
             <h2 class="filters-title">Фильтры</h2>
             <div class="filters-header-actions">
@@ -137,8 +141,8 @@
             {% if query %}Найдено: {% else %}Товаров: {% endif %}<strong>{{ page.paginator.count }}</strong>
           </div>
           <div class="catalog-sort-wrap">
-            {% if filter_groups %}
-              <button class="btn filter-toggle-btn" type="button" data-filter-toggle aria-expanded="false">Фильтры</button>
+            {% if filter_groups or category_options %}
+              <button class="btn filter-toggle-btn" type="button" data-filter-toggle aria-expanded="false" aria-controls="catalog-filters">Фильтры</button>
             {% endif %}
             <form method="get">
               {% for key, values in request.GET.lists %}
@@ -146,7 +150,7 @@
                   {% for value in values %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endfor %}
                 {% endif %}
               {% endfor %}
-              <select class="field field-sort" name="sort" aria-label="Сортировка" onchange="this.form.submit()">
+              <select class="field field-sort" name="sort" aria-label="Сортировка">
                 {% for key, label in sorts %}
                   <option value="{{ key }}"{% if key == sort %} selected{% endif %}>{{ label }}</option>
                 {% endfor %}

@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load shop_tags %}
-{% block title %}Все категории — {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}Категории и подразделы каталога {{ site.shop_name }}: {{ site.tagline|lower }}.{% endblock %}
+{% block title %}Все категории — {{ site.shop_name }}{% endblock %}
+{% block description %}Полный список разделов и подразделов каталога {{ site.shop_name }}: ноутбуки, ПК, комплектующие и мониторы с актуальным количеством товаров.{% endblock %}
+{% block og_title %}Все категории — {{ site.shop_name }}{% endblock %}
+{% block og_description %}Разделы каталога {{ site.shop_name }} в {{ site.city }}: ноутбуки, готовые ПК, комплектующие и мониторы.{% endblock %}
 {% block content %}
 <div class="wrap">
   <nav class="crumbs" aria-label="Путь">
