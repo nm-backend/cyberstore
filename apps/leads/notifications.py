@@ -57,6 +57,11 @@ def notify_managers_about_lead(lead):
     token = getattr(settings, "TELEGRAM_BOT_TOKEN", "")
     recipients = chat_ids()
     if not token or not recipients:
+        # A silent skip looks exactly like a broken bot, so say it in the log.
+        logger.warning(
+            "Telegram notification for lead %s skipped: set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env",
+            lead.pk,
+        )
         return False
 
     text = build_message(lead)

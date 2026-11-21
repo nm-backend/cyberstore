@@ -4,16 +4,18 @@
     <h2>Бренды</h2>
     <span class="muted brand-tiles-hint">Выберите производителя</span>
   </div>
-  <div class="brand-tiles">
+  <div class="tile-strip">
     {% for item in brand_tiles %}
-      <a class="brand-tile" href="?brand={{ item.brand.slug }}">
-        {% if item.brand.logo %}
-          <img class="brand-logo" src="{{ item.brand.logo.url }}" alt="{{ item.brand.name }}" loading="lazy">
-        {% else %}
-          <span class="brand-monogram" aria-hidden="true">{{ item.brand.name|first|upper }}</span>
-        {% endif %}
-        <span class="brand-tile-name">{{ item.brand.name }}</span>
-        <span class="brand-tile-count">{{ item.count|items }}</span>
+      <a class="tile-card" href="?brand={{ item.brand.slug }}">
+        <span class="tile-card-media">
+          {% if item.brand.logo %}
+            <img class="tile-card-img" src="{{ item.brand.logo.url }}" alt="" loading="lazy" width="160" height="160">
+          {% else %}
+            <span class="tile-card-monogram" aria-hidden="true">{{ item.brand.name|first|upper }}</span>
+          {% endif %}
+          <span class="tile-card-count" title="Товаров бренда">{{ item.count }}</span>
+        </span>
+        <span class="tile-card-name">{{ item.brand.name }}</span>
       </a>
     {% endfor %}
   </div>

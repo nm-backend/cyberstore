@@ -83,8 +83,14 @@ def whatsapp_product(context, product):
         return ""
     url = request.build_absolute_uri(product.get_absolute_url()) if request else ""
     
+    # Значок по разделу: «комп» ловил «Другие комплектующие», а «Мониторы» оставались без значка
     category_name = getattr(product.category, "name", "").lower()
-    icon = "💻" if "ноут" in category_name else ("🖥️" if "пк" in category_name or "комп" in category_name else "🔧")
+    if "ноут" in category_name:
+        icon = "💻"
+    elif any(word in category_name for word in ("пк", "системн", "моноблок", "неттоп", "монитор")):
+        icon = "🖥️"
+    else:
+        icon = "🔧"
 
     category_title = f" ({product.category.name})" if product.category_id else ""
     lines = [

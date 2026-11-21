@@ -23,7 +23,7 @@ SORTS = {
 
 FILTER_PARAMS = (
     "q", "brand", "use_case", "price_min", "price_max",
-    "condition", "delivery", "location", "installment", "stock",
+    "condition", "delivery", "installment", "stock",
 )
 
 
@@ -73,7 +73,6 @@ def _selected(request):
         "use_case": use_cases,
         "condition": {value for value in request.GET.getlist("condition") if value},
         "delivery": {value for value in request.GET.getlist("delivery") if value},
-        "location": {value for value in request.GET.getlist("location") if value},
         "installment": {value for value in request.GET.getlist("installment") if value in {"0", "1"}},
         "stock": request.GET.get("stock") == "1",
     }
@@ -125,13 +124,8 @@ def _apply_filters(qs, request, rows, selected, rate, skip=None):
         qs = qs.filter(condition__in=selected["condition"])
     if skip != "delivery" and selected["delivery"]:
         qs = qs.filter(delivery__in=selected["delivery"])
-    if skip != "location" and selected["location"]:
-        city = SiteSettings.load().city.strip()
-        # Goods without a filled city belong to the shop's own city.
-        place = Q(location__in=selected["location"])
-        if city and city in selected["location"]:
-            place |= Q(location="")
-        qs = qs.filter(place)
+    # «Местоположение» is gone from the storefront filters: the shop is one city,
+    # so every good already comes from the same place.
     if skip != "installment":
         if selected["installment"] == {"1"}:
             qs = qs.filter(installment_available=True)
@@ -221,6 +215,8 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
     groups = []
     spec_selection = _spec_values(request)
     for row in rows:
+        if row.source == "location":
+            continue  # removed from the storefront, admin rows are ignored
         key = f"spec_{row.pk}" if row.source == "spec" else row.source
         facet_base = _apply_filters(base, request, rows, selected, rate, skip=key)
 
@@ -229,7 +225,7 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
             # Configured price filter stays visible even in an empty section.
             groups.append({
                 "key": "price", "title": row.display_title, "type": "price",
-                "low": low, "high": high,
+                "low": low, "high": high, "open": True,
             })
             continue
 
@@ -304,28 +300,6 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
                     "count": facet_base.filter(delivery=value).count(),
                     "checked": value in selected["delivery"],
                 })
-        elif row.source == "location":
-            stats = (
-                facet_base.exclude(location="")
-                .values("location")
-                .annotate(n=Count("id"))
-                .order_by("location")
-            )
-            options = [
-                {
-                    "value": item["location"], "label": item["location"],
-                    "count": item["n"], "checked": item["location"] in selected["location"],
-                }
-                for item in stats
-            ]
-            if not options:
-                # No goods with a city yet: everything is sold from the shop's city.
-                city = SiteSettings.load().city.strip()
-                if city:
-                    options = [{
-                        "value": city, "label": city, "count": facet_base.count(),
-                        "checked": city in selected["location"],
-                    }]
         elif row.source == "installment":
             yes = facet_base.filter(installment_available=True).count()
             no = facet_base.filter(installment_available=False).count()
@@ -353,6 +327,11 @@ def _build_filter_groups(rows, request, base, selected, rate, currency):
         groups.append({
             "key": key, "title": row.display_title, "type": "checkbox",
             "options": options, "searchable": len(options) > 6,
+            # Long lists stay folded: the group title works as a button that
+            # opens the choices, so the sidebar is a short list of buttons.
+            "collapsible": len(options) > 4,
+            "active_count": sum(1 for option in options if option["checked"]),
+            "open": len(options) <= 4 or any(option["checked"] for option in options),
         })
     return groups
 
@@ -520,6 +499,22 @@ def product_list(request, category_slug=None):
     if category and show_products and not has_filters:
         quick_links = list(category.quick_links.filter(is_active=True).prefetch_related("use_cases"))
 
+    # «Под ваши задачи» goes above the goods: the visitor narrows the section
+    # before scrolling through it. Only the tasks this section actually has.
+    use_case_tiles = []
+    if category and not has_filters:
+        stats = (
+            base.filter(use_cases__isnull=False)
+            .values("use_cases__slug")
+            .annotate(n=Count("id", distinct=True))
+        )
+        counts = {item["use_cases__slug"]: item["n"] for item in stats}
+        if counts:
+            use_case_tiles = [
+                {"case": case, "count": counts[case.slug], "selected": case.slug in selected["use_case"]}
+                for case in UseCase.objects.filter(slug__in=counts)
+            ]
+
     price_low, price_high = _price_bounds(
         _apply_filters(base, request, rows, selected, rate, skip="price"), currency, rate
     )
@@ -547,6 +542,7 @@ def product_list(request, category_slug=None):
         category_options.append({
             "slug": item.slug,
             "name": f"{'— ' * depth}{item.name}",
+            "category": item,
             "count": tree.totals.get(item.pk, 0),
             "selected": bool(category and category.pk == item.pk),
         })
@@ -561,6 +557,7 @@ def product_list(request, category_slug=None):
             "subcategory_tiles": subcategory_tiles,
             "brand_tiles": brand_tiles,
             "quick_links": quick_links,
+            "use_case_tiles": use_case_tiles,
             "page": page,
             "filter_groups": groups,
             "category_options": category_options,

@@ -9,7 +9,24 @@
       </div>
     {% endif %}
   </div>
-  <div class="category-tiles{% if compact %} category-tiles-compact{% endif %}">
+  {% if compact %}
+  <div class="tile-strip">
+    {% for t in tiles %}
+      <a class="tile-card{% if t.is_all %} is-all{% endif %}{% if t.is_current %} is-current{% endif %}" href="{{ t.url }}" data-tile-name="{{ t.name|lower }}">
+        <span class="tile-card-media">
+          {% if t.image %}
+            <img class="tile-card-img" src="{{ t.image.url }}" alt="" loading="lazy" width="160" height="160">
+          {% else %}
+            <span class="tile-card-icon" aria-hidden="true">{% category_icon t.category "ic" %}</span>
+          {% endif %}
+          <span class="tile-card-count" title="Товаров в разделе">{{ t.count }}</span>
+        </span>
+        <span class="tile-card-name">{{ t.name }}</span>
+      </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="category-tiles">
     {% for t in tiles %}
       <a class="category-tile{% if t.is_all %} category-tile-all{% endif %}{% if t.is_current %} is-current{% endif %}" href="{{ t.url }}" data-tile-name="{{ t.name|lower }}">
         {% if t.image %}
@@ -25,6 +42,7 @@
       </a>
     {% endfor %}
   </div>
+  {% endif %}
   <p class="category-search-empty" data-cat-search-empty hidden>Ничего не найдено — попробуйте другой запрос.</p>
 </section>
 {% endif %}

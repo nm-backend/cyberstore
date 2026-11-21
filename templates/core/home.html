@@ -59,44 +59,6 @@
        </ul>
      </div>
    </aside>
-
-    <!-- Quick filter pill bar -->
-    <div class="hero-quick-categories">
-      <span class="quick-cat-label">Быстрый переход:</span>
-      {% for c in categories %}
-        <a class="quick-cat-pill" href="{{ c.get_absolute_url }}">{% category_icon c "ic ic-sm" %}{{ c.name }}</a>
-      {% endfor %}
-      <a class="quick-cat-pill" href="{% url 'core:installment' %}"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-card"/></svg>Рассрочка 18+</a>
-    </div>
-  </div>
-</section>
-
-<!-- Trust Bar / Benefits -->
-<section class="trust-bar-section">
-  <div class="wrap">
-    <div class="trust-grid-modern">
-      <div class="trust-card-m">
-        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-card"/></svg></div>
-        <div>
-          <p class="trust-card-title">Рассрочка 18+</p>
-          <p>С банком и без банка. Нужен паспорт.</p>
-        </div>
-      </div>
-      <div class="trust-card-m">
-        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg></div>
-        <div>
-          <p class="trust-card-title">Доставка по Кыргызстану</p>
-          <p>{{ site.delivery_paragraphs|join:" " }}</p>
-        </div>
-      </div>
-      <div class="trust-card-m">
-        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></div>
-        <div>
-          <p class="trust-card-title">{{ site.city }}, {{ site.address }}</p>
-          <p>{{ site.work_days }}, {{ site.hours_without_days }}</p>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -115,7 +77,14 @@
       {% for c in categories %}
         <a class="cat-box" href="{{ c.get_absolute_url }}">
           <div class="cat-box-bg"></div>
-          <div class="cat-box-icon">{% category_icon c "ic ic-lg" %}</div>
+          <div class="cat-box-media">
+            {% if c.image %}
+              <img class="cat-box-img" src="{{ c.image.url }}" alt="" loading="lazy" width="320" height="320">
+            {% else %}
+              <div class="cat-box-icon">{% category_icon c "ic ic-lg" %}</div>
+            {% endif %}
+            <span class="cat-box-count" title="Товаров в разделе">{{ c.product_count }}</span>
+          </div>
           <h3>{{ c.name }}</h3>
           <p>{{ c.description }}</p>
           <span class="cat-box-action">Смотреть →</span>
@@ -125,13 +94,13 @@
   </div>
 </section>
 
-<!-- Featured Products (Хиты продаж) -->
+<!-- Featured Products (Рекомендуемые) -->
 <section class="section" style="padding-top:0">
   <div class="wrap">
     <div class="section-head">
       <div>
         <span class="section-kicker">Витрина</span>
-        <h2>Товары каталога</h2>
+        <h2>Рекомендуемые</h2>
       </div>
       <a class="section-link" href="{% url 'catalog:list' %}">Весь каталог ({{ total }}) →</a>
     </div>
@@ -156,7 +125,7 @@
     <div class="section-head">
       <div>
         <span class="section-kicker">Быстрый подбор</span>
-        <h2>Подбор по вашей задаче</h2>
+        <h2>Под ваши задачи</h2>
       </div>
     </div>
     <div class="use-cases-grid">
@@ -237,6 +206,48 @@
           <div class="contact-live-status"><span class="pulse-dot"></span><span>{{ site.hours_without_days }}</span></div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- Trust Bar / Benefits: informational, so it sits below the goods -->
+<section class="trust-bar-section">
+  <div class="wrap">
+    <div class="trust-grid-modern">
+      <div class="trust-card-m">
+        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-card"/></svg></div>
+        <div>
+          <p class="trust-card-title">Рассрочка 18+</p>
+          <p>С банком и без банка. Нужен паспорт.</p>
+        </div>
+      </div>
+      <div class="trust-card-m">
+        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg></div>
+        <div>
+          <p class="trust-card-title">Доставка по Кыргызстану</p>
+          <p>{{ site.delivery_paragraphs|join:" " }}</p>
+        </div>
+      </div>
+      <div class="trust-card-m">
+        <div class="trust-icon-wrap"><svg class="ic" aria-hidden="true"><use href="#i-pin"/></svg></div>
+        <div>
+          <p class="trust-card-title">{{ site.city }}, {{ site.address }}</p>
+          <p>{{ site.work_days }}, {{ site.hours_without_days }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick transition pills: last block of the page -->
+<section class="quick-bar-section">
+  <div class="wrap">
+    <div class="hero-quick-categories">
+      <span class="quick-cat-label">Быстрый переход:</span>
+      {% for c in categories %}
+        <a class="quick-cat-pill" href="{{ c.get_absolute_url }}">{% category_icon c "ic ic-sm" %}{{ c.name }}</a>
+      {% endfor %}
+      <a class="quick-cat-pill" href="{% url 'core:installment' %}"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-card"/></svg>Рассрочка 18+</a>
     </div>
   </div>
 </section>

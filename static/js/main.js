@@ -127,7 +127,7 @@
   if (filterForm) {
     filterForm.addEventListener("submit", function () { cleanEmptyFields(filterForm); });
     filterForm.addEventListener("change", function (event) {
-      if (event.target.matches("select[data-auto-submit]")) {
+      if (event.target.matches("select[data-auto-submit], input[type='radio'][data-auto-submit]")) {
         cleanEmptyFields(filterForm);
         filterForm.submit();
       }

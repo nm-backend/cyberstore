@@ -19,6 +19,9 @@ def home(request):
     # Counts include nested sections, and empty roots are not advertised.
     tree = CategoryTree()
     categories = [root for root in tree.roots if tree.totals.get(root.pk, 0)]
+    # The mobile section strip shows how many goods each section has.
+    for root in categories:
+        root.product_count = tree.totals.get(root.pk, 0)
     return render(
         request,
         "core/home.html",

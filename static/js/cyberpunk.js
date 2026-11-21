@@ -33,7 +33,6 @@
   /* ---------------- Reveal on scroll ---------------- */
   var revealSelectors = [
     ".section", ".catalog-page-head", ".category-tiles-section",
-    ".product-detail-layout", ".product-info-tabs-wrap",
     ".cat-box", ".card", ".category-tile", ".flow-step", ".calc-box",
     ".zone-card", ".plan-card", ".trust-card-m", ".contact-card",
     ".use-case-card", ".modern-banner", ".home-contacts-row", ".quick-link-card"

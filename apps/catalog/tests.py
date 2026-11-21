@@ -173,14 +173,14 @@ class CatalogTests(TestCase):
             category=self.laptops, source="spec", spec_type=self.cpu, title="Процессор"
         )
         response = self.client.get(self.gaming.get_absolute_url())
-        self.assertContains(response, 'filter-group-title">Процессор')
+        self.assertContains(response, 'filter-group-name">Процессор')
 
         self.pricey.brand = self.brand
         self.pricey.save()
         CategoryFilter.objects.create(category=self.gaming, source="brand", title="Бренд")
         response = self.client.get(self.gaming.get_absolute_url())
-        self.assertContains(response, 'filter-group-title">Бренд')
-        self.assertNotContains(response, 'filter-group-title">Процессор')
+        self.assertContains(response, 'filter-group-name">Бренд')
+        self.assertNotContains(response, 'filter-group-name">Процессор')
 
     def test_quick_link_enables_use_case_filter(self):
         games = UseCase.objects.get(slug="games")

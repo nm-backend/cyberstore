@@ -919,17 +919,14 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
   box-shadow: 0 0 0 3px var(--gesso-primary-ring);
 }
 
+/* Списки значений прокручиваются, но полоса прокрутки не рисуется */
 .filter-checkbox-list {
   display: flex; flex-direction: column; gap: var(--gesso-space-2);
   max-height: 280px; overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--gesso-neutral-300) transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.filter-checkbox-list::-webkit-scrollbar { width: 6px; }
-.filter-checkbox-list::-webkit-scrollbar-track { background: transparent; }
-.filter-checkbox-list::-webkit-scrollbar-thumb {
-  background: var(--gesso-neutral-300); border-radius: var(--radius-full);
-}
+.filter-checkbox-list::-webkit-scrollbar { width: 0; height: 0; }
 .checkbox-item {
   display: flex; align-items: center; gap: var(--gesso-space-2);
   font-size: var(--gesso-text-xs); color: var(--gesso-neutral-600);
@@ -1826,6 +1823,13 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
   .filters { max-height: calc(100dvh - 110px); overflow-y: auto; overscroll-behavior: contain; }
 }
 
+/* Панель фильтров тоже прокручивается без видимой полосы */
+.filters {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.filters::-webkit-scrollbar { width: 0; height: 0; }
+
 /* Mobile: the filters become a full-height drawer with a pinned apply button */
 @media (max-width: 1024px) {
   .nav-drop { width: 100%; }
@@ -1910,3 +1914,192 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
   .category-tile-desc { display: none; }
   .category-tile-count { margin-top: 0; white-space: nowrap; }
 }
+
+/* ==========================================================================
+   MOBILE-FIRST SHORTCUTS
+   Compact section cards and tappable filter rows, so the visitor reaches the
+   goods without scrolling through a wall of large blocks.
+   ========================================================================== */
+
+/* «Под ваши задачи» — the first block of a section page */
+.task-strip { margin-bottom: var(--gesso-space-6); }
+.task-strip-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--gesso-space-3); margin-bottom: var(--gesso-space-3);
+}
+.task-strip-head h2 { margin: 0; font-size: var(--gesso-text-lg); }
+.task-strip-reset { font-size: var(--gesso-text-2xs); color: var(--gesso-accent-text); white-space: nowrap; }
+.task-strip-row {
+  display: flex; gap: var(--gesso-space-2);
+  overflow-x: auto; padding-bottom: 2px;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.task-strip-row::-webkit-scrollbar { width: 0; height: 0; }
+.task-chip {
+  display: inline-flex; align-items: center; gap: 8px; flex: none;
+  padding: 9px 14px; border-radius: var(--radius-full);
+  border: 1px solid var(--gesso-divider); background: var(--gesso-surface);
+  font-size: 13px; color: var(--gesso-fg); white-space: nowrap;
+  transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+}
+.task-chip .ic { width: 16px; height: 16px; color: var(--gesso-neon); }
+.task-chip:hover { border-color: var(--gesso-primary-line); }
+.task-chip.is-active { background: var(--gesso-primary); border-color: var(--gesso-primary); color: var(--gesso-on-accent); }
+.task-chip.is-active .ic { color: var(--gesso-on-accent); }
+.task-chip-count { font-family: var(--gesso-font-mono); font-size: 10px; color: var(--gesso-neutral-500); }
+.task-chip.is-active .task-chip-count { color: var(--gesso-on-accent); opacity: .8; }
+
+/* Category picker inside the filters: rows with icon, name and count */
+.filter-cat-list {
+  display: flex; flex-direction: column; gap: 6px;
+  max-height: 320px; overflow-y: auto;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.filter-cat-list::-webkit-scrollbar { width: 0; height: 0; }
+.filter-cat-item {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; cursor: pointer;
+  border: 1px solid var(--gesso-divider); border-radius: 12px;
+  background: var(--gesso-surface-recessed);
+  font-size: var(--gesso-text-xs); color: var(--gesso-fg);
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.filter-cat-item input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+.filter-cat-icon {
+  width: 32px; height: 32px; flex: none;
+  display: grid; place-items: center;
+  border-radius: 9px; background: var(--gesso-surface); color: var(--gesso-neon);
+}
+.filter-cat-icon .ic { width: 18px; height: 18px; }
+.filter-cat-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.filter-cat-count { font-family: var(--gesso-font-mono); font-size: 10px; color: var(--gesso-neutral-500); }
+.filter-cat-chevron { width: 14px; height: 14px; flex: none; color: var(--gesso-neutral-500); transform: rotate(-90deg); }
+.filter-cat-item:hover { border-color: var(--gesso-primary-line); }
+.filter-cat-item.is-current { border-color: var(--gesso-primary); background: var(--gesso-primary-tint); }
+.filter-cat-item.is-current .filter-cat-chevron { color: var(--gesso-accent-text); }
+.filter-cat-item:focus-within { outline: 2px solid var(--gesso-primary); outline-offset: 2px; }
+
+/* Every filter value is a tappable row instead of a bare checkbox line */
+.checkbox-item {
+  padding: 8px 10px;
+  border: 1px solid var(--gesso-divider); border-radius: 10px;
+  background: var(--gesso-surface-recessed);
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.checkbox-item:hover { border-color: var(--gesso-primary-line); }
+.checkbox-item:has(input[type="checkbox"]:checked) {
+  border-color: var(--gesso-primary); background: var(--gesso-primary-tint);
+}
+.checkbox-item input[type="checkbox"] { width: 17px; height: 17px; }
+
+/* Home section cards: a photo tile with the count and a short name */
+.cat-box-media { position: relative; }
+.cat-box-media .cat-box-icon { margin-bottom: 0; }
+.cat-box-img { display: block; width: 64px; height: 64px; object-fit: contain; border-radius: var(--radius-sm); }
+.cat-box-count {
+  display: block; margin-top: var(--gesso-space-3);
+  font-family: var(--gesso-font-mono); font-size: 10px; letter-spacing: .04em;
+  color: var(--gesso-neutral-500);
+}
+
+/* Phone: sections become one swipeable strip of small cards */
+@media (max-width: 700px) {
+  .cat-grid-modern {
+    display: flex; gap: 10px;
+    overflow-x: auto; scroll-snap-type: x proximity;
+    margin-inline: calc(var(--outer-margin) * -1);
+    padding: 0 var(--outer-margin) 6px;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .cat-grid-modern::-webkit-scrollbar { width: 0; height: 0; }
+  .cat-box { flex: 0 0 138px; scroll-snap-align: start; padding: 8px; border-radius: 16px; }
+  .cat-box-media {
+    position: relative; display: grid; place-items: center;
+    aspect-ratio: 1 / 1; overflow: hidden;
+    margin-bottom: 8px; border-radius: 12px;
+    background: var(--gesso-surface-recessed);
+  }
+  .cat-box-img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; }
+  .cat-box-icon .ic { width: 34px; height: 34px; }
+  .cat-box-count {
+    position: absolute; left: 6px; bottom: 6px; margin: 0;
+    padding: 2px 7px; border-radius: var(--radius-full);
+    background: rgba(5, 8, 15, .72); color: var(--gesso-fg);
+  }
+  .cat-box h3 { margin: 0; font-size: 14px; }
+  .cat-box p, .cat-box-action { display: none; }
+
+  .task-strip-head h2 { font-size: var(--gesso-text-base); }
+  .filter-cat-list { max-height: 46vh; }
+}
+
+/* Product page: blocks fade in place, they never slide under the cursor */
+.product-page [data-reveal] { transform: none; }
+
+/* Home: the informational strip and quick transition sit below the goods */
+.quick-bar-section { padding: var(--gesso-space-8) 0 var(--gesso-space-10); }
+.quick-bar-section .hero-quick-categories { padding-top: 0; border-top: 0; }
+
+/* One swipeable ribbon of small cards: subcategories and brands */
+.tile-strip {
+  display: flex; gap: 10px;
+  overflow-x: auto; scroll-snap-type: x proximity;
+  padding-bottom: 6px;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.tile-strip::-webkit-scrollbar { width: 0; height: 0; }
+.tile-card {
+  flex: 0 0 118px; scroll-snap-align: start;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--gesso-divider); border-radius: 14px;
+  background: var(--gesso-surface); color: var(--gesso-fg); text-align: center;
+  transition: border-color .15s ease, background-color .15s ease;
+}
+.tile-card:hover { border-color: var(--gesso-primary-line); background: var(--gesso-surface-hover); }
+.tile-card.is-current { border-color: var(--gesso-primary); background: var(--gesso-primary-tint); }
+.tile-card-media {
+  position: relative; display: grid; place-items: center;
+  aspect-ratio: 1 / 1; overflow: hidden; border-radius: 10px;
+  background: var(--gesso-surface-recessed);
+}
+.tile-card-img { width: 100%; height: 100%; object-fit: contain; }
+.tile-card-icon .ic { width: 30px; height: 30px; color: var(--gesso-neon); }
+.tile-card-monogram {
+  width: 44px; height: 44px; display: grid; place-items: center;
+  border-radius: var(--radius-full); border: 1px solid var(--gesso-primary-line);
+  color: var(--gesso-neon); font-family: var(--gesso-font-mono); font-weight: 600; font-size: 16px;
+}
+.tile-card-count {
+  position: absolute; left: 6px; bottom: 6px;
+  padding: 2px 7px; border-radius: var(--radius-full);
+  background: rgba(5, 8, 15, .72); color: var(--gesso-fg);
+  font-family: var(--gesso-font-mono); font-size: 10px; line-height: 1.5;
+}
+.tile-card-name {
+  font-size: 12px; line-height: 1.3; font-weight: 600;
+  color: var(--gesso-fg); overflow-wrap: anywhere;
+}
+
+/* Filters: every group is a button, long value lists stay folded */
+#filter-form { gap: 10px; }
+.filter-group {
+  gap: 0; padding: 0;
+  border: 1px solid var(--gesso-divider); border-radius: 12px;
+  background: var(--gesso-surface-recessed);
+  overflow: hidden;
+}
+.filter-group-title {
+  display: flex; align-items: center; gap: 8px;
+  padding: 11px 12px;
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  text-transform: none; letter-spacing: 0; color: var(--gesso-fg);
+}
+.filter-group-name { flex: 1; min-width: 0; }
+.filter-group-badge {
+  min-width: 20px; padding: 1px 6px; border-radius: var(--radius-full);
+  background: var(--gesso-primary); color: var(--gesso-on-accent);
+  font-family: var(--gesso-font-mono); font-size: 10px; text-align: center;
+}
+.filter-group-body { display: flex; flex-direction: column; gap: var(--gesso-space-2); padding: 0 12px 12px; }
+.filter-group-title::after { color: var(--gesso-neutral-500); }

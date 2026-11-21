@@ -200,3 +200,18 @@ class InstallmentOption(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def whatsapp_text(self):
+        """Сообщение для WhatsApp с уточнением именно этого варианта.
+
+        «Рассрочка с банком» → «…условия рассрочки с банком.»,
+        «Рассрочка без банка» → «…условия рассрочки без банка.».
+        Если в названии нет уточнения, остаётся общий текст.
+        """
+        title = re.sub(r"\s+", " ", self.title or "").strip()
+        detail = re.sub(r"^рассрочк\w*\s*", "", title, flags=re.IGNORECASE)
+        detail = detail.strip(" -–—:,.")
+        if detail:
+            return f"Здравствуйте! Хочу уточнить условия рассрочки {detail}."
+        return "Здравствуйте! Хочу уточнить условия рассрочки."

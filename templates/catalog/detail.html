@@ -11,6 +11,7 @@
 "offers":{"@type":"Offer","priceCurrency":"KGS","price":"{{ product.price }}","availability":"{% if product.is_available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}","url":"{% canonical %}"}{% endif %}}
 </script>
 {% endblock %}
+{% block main_class %}product-page{% endblock %}
 {% block content %}
 <div class="wrap">
   <!-- Breadcrumbs -->
