@@ -4,6 +4,8 @@
 {% block description %}{{ site.shop_name }} в {{ site.city }}: ноутбуки, готовые игровые ПК и комплектующие. Цены, рассрочка 18+, доставка по Кыргызстану, WhatsApp {{ site.phone }}.{% endblock %}
 {% block og_title %}{{ site.shop_name }} — ноутбуки и ПК в {{ site.city }}{% endblock %}
 {% block og_description %}Каталог ноутбуков, готовых ПК и комплектующих {{ site.shop_name }}. Рассрочка, доставка по КР, адрес: {{ site.city }}, {{ site.address }}.{% endblock %}
+{# LCP: the hero veil paints with this texture, so fetch it with the stylesheets. #}
+{% block head_extra %}<link rel="preload" href="{% static 'img/circuit.png' %}" as="image">{% endblock %}
 {% block content %}
 <!-- Hero Section -->
 <section class="hero-home">
@@ -40,7 +42,10 @@
 
    <!-- HUD: the avatar's ring and labels, made informative -->
    <aside class="hero-hud" aria-label="Коротко о магазине">
-     <span class="hero-hud-ring" aria-hidden="true"></span>
+     <span class="hero-hud-ring" aria-hidden="true">
+       <span class="hud-orbit hud-orbit-a"></span>
+       <span class="hud-orbit hud-orbit-b"></span>
+     </span>
      <div class="hud-panel">
        <div class="hud-head">
          <span>CyberStore · {{ site.city }}</span>

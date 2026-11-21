@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load shop_tags %}
 {% block title %}{% if category %}{{ category.name }} — {{ site.shop_name }}{% elif query %}Поиск: {{ query }} — {{ site.shop_name }}{% else %}Все товары — {{ site.shop_name }}{% endif %}{% endblock %}
-{% block description %}{% if category %}{{ category.name }} в {{ site.shop_name }}{% if category.description %}: {{ category.description }}{% else %} — товары в наличии, цены и рассрочка в {{ site.city }}{% endif %}.{% elif query %}Результаты поиска по запросу «{{ query }}» в {{ site.shop_name }}: цены, наличие и рассрочка в {{ site.city }}.{% else %}Все товары {{ site.shop_name }}: ноутбуки, готовые ПК и комплектующие. Цены, наличие, рассрочка и доставка по Кыргызстану.{% endif %}{% endblock %}
+{% block description %}{% if category %}{% if category.description %}{{ site.shop_name }}: {{ category.description }}{% else %}{{ category.name }} — товары в наличии, цены и рассрочка, {{ site.city }}{% endif %}.{% elif query %}Результаты поиска по запросу «{{ query }}» в {{ site.shop_name }}: цены, наличие и рассрочка в {{ site.city }}.{% else %}Все товары {{ site.shop_name }}: ноутбуки, готовые ПК и комплектующие. Цены, наличие, рассрочка и доставка по Кыргызстану.{% endif %}{% endblock %}
 {% block og_title %}{% if category %}{{ category.name }} — {{ site.shop_name }}{% elif query %}Поиск: {{ query }} — {{ site.shop_name }}{% else %}Все товары — {{ site.shop_name }}{% endif %}{% endblock %}
 {% block og_description %}{{ block.super }}{% endblock %}
 {% block robots %}{% if query %}noindex, follow{% else %}index, follow{% endif %}{% endblock %}
@@ -27,7 +27,7 @@
       <h1>{% if category %}{{ category.name }}{% elif query %}Поиск: «{{ query }}»{% else %}{{ site.catalog_title }}{% endif %}</h1>
       <p class="muted">
         {% if category and category.description %}{{ category.description }}
-        {% elif query %}Найдено по запросу с учётом фильтров.
+        {% elif query %}{% if page.paginator.count %}Найдено по запросу{% if has_filters %} с учётом фильтров{% endif %}.{% else %}По запросу «{{ query }}» ничего не найдено. Проверьте написание или напишите нам — подберём вручную.{% endif %}
         {% else %}Выберите раздел или воспользуйтесь поиском и фильтрами.{% endif %}
       </p>
     </div>
@@ -194,17 +194,21 @@
           <div class="empty">
             <div class="empty-icon"><svg class="ic ic-xl" aria-hidden="true"><use href="#i-search"/></svg></div>
             <h3>{% if has_filters %}Ничего не найдено{% else %}Пока нет товаров{% endif %}</h3>
-            <p>{% if has_filters %}Попробуйте изменить параметры или сбросить фильтры.{% else %}В этом разделе товары появятся позже.{% endif %}</p>
-            {% if has_filters %}
+            <p>{% if query %}Попробуйте изменить запрос или откройте каталог — в нём есть все разделы.{% elif has_filters %}Попробуйте изменить параметры или сбросить фильтры.{% else %}В этом разделе товары появятся позже.{% endif %}</p>
+            {% if query %}
+              <a class="btn btn-primary" href="{% url 'catalog:list' %}">Открыть каталог</a>
+            {% elif has_filters %}
               <a class="btn btn-primary" href="{{ request.path }}">Очистить фильтры</a>
             {% endif %}
             <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Помогите подобрать технику.' %}" target="_blank" rel="noopener">
               <svg><use href="#i-wa"/></svg>
               Спросить в WhatsApp
             </a>
+            {% if not query %}
             <a class="btn" href="{% whatsapp_generic 'Здравствуйте! Сообщите, пожалуйста, когда появится товар в этом разделе.' %}" target="_blank" rel="noopener">
               Сообщить о поступлении
             </a>
+            {% endif %}
           </div>
         {% endif %}
       </section>

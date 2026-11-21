@@ -625,6 +625,30 @@ def category_index(request):
     )
 
 
+def _visible_specs(specs):
+    """Drop a spec row whose value is already spelled out inside a richer row.
+
+    Products carry both a detailed row («Экран: 16″ QHD+ (2560x1600) 165Hz IPS»)
+    and a short facet row («Разрешение экрана: 2560x1600») used by the catalog
+    filters. The short one is redundant on the product page, so it is hidden
+    there while staying available for filtering.
+    """
+    # A two-row table (e.g. a CPU: model + core count) reads better complete.
+    if len(specs) <= 3:
+        return specs
+    values = [(spec.value or "").strip().lower() for spec in specs]
+    visible = []
+    for index, spec in enumerate(specs):
+        value = values[index]
+        redundant = bool(value) and any(
+            other != index and values[other] and value != values[other] and value in values[other]
+            for other in range(len(values))
+        )
+        if not redundant:
+            visible.append(spec)
+    return visible
+
+
 def product_detail(request, slug):
     product = get_object_or_404(Product.objects.published().with_cards(), slug=slug)
     related = (
@@ -638,7 +662,7 @@ def product_detail(request, slug):
         {
             "product": product,
             "images": list(product.images.all()),
-            "specs": list(product.specs.all()),
+            "specs": _visible_specs(list(product.specs.select_related("spec_type"))),
             "use_cases": list(product.use_cases.all()),
             "related": related,
             "lead_state": lead_state,

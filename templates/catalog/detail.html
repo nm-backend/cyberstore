@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load shop_tags %}
 {% block title %}{{ product.title|truncatechars:62 }} — {{ site.shop_name }}{% endblock %}
-{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description|truncatechars:110 }} Купить в {{ site.city }}, рассрочка и доставка по КР.{% endblock %}
+{% block description %}{{ product.title }}{% if product.price %} за {{ product.price|price }}{% endif %}. {{ product.short_description|truncatechars:110 }}. Купить в {{ site.city_prepositional }}: рассрочка и доставка по КР.{% endblock %}
 {% block og_title %}{{ product.title }}{% endblock %}
 {% block og_description %}{{ product.title }}{% if product.price %} — {{ product.price|price }}{% endif %}. {{ product.short_description|truncatechars:140 }}{% endblock %}
 {% block head_extra %}

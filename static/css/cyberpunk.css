@@ -854,3 +854,124 @@ body > .messages {
 @media (min-width: 1181px) and (max-width: 1400px) {
   .hero-hud-ring { right: -12px; width: 360px; height: 360px; }
 }
+
+/* --------------------------------------------------------------------------
+   FILTERS: neon scrollbar
+   Gradient thumb in the accent colours, glow on hover, and a slow sheen only
+   while the panel is hovered, so an idle page animates nothing.
+   -------------------------------------------------------------------------- */
+/* Firefox has no scrollbar pseudo-elements: standard properties only there.
+   Chromium ignores ::-webkit-scrollbar once the standard ones are set, so the
+   two groups must stay apart. */
+@supports not (selector(::-webkit-scrollbar)) {
+  .filters,
+  .filter-checkbox-list {
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-blue) rgba(77, 157, 255, .07);
+  }
+}
+
+.filters::-webkit-scrollbar,
+.filter-checkbox-list::-webkit-scrollbar { width: 10px; }
+.filter-checkbox-list::-webkit-scrollbar { width: 8px; }
+.filters::-webkit-scrollbar-button,
+.filter-checkbox-list::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+
+.filters::-webkit-scrollbar-track,
+.filter-checkbox-list::-webkit-scrollbar-track {
+  background: rgba(77, 157, 255, .07);
+  border-radius: var(--radius-full);
+}
+.filters::-webkit-scrollbar-track { margin: 12px 0; }
+
+.filters::-webkit-scrollbar-thumb,
+.filter-checkbox-list::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(4, 6, 11, .55);
+  background-image: linear-gradient(180deg, var(--neon-blue) 0%, #7c6bff 52%, var(--neon-pink) 100%);
+  background-size: 100% 220%;
+  background-position: 50% 0%;
+  box-shadow: 0 0 10px rgba(77, 157, 255, .28);
+  transition: box-shadow var(--motion-base) var(--ease-out);
+}
+.filters::-webkit-scrollbar-thumb:hover,
+.filter-checkbox-list::-webkit-scrollbar-thumb:hover {
+  box-shadow: 0 0 16px rgba(77, 157, 255, .55), 0 0 7px rgba(255, 46, 136, .32);
+}
+
+/* --------------------------------------------------------------------------
+   HERO HUD: orbiting sparks
+   Two comet arcs run along the rings, each with a glowing head, so the circle
+   never sits still. Only transforms move (no layout, no paint per frame), and
+   both stop for prefers-reduced-motion.
+   -------------------------------------------------------------------------- */
+.hero-hud-ring > .hud-orbit {
+  position: absolute; inset: 0; border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+  animation: hud-orbit-a 13s linear infinite;
+}
+.hero-hud-ring > .hud-orbit::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(77, 157, 255, 0) 0deg,
+    rgba(77, 157, 255, .45) 336deg,
+    rgba(214, 236, 255, .95) 357deg,
+    rgba(77, 157, 255, 0) 360deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent calc(100% - 17px), #000 calc(100% - 2px), transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent calc(100% - 17px), #000 calc(100% - 2px), transparent 100%);
+}
+.hero-hud-ring > .hud-orbit::after {
+  content: ""; position: absolute; top: -3px; left: 50%;
+  width: 6px; height: 6px; margin-left: -3px; border-radius: 50%;
+  background: #d9ecff;
+  box-shadow:
+    0 0 8px 2px rgba(77, 157, 255, .9),
+    0 0 20px 5px rgba(77, 157, 255, .35);
+}
+
+.hero-hud-ring > .hud-orbit-b {
+  inset: 42px;
+  animation-name: hud-orbit-b;
+  animation-duration: 9s;
+}
+.hero-hud-ring > .hud-orbit-b::before {
+  background: conic-gradient(from 120deg,
+    rgba(255, 46, 136, 0) 0deg,
+    rgba(255, 46, 136, .42) 336deg,
+    rgba(255, 214, 231, .95) 357deg,
+    rgba(255, 46, 136, 0) 360deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent calc(100% - 13px), #000 calc(100% - 2px), transparent 100%);
+  mask-image: radial-gradient(closest-side, transparent calc(100% - 13px), #000 calc(100% - 2px), transparent 100%);
+}
+.hero-hud-ring > .hud-orbit-b::after {
+  width: 5px; height: 5px; margin-left: -2.5px; top: -2.5px;
+  background: #ffdcea;
+  box-shadow:
+    0 0 8px 2px rgba(255, 46, 136, .85),
+    0 0 18px 4px rgba(255, 46, 136, .32);
+}
+
+@keyframes hud-orbit-a { to { transform: rotate(360deg); } }
+@keyframes hud-orbit-b { to { transform: rotate(-360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-hud-ring > .hud-orbit { animation: none; }
+  .hero-hud-ring > .hud-orbit-b,
+  .hero-hud-ring > .hud-orbit-b::before,
+  .hero-hud-ring > .hud-orbit-b::after { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   MOBILE PERFORMANCE BUDGET
+   Decorative motion and backdrop blurs cost more than they give on phones:
+   they keep repainting the hero and force full-screen compositing on scroll.
+   -------------------------------------------------------------------------- */
+@media (max-width: 700px) {
+  .site-header, .hud-panel, .badge { backdrop-filter: none; }
+  .site-header { background: rgba(5, 8, 15, .96); }
+  .hero-home::before, .hero-home::after,
+  .hero-hud-ring::before, .hero-hud-ring::after { animation: none; }
+  /* Entrance keeps its motion but stops holding the hero invisible for ~1s. */
+  .hero-copy > *, .hero-hud { animation-duration: 260ms; animation-delay: 0ms; }
+}

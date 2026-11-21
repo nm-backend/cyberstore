@@ -25,7 +25,7 @@
         </div>
         <h2>{{ o.title }}</h2>
         {% if o.description %}<p class="plan-lead">{{ o.description|linebreaksbr }}</p>{% endif %}
-        <a class="btn {% if forloop.first %}btn-primary{% else %}btn-outline{% endif %} btn-block" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить условия рассрочки.' %}" target="_blank" rel="noopener">
+        <a class="btn {% if forloop.first %}btn-primary{% else %}btn-outline{% endif %} btn-block" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить условия рассрочки — «'|add:o.title|add:'».' %}" target="_blank" rel="noopener">
           <svg><use href="#i-wa"/></svg>
           Уточнить в WhatsApp
         </a>

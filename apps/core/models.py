@@ -128,6 +128,23 @@ class SiteSettings(models.Model):
         return f"{self.address}, {self.city}"
 
     @property
+    def city_prepositional(self):
+        """Город в предложном падеже — для фраз вида «Купить в Бишкеке»."""
+        known = {
+            "бишкек": "Бишкеке",
+            "ош": "Оше",
+            "джалал-абад": "Джалал-Абаде",
+            "каракол": "Караколе",
+            "нарын": "Нарыне",
+            "талас": "Таласе",
+            "баткен": "Баткене",
+            "токмок": "Токмоке",
+            "кара-балта": "Кара-Балте",
+        }
+        city = (self.city or "").strip()
+        return known.get(city.lower(), city)
+
+    @property
     def hours_without_days(self):
         """Часы работы без уже показанных дней недели.
 

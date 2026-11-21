@@ -629,6 +629,9 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
   gap: var(--gesso-space-4); margin-bottom: var(--gesso-space-8); flex-wrap: wrap;
 }
 .section-head h2 { margin: 0; }
+/* A long single word in an H1 (e.g. «конфиденциальности») must wrap instead of
+   stretching the flex item past the viewport on narrow phones. */
+.section-head > div { min-width: 0; }
 .section-link {
   font-size: var(--gesso-text-sm); font-weight: 500;
   color: var(--gesso-accent-text);
@@ -1194,7 +1197,8 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
    INFO PAGES: installment / delivery
    ========================================================================== */
 
-.info-page { padding: var(--section-padding) 0 var(--gesso-space-24); }
+.info-page { padding: calc(var(--section-padding) / 3) 0 var(--gesso-space-24); }
+.info-page .crumbs { padding: var(--gesso-space-2) 0 var(--gesso-space-3); }
 
 .contacts-head { text-align: center; margin-bottom: var(--gesso-space-12); }
 .contacts-head h1 {
@@ -1318,7 +1322,8 @@ a.chip-m:hover { border-color: var(--gesso-primary); color: var(--gesso-accent-t
    CONTACTS
    ========================================================================== */
 
-.contacts-page { padding: var(--section-padding) 0 var(--gesso-space-24); }
+.contacts-page { padding: calc(var(--section-padding) / 3) 0 var(--gesso-space-24); }
+.contacts-page .crumbs { padding: var(--gesso-space-2) 0 var(--gesso-space-3); }
 
 .contacts-layout {
   display: grid; grid-template-columns: minmax(340px, 420px) 1fr;
