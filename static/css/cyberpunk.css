@@ -1483,3 +1483,8 @@ body:has(.info-page) .wa-float { display: none; }
   .category-tiles-head .section-head h2 { font-size: 19px; line-height: 1.2; }
   .category-tiles-section { margin-top: 10px; }
 }
+
+/* P9 — desktop H1 stays inside the 40–48 px scale. */
+@media (min-width: 1025px) {
+  .hero-main-title { font-size: clamp(2.5rem, 3.4vw, 3rem); }
+}
