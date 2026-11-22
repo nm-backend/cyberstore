@@ -1488,3 +1488,12 @@ body:has(.info-page) .wa-float { display: none; }
 @media (min-width: 1025px) {
   .hero-main-title { font-size: clamp(2.5rem, 3.4vw, 3rem); }
 }
+
+/* G2/P11 — the USP chips are readable at 14 px and wrap instead of hiding. */
+.hero-usp li { font-size: 14px; }
+@media (max-width: 768px) {
+  .hero-usp { flex-wrap: wrap; overflow: visible; padding-bottom: 0; }
+}
+@media (min-width: 380px) and (max-width: 768px) {
+  .category-tiles-section { margin-top: 6px; }
+}
