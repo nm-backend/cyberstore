@@ -462,3 +462,71 @@ class CatalogAdminTests(TestCase):
         self.option.is_active = False
         self.option.save()
         self.assertContains(self.client.get(self.product.get_absolute_url()), "Intel Core i5 ADMIN")
+
+
+class StorefrontRegressionTests(TestCase):
+    """Guards for the audit fixes that must not regress."""
+
+    def test_sitemap_lists_exactly_the_published_catalog(self):
+        import re
+
+        response = self.client.get(reverse("core:sitemap"))
+        self.assertEqual(response.status_code, 200)
+        locations = re.findall(r"<loc>(.*?)</loc>", response.content.decode())
+        sitemap_products = {
+            url for url in locations if "/catalog/p/" in url
+        }
+        published = {
+            f"http://testserver{product.get_absolute_url()}"
+            for product in Product.objects.published()
+        }
+        self.assertEqual(sitemap_products, published)
+
+    def test_empty_filter_state_is_actionable(self):
+        response = self.client.get(reverse("catalog:list"), {"price_min": 999999999})
+        self.assertContains(response, "Нет товаров с такими фильтрами")
+        self.assertContains(response, "Сбросить фильтры")
+        self.assertContains(response, "Спросить в WhatsApp")
+
+    def test_card_has_one_stretched_link_and_no_competing_cta(self):
+        category, _ = Category.objects.get_or_create(
+            slug="qa-laptops", defaults={"name": "QA ноутбуки", "order": 1}
+        )
+        product = Product.objects.create(title="QA Card", category=category, price=10000)
+        response = self.client.get(reverse("catalog:list"))
+        html = response.content.decode()
+        self.assertIn('class="card-link"', html)
+        self.assertNotIn("Подробнее", html)
+        self.assertNotIn("btn-card-wa", html)
+        self.assertIn(product.get_absolute_url(), html)
+
+    def test_home_carries_instagram_trust_block(self):
+        response = self.client.get(reverse("core:home"))
+        self.assertContains(response, "500+ отзывов")
+        self.assertContains(response, "ig.me/m/cyberstore_nout")
+
+    def test_2gis_link_is_a_place_not_a_search(self):
+        site = SiteSettings.load()
+        self.assertNotIn("/search/", site.gis_url)
+        response = self.client.get(reverse("core:contacts"))
+        self.assertContains(response, "2gis.kg/bishkek/geo/")
+
+    def test_default_catalog_order_starts_with_computers(self):
+        import re
+
+        laptops, _ = Category.objects.get_or_create(
+            slug="laptops", defaults={"name": "Ноутбуки", "order": 4}
+        )
+        components, _ = Category.objects.get_or_create(
+            slug="components", defaults={"name": "Комплектующие", "order": 2}
+        )
+        Product.objects.create(title="QA Part", category=components, price=1, is_featured=True)
+        Product.objects.create(title="QA Laptop", category=laptops, price=2)
+        response = self.client.get(reverse("catalog:list"))
+        slugs = re.findall(r"/catalog/p/([^/]+)/", response.content.decode())
+        self.assertTrue(slugs)
+        first = Product.objects.get(slug=slugs[0])
+        root = first.category
+        while root.parent_id:
+            root = root.parent
+        self.assertIn(root.slug, {"laptops", "pc", "pcs"})

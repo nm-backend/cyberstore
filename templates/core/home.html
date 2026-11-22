@@ -29,6 +29,13 @@
     <h1 class="hero-main-title">{{ site.hero_title }}</h1>
     <p class="hero-subtitle">{{ site.hero_subtitle }}</p>
 
+    <ul class="hero-usp" aria-label="Условия магазина">
+      <li>Рассрочка с банком и без</li>
+      <li>Только паспорт · 18+</li>
+      <li>Бесплатная доставка по КР</li>
+      <li>500+ отзывов</li>
+    </ul>
+
     <div class="hero-cta-row">
       <a class="btn btn-primary btn-hero" href="{% url 'catalog:list' %}">
         Открыть каталог
@@ -210,6 +217,13 @@
   </div>
 </section>
 
+<!-- Reviews trust block: links to the store's Instagram, no invented ratings -->
+<section class="section" style="padding-top:0">
+  <div class="wrap">
+    {% include "partials/_trust_reviews.html" %}
+  </div>
+</section>
+
 <!-- Trust Bar / Benefits: informational, so it sits below the goods -->
 <section class="trust-bar-section">
   <div class="wrap">
@@ -235,19 +249,6 @@
           <p>{{ site.work_days }}, {{ site.hours_without_days }}</p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- Quick transition pills: last block of the page -->
-<section class="quick-bar-section">
-  <div class="wrap">
-    <div class="hero-quick-categories">
-      <span class="quick-cat-label">Быстрый переход:</span>
-      {% for c in categories %}
-        <a class="quick-cat-pill" href="{{ c.get_absolute_url }}">{% category_icon c "ic ic-sm" %}{{ c.name }}</a>
-      {% endfor %}
-      <a class="quick-cat-pill" href="{% url 'core:installment' %}"><svg class="ic ic-sm" aria-hidden="true"><use href="#i-card"/></svg>Рассрочка 18+</a>
     </div>
   </div>
 </section>

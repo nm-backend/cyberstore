@@ -90,7 +90,7 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="product-cta-stack">
+      <div class="product-cta-stack" data-product-cta>
         {% whatsapp_product product as wa %}
         <a class="btn btn-wa btn-lg btn-block" href="{{ wa }}" target="_blank" rel="noopener">
           <svg><use href="#i-wa"/></svg>
@@ -100,6 +100,8 @@
           Оставить заявку, мы перезвоним
         </button>
       </div>
+
+      {% include "partials/_trust_reviews.html" with compact=True %}
 
       {% if use_cases %}
       <div class="product-use-cases">
@@ -170,7 +172,7 @@
 </div>
 
 <!-- Sticky purchase bar (phones): price and the two order actions always at hand -->
-<div class="buy-bar" data-buy-bar>
+<div class="buy-bar" data-buy-bar aria-hidden="true">
   <div class="buy-bar-price">
     <span class="buy-bar-value">{{ product.price|price }}</span>
     {% if product.installment_available %}<span class="buy-bar-note">Рассрочка 18+</span>{% endif %}

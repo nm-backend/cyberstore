@@ -1,0 +1,37 @@
+{% load shop_tags %}
+<section class="trust-reviews{% if compact %} trust-reviews-compact{% endif %}" aria-labelledby="trust-reviews-title">
+  <div class="trust-reviews-head">
+    <div>
+      <span class="section-kicker">Отзывы покупателей</span>
+      <h2 id="trust-reviews-title">500+ отзывов</h2>
+      <p class="muted">Реальные отзывы и сборки — в Instagram магазина. Без накрученных оценок на сайте.</p>
+    </div>
+    <a class="btn btn-primary trust-reviews-cta" href="{% if site.instagram_url %}{{ site.instagram_url }}{% else %}https://instagram.com/cyberstore_nout{% endif %}" target="_blank" rel="noopener">
+      <svg aria-hidden="true"><use href="#i-ig"/></svg>
+      Открыть Instagram
+    </a>
+  </div>
+  <div class="trust-reviews-tiles">
+    <a class="trust-tile" href="{% if site.instagram_url %}{{ site.instagram_url }}{% else %}https://instagram.com/cyberstore_nout{% endif %}" target="_blank" rel="noopener">
+      <span class="trust-tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-ig"/></svg></span>
+      <span class="trust-tile-body">
+        <span class="trust-tile-title">Хайлайт «Отзывы»</span>
+        <span class="trust-tile-sub">В профиле @cyberstore_nout</span>
+      </span>
+    </a>
+    <a class="trust-tile" href="{% if site.instagram_url %}{{ site.instagram_url }}{% else %}https://instagram.com/cyberstore_nout{% endif %}" target="_blank" rel="noopener">
+      <span class="trust-tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-desktop"/></svg></span>
+      <span class="trust-tile-body">
+        <span class="trust-tile-title">Хайлайт «Сборки»</span>
+        <span class="trust-tile-sub">Готовые ПК и ноутбуки</span>
+      </span>
+    </a>
+    <a class="trust-tile trust-tile-secondary" href="https://ig.me/m/cyberstore_nout" target="_blank" rel="noopener">
+      <span class="trust-tile-icon" aria-hidden="true"><svg class="ic"><use href="#i-ig"/></svg></span>
+      <span class="trust-tile-body">
+        <span class="trust-tile-title">Написать в Direct</span>
+        <span class="trust-tile-sub">Ответим в Instagram</span>
+      </span>
+    </a>
+  </div>
+</section>

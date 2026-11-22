@@ -183,7 +183,7 @@
           </div>
           <div class="catalog-sort-wrap">
             {% if filter_groups or category_options %}
-              <button class="btn filter-toggle-btn" type="button" data-filter-toggle aria-expanded="false" aria-controls="catalog-filters">Фильтры</button>
+              <button class="btn filter-toggle-btn" type="button" data-filter-toggle aria-expanded="false" aria-controls="catalog-filters">Фильтры{% if active_filters %} ({{ active_filters|length }}){% endif %}</button>
             {% endif %}
             <form method="get">
               {% for key, values in request.GET.lists %}
@@ -234,14 +234,14 @@
         {% else %}
           <div class="empty">
             <div class="empty-icon"><svg class="ic ic-xl" aria-hidden="true"><use href="#i-search"/></svg></div>
-            <h3>{% if has_filters %}Ничего не найдено{% else %}Пока нет товаров{% endif %}</h3>
-            <p>{% if query %}Попробуйте изменить запрос или откройте каталог — в нём есть все разделы.{% elif has_filters %}Попробуйте изменить параметры или сбросить фильтры.{% else %}В этом разделе товары появятся позже.{% endif %}</p>
+            <h3>{% if query %}Ничего не найдено{% elif has_filters %}Нет товаров с такими фильтрами{% else %}Пока нет товаров{% endif %}</h3>
+            <p>{% if query %}По запросу ничего не нашлось. Измените запрос, откройте каталог или спросите менеджера.{% elif has_filters %}Сбросьте фильтры или напишите нам — подберём технику вручную.{% else %}В этом разделе товары появятся позже.{% endif %}</p>
             {% if query %}
               <a class="btn btn-primary" href="{% url 'catalog:list' %}">Открыть каталог</a>
             {% elif has_filters %}
-              <a class="btn btn-primary" href="{{ request.path }}">Очистить фильтры</a>
+              <a class="btn btn-primary" href="{{ request.path }}">Сбросить фильтры</a>
             {% endif %}
-            <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Помогите подобрать технику.' %}" target="_blank" rel="noopener">
+            <a class="btn btn-primary" href="{% whatsapp_generic 'Здравствуйте! Помогите подобрать технику.' %}" target="_blank" rel="noopener">
               <svg><use href="#i-wa"/></svg>
               Спросить в WhatsApp
             </a>

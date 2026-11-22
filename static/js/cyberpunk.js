@@ -44,8 +44,13 @@
 
   if (targets.length && !reduceMotion && "IntersectionObserver" in window) {
     var seen = 0;
+    // Progressive enhancement: nothing is hidden by CSS. JS only adds a short
+    // entrance animation to blocks below the fold, so content is readable
+    // without JS, in full-page captures and after an instant scroll.
+    document.documentElement.classList.add("js-reveal");
     targets.forEach(function (el) {
       if (el.closest(".hero-home")) return; // hero has its own entrance
+      if (el.getBoundingClientRect().top < window.innerHeight) return;
       el.setAttribute("data-reveal", "");
       var siblings = Array.prototype.filter.call(el.parentNode.children, function (node) {
         return node.hasAttribute("data-reveal");
@@ -68,6 +73,14 @@
         document.querySelectorAll("[data-reveal]"),
         function (el) { observer.observe(el); }
       );
+
+      // Safety net: anything still waiting becomes visible after 1.2 s.
+      setTimeout(function () {
+        Array.prototype.forEach.call(
+          document.querySelectorAll("[data-reveal]:not(.is-in)"),
+          function (el) { el.classList.add("is-in"); observer.unobserve(el); }
+        );
+      }, 1200);
     }
   }
 
@@ -138,8 +151,44 @@
     updateFilterCount();
   }
 
-  /* ---------------- Product: room for the sticky purchase bar ---------------- */
-  if (document.querySelector("[data-buy-bar]")) {
-    document.body.classList.add("has-buy-bar");
+  /* ---------------- Product: sticky bar only after the main CTA leaves ---------------- */
+  var buyBar = document.querySelector("[data-buy-bar]");
+  var priceBox = document.querySelector(".product-price-box") || document.querySelector("[data-product-cta]");
+  if (buyBar && priceBox && "IntersectionObserver" in window) {
+    var setBuyBar = function (visible) {
+      buyBar.classList.toggle("is-visible", visible);
+      buyBar.setAttribute("aria-hidden", String(!visible));
+      document.body.classList.toggle("has-buy-bar", visible);
+    };
+    var ctaObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        // Show once the real price/CTA block has scrolled above the viewport.
+        setBuyBar(!entry.isIntersecting && entry.boundingClientRect.bottom < 120);
+      });
+    }, { threshold: 0, rootMargin: "-120px 0px 0px 0px" });
+    ctaObserver.observe(priceBox);
+    setBuyBar(false);
+  } else if (buyBar) {
+    // No observer: never cover content with a bar that cannot hide again.
+    buyBar.hidden = true;
+  }
+
+  /* ---------------- Contacts: map facade loads on demand ---------------- */
+  var mapLoad = document.querySelector("[data-map-load]");
+  var mapWrap = document.querySelector("[data-map-facade]");
+  if (mapLoad && mapWrap) {
+    mapLoad.addEventListener("click", function () {
+      var embed = mapWrap.getAttribute("data-map-embed");
+      if (!embed) return;
+      var iframe = document.createElement("iframe");
+      iframe.className = "contacts-map-iframe";
+      iframe.title = mapWrap.getAttribute("data-map-title") || "Карта магазина";
+      iframe.src = embed;
+      iframe.loading = "lazy";
+      iframe.referrerPolicy = "no-referrer-when-downgrade";
+      var facade = mapWrap.querySelector(".map-facade");
+      if (facade) facade.remove();
+      mapWrap.appendChild(iframe);
+    });
   }
 })();

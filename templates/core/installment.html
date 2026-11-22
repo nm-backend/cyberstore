@@ -25,18 +25,15 @@
         </div>
         <h2>{{ o.title }}</h2>
         {% if o.description %}<p class="plan-lead">{{ o.description|linebreaksbr }}</p>{% endif %}
-<<<<<<< Updated upstream
-        <a class="btn {% if forloop.first %}btn-primary{% else %}btn-outline{% endif %} btn-block" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить условия рассрочки — «'|add:o.title|add:'».' %}" target="_blank" rel="noopener">
-=======
-        <a class="btn {% if forloop.first %}btn-primary{% else %}btn-outline{% endif %} btn-block" href="{% whatsapp_generic o.whatsapp_text %}" target="_blank" rel="noopener">
->>>>>>> Stashed changes
-          <svg><use href="#i-wa"/></svg>
+        <a class="btn {% if forloop.first %}btn-primary{% else %}btn-outline{% endif %} btn-block" href="{% whatsapp_generic o.whatsapp_text %}" target="_blank" rel="noopener">          <svg><use href="#i-wa"/></svg>
           Уточнить в WhatsApp
         </a>
       </div>
       {% endfor %}
     </div>
     {% endif %}
+
+    {% include "partials/_trust_reviews.html" with compact=True %}
 
     <section class="flow-steps" aria-labelledby="installment-steps">
       <div class="section-head">
@@ -79,7 +76,7 @@
           <span>В месяц</span>
           <strong data-calc-monthly>4 167 сом</strong>
         </div>
-        <a class="btn btn-wa btn-block" data-calc-wa href="{% whatsapp_generic 'Здравствуйте! Хочу оформить рассрочку.' %}" target="_blank" rel="noopener">
+        <a class="btn btn-primary btn-block" data-calc-wa href="{% whatsapp_generic 'Здравствуйте! Хочу оформить рассрочку.' %}" target="_blank" rel="noopener">
           <svg><use href="#i-wa"/></svg>
           Оформить в WhatsApp
         </a>
@@ -92,7 +89,7 @@
         <p class="muted">Напишите нам в WhatsApp — менеджер ответит на вопросы.</p>
       </div>
       <div style="flex:none">
-        <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Хочу рассчитать ежемесячный платёж по рассрочке.' %}" target="_blank" rel="noopener">
+        <a class="btn btn-primary" href="{% whatsapp_generic 'Здравствуйте! Хочу рассчитать ежемесячный платёж по рассрочке.' %}" target="_blank" rel="noopener">
           <svg><use href="#i-wa"/></svg>
           Рассчитать в WhatsApp
         </a>

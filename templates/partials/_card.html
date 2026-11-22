@@ -1,6 +1,6 @@
 {% load shop_tags %}
 <article class="card">
-  <a class="card-media" href="{{ p.get_absolute_url }}" aria-label="{{ p.title }}">
+  <div class="card-media">
     {% with img=p.main_image %}
       {% if img %}
         {% with w480=img.image|webp_variant:480 w900=img.image|webp_variant:900 %}
@@ -28,12 +28,13 @@
       {% endif %}
     </div>
     {% if p.brand %}<span class="card-brand-tag">{{ p.brand.name }}</span>{% endif %}
-  </a>
+  </div>
 
   <div class="card-body">
     <div class="card-category-label">{{ p.category.name }}</div>
     <h3 class="card-title">
-      <a href="{{ p.get_absolute_url }}">{{ p.title }}</a>
+      {# One stretched link makes the whole card a single, accessible target. #}
+      <a class="card-link" href="{{ p.get_absolute_url }}">{{ p.title }}</a>
     </h3>
 
     {% if p.card_specs %}
@@ -54,14 +55,7 @@
           <span class="old-price">{{ p.old_price|price }}</span>
         {% endif %}
       </div>
-      <div class="card-actions">
-        <a class="btn btn-card-details" href="{{ p.get_absolute_url }}">Подробнее</a>
-        {% whatsapp_product p as wa %}
-        <a class="btn btn-wa btn-card-wa" href="{{ wa }}" target="_blank" rel="noopener" title="Купить в 1 клик через WhatsApp">
-          <svg><use href="#i-wa"/></svg>
-          <span>Заказать</span>
-        </a>
-      </div>
+      <span class="card-go">Смотреть и заказать →</span>
     </div>
   </div>
 </article>

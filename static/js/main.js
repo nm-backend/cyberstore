@@ -1,6 +1,10 @@
 (function () {
   "use strict";
 
+  // Browsers already restore the catalog position on «back»; keep that, and
+  // never reset scroll ourselves. This only makes the behaviour explicit.
+  if ("scrollRestoration" in history) history.scrollRestoration = "auto";
+
   var scrollLocks = { menu: false, filters: false };
   function syncScrollLock() {
     var locked = scrollLocks.menu || scrollLocks.filters;

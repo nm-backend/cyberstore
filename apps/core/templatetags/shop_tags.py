@@ -52,6 +52,12 @@ def items(value):
 
 
 @register.filter
+def nbsp(value):
+    """Keep short address and phone fragments on one line."""
+    return str(value or "").replace(" ", "\u00a0")
+
+
+@register.filter
 def price(value):
     """113000 -> '113 000 сом'. Empty price -> 'Цена по запросу'."""
     if value in (None, ""):

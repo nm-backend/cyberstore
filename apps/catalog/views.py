@@ -2,7 +2,7 @@ import re
 from collections import defaultdict
 
 from django.core.paginator import Paginator
-from django.db.models import Count, F, Max, Min, Q
+from django.db.models import Case, Count, F, IntegerField, Max, Min, Q, Value, When
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
@@ -20,6 +20,10 @@ SORTS = {
     "price_asc": ("Сначала дешевле", (F("price").asc(nulls_last=True), "-id")),
     "price_desc": ("Сначала дороже", (F("price").desc(nulls_last=True), "-id")),
 }
+
+# A computer shop leads with computers: laptops and ready-made PCs before parts.
+ROOT_SORT_PRIORITY = {"laptops": 0, "pc": 0, "pcs": 1, "monitors": 2, "components": 3}
+DEFAULT_ROOT_PRIORITY = 4
 
 FILTER_PARAMS = (
     "q", "brand", "use_case", "price_min", "price_max",
@@ -489,7 +493,23 @@ def product_list(request, category_slug=None):
     sort = request.GET.get("sort", "default")
     if sort not in SORTS:
         sort = "default"
-    qs = qs.order_by(*SORTS[sort][1])
+    if sort == "default":
+        # Category rank is a real field of the default view, not a user sort:
+        # laptops and ready-made PCs come first, parts last. Explicit sorts
+        # (new / price) keep their own order untouched.
+        priority = {}
+        for root in tree.roots:
+            rank = ROOT_SORT_PRIORITY.get(root.slug, DEFAULT_ROOT_PRIORITY)
+            for category_id in root.descendant_ids():
+                priority.setdefault(category_id, rank)
+        ordering = Case(
+            *[When(category_id=cid, then=Value(rank)) for cid, rank in priority.items()],
+            default=Value(DEFAULT_ROOT_PRIORITY),
+            output_field=IntegerField(),
+        )
+        qs = qs.order_by(ordering, *SORTS[sort][1])
+    else:
+        qs = qs.order_by(*SORTS[sort][1])
 
     page = Paginator(qs, PAGE_SIZE).get_page(request.GET.get("page"))
     params = request.GET.copy()

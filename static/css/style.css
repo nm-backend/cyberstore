@@ -16,8 +16,8 @@
   --gesso-primary: #4d9dff;
   --gesso-on-accent: #000000;
   --gesso-accent-text: #4d9dff;
-  --gesso-secondary: #ff2e88;
-  --gesso-accent-2-text: #ff2e88;
+  --gesso-secondary: #4d9dff;
+  --gesso-accent-2-text: #4d9dff;
 
   --gesso-neutral-50: #05080f;
   --gesso-neutral-100: #0c1422;
@@ -35,12 +35,12 @@
   --gesso-warning: #d97706;
   --gesso-error: #e35151;
 
-  --gesso-data-1: #9d004e;
-  --gesso-data-2: #c40063;
-  --gesso-data-3: #ec0779;
-  --gesso-data-4: #ff4f92;
-  --gesso-data-5: #ff8aad;
-  --gesso-data-6: #ffb6c9;
+  --gesso-data-1: #1b4d8a;
+  --gesso-data-2: #2a6bc4;
+  --gesso-data-3: #4d9dff;
+  --gesso-data-4: #7dbcff;
+  --gesso-data-5: #b3d7ff;
+  --gesso-data-6: #e0f0ff;
 
   /* Typography */
   --gesso-font-display: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -99,7 +99,7 @@
 
   /* Interaction states */
   --gesso-primary-hover: #6aacff;
-  --gesso-secondary-hover: #ff5099;
+  --gesso-secondary-hover: #6aacff;
   --gesso-surface-hover: #0e1727;
 
   /* Accent alpha ramps — every tint/border/glow derives from primary or secondary */
@@ -107,10 +107,10 @@
   --gesso-primary-soft: rgba(77, 157, 255, .1);
   --gesso-primary-line: rgba(77, 157, 255, .32);
   --gesso-primary-ring: rgba(77, 157, 255, .14);
-  --gesso-secondary-tint: rgba(255, 46, 136, .05);
-  --gesso-secondary-soft: rgba(255, 46, 136, .1);
-  --gesso-secondary-line: rgba(255, 46, 136, .3);
-  --gesso-secondary-glow: rgba(255, 46, 136, .28);
+  --gesso-secondary-tint: rgba(77, 157, 255, .05);
+  --gesso-secondary-soft: rgba(77, 157, 255, .1);
+  --gesso-secondary-line: rgba(77, 157, 255, .3);
+  --gesso-secondary-glow: rgba(77, 157, 255, .28);
 
   /* Brand identity from the @cyberstore_nout avatar: electric ring + chrome wordmark */
   --gesso-neon: #3fb4ff;
@@ -136,7 +136,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+/* No global smooth scrolling: it made history restoration crawl from the top
+   and look like a lost scroll position when going back to the catalog. */
+html { scroll-behavior: auto; }
 
 body {
   margin: 0;

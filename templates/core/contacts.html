@@ -13,109 +13,80 @@
       <span class="crumb-current">Контакты</span>
     </nav>
 
-    <!-- Centered Header -->
     <div class="contacts-head">
       <h1>Свяжитесь с нами</h1>
       <p>Приходите к нам в магазин или напишите нам.</p>
     </div>
 
     <div class="contacts-layout">
-      <!-- Left Column: Cards -->
       <div class="contacts-cards">
-        <!-- Card 1: Address -->
         <div class="contact-card">
-          <div class="contact-card-icon">
-            <svg><use href="#i-pin"/></svg>
-          </div>
+          <div class="contact-card-icon"><svg aria-hidden="true"><use href="#i-pin"/></svg></div>
           <div class="contact-card-content">
             <span class="contact-label">Адрес</span>
-            <div class="contact-main-text">{{ site.city }}, ул. {{ site.address }}</div>
+            <div class="contact-main-text">{{ site.city }}, ул. {{ site.address|nbsp }}</div>
             {% if site.address_note %}<div class="contact-sub-text">▼ {{ site.address_note }}</div>{% endif %}
           </div>
-          {% if site.gis_url %}
-            <a class="contact-top-link" href="{{ site.gis_url }}" target="_blank" rel="noopener">
-              <span>2GIS</span>
-              <svg><use href="#i-ext"/></svg>
-            </a>
-          {% endif %}
         </div>
 
-        <!-- Card 2: Phone -->
         <div class="contact-card">
-          <div class="contact-card-icon">
-            <svg><use href="#i-phone"/></svg>
-          </div>
+          <div class="contact-card-icon"><svg aria-hidden="true"><use href="#i-phone"/></svg></div>
           <div class="contact-card-content">
             <span class="contact-label">Телефон</span>
-            <div class="contact-main-text">
-              <a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a>
-            </div>
+            <div class="contact-main-text"><a href="tel:{{ site.phone_tel }}">{{ site.phone|nbsp }}</a></div>
             <div class="contact-sub-text">Консультация и приём заказов</div>
           </div>
         </div>
 
-        <!-- Card 3: Working Hours -->
         <div class="contact-card">
-          <div class="contact-card-icon">
-            <svg><use href="#i-clock"/></svg>
-          </div>
+          <div class="contact-card-icon"><svg aria-hidden="true"><use href="#i-clock"/></svg></div>
           <div class="contact-card-content">
             <span class="contact-label">Время работы</span>
             <div class="contact-main-text">{{ site.work_days }}</div>
-            <div class="contact-live-status">
-              <span class="pulse-dot"></span>
-              <span>{{ site.hours_without_days }}</span>
-            </div>
+            <div class="contact-live-status"><span class="pulse-dot"></span><span>{{ site.hours_without_days }}</span></div>
           </div>
         </div>
 
-        <!-- Row of 3 Messengers / Socials -->
-        <div class="contact-social-grid">
-          <a class="social-box social-box-wa" href="{{ site.whatsapp_url }}" target="_blank" rel="noopener">
-            <div class="social-box-icon">
-              <svg><use href="#i-wa"/></svg>
-            </div>
-            <span>WhatsApp</span>
+        {# One primary action; call, Instagram and the map are secondary. #}
+        <a class="btn btn-primary btn-lg btn-block contacts-primary" href="{% whatsapp_generic 'Здравствуйте! Хочу задать вопрос по технике.' %}" target="_blank" rel="noopener">
+          <svg aria-hidden="true"><use href="#i-wa"/></svg>
+          Написать в WhatsApp
+        </a>
+        <div class="contacts-secondary">
+          <a class="btn btn-outline" href="tel:{{ site.phone_tel }}">
+            <svg aria-hidden="true"><use href="#i-phone"/></svg>
+            Позвонить
           </a>
-
           {% if site.instagram_url %}
-          <a class="social-box social-box-ig" href="{{ site.instagram_url }}" target="_blank" rel="noopener">
-            <div class="social-box-icon">
-              <svg><use href="#i-ig"/></svg>
-            </div>
-            <span>Instagram</span>
+          <a class="btn btn-outline" href="{{ site.instagram_url }}" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-ig"/></svg>
+            Instagram
           </a>
           {% endif %}
-
-          {% if site.telegram_url %}
-          <a class="social-box social-box-tg" href="{{ site.telegram_url }}" target="_blank" rel="noopener">
-            <div class="social-box-icon">
-              <svg><use href="#i-tg"/></svg>
-            </div>
-            <span>Telegram</span>
+          {% if site.gis_url %}
+          <a class="btn btn-outline" href="{{ site.gis_url }}" target="_blank" rel="noopener">
+            <svg aria-hidden="true"><use href="#i-pin"/></svg>
+            2GIS
           </a>
           {% endif %}
         </div>
-
-        <a class="btn btn-wa btn-block" href="{% whatsapp_generic 'Здравствуйте! Хочу проконсультироваться по выбору техники.' %}" target="_blank" rel="noopener">
-          <svg><use href="#i-wa"/></svg>
-          Заказать в WhatsApp
-        </a>
       </div>
 
-      <!-- Right Column: Map -->
-      <div class="contacts-map-wrap">
-        <a class="map-overlay-btn" href="{{ site.map_search_url }}" target="_blank" rel="noopener">
-          <span>Открыть в Картах</span>
-          <svg><use href="#i-ext"/></svg>
-        </a>
-        <iframe
-          class="contacts-map-iframe"
-          title="Карта: {{ site.full_address }}"
-          src="{{ site.map_embed_url }}"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade">
-        </iframe>
+      <div class="contacts-map-wrap" data-map-facade data-map-embed="{{ site.map_embed_url }}" data-map-title="Карта: {{ site.full_address }}">
+        <div class="map-facade">
+          <div class="map-facade-grid" aria-hidden="true"></div>
+          <div class="map-facade-body">
+            <span class="map-facade-pin" aria-hidden="true"><svg class="ic ic-xl"><use href="#i-pin"/></svg></span>
+            <p class="map-facade-kicker">{{ site.shop_name }}</p>
+            <p class="map-facade-address">{{ site.city }}, ул. {{ site.address|nbsp }}</p>
+            <p class="map-facade-hours">{{ site.work_days }}, {{ site.hours_without_days }}</p>
+            <div class="map-facade-actions">
+              <button class="btn btn-outline" type="button" data-map-load>Показать карту</button>
+              {% if site.gis_url %}<a class="btn btn-outline" href="{{ site.gis_url }}" target="_blank" rel="noopener">Открыть в 2GIS</a>{% endif %}
+              <a class="btn btn-outline" href="{{ site.map_search_url }}" target="_blank" rel="noopener">Google Maps</a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load shop_tags %}
 {% block title %}Доставка — {{ site.shop_name }}, {{ site.city }}{% endblock %}
-{% block description %}Доставка техники по Кыргызстану. Условия и сроки уточняйте у менеджера.{% endblock %}
+{% block description %}Бесплатная доставка по всему Кыргызстану. Самовывоз из магазина в Бишкеке. Уточняйте детали у менеджера.{% endblock %}
 {% block content %}
 <section class="info-page">
   <div class="wrap">
@@ -13,17 +13,24 @@
     <div class="contacts-head">
       <h1>Доставка</h1>
       {% for p in site.delivery_paragraphs %}<p>{{ p }}</p>{% endfor %}
+      <div class="hero-cta-row delivery-hero-cta">
+        <a class="btn btn-primary btn-lg" href="{% whatsapp_generic 'Здравствуйте! Хочу заказать доставку по Кыргызстану.' %}" target="_blank" rel="noopener">
+          <svg aria-hidden="true"><use href="#i-wa"/></svg>
+          Уточнить доставку в WhatsApp
+        </a>
+        <a class="btn btn-outline" href="tel:{{ site.phone_tel }}">Позвонить {{ site.phone|nbsp }}</a>
+      </div>
     </div>
 
     <div class="delivery-grid">
       <div class="delivery-card">
         <div class="delivery-card-icon"><svg class="ic ic-lg" aria-hidden="true"><use href="#i-store"/></svg></div>
         <span class="plan-pill">Самовывоз</span>
-        <h2>Забрать в магазине</h2>
+        <h2>Из магазина в Бишкеке</h2>
         <ul class="plan-features">
-          <li>Адрес: <strong>{{ site.city }}, ул. {{ site.address }}</strong>{% if site.address_note %} ({{ site.address_note }}){% endif %}</li>
+          <li>Адрес: <strong>{{ site.city }}, ул. {{ site.address|nbsp }}</strong>{% if site.address_note %} ({{ site.address_note }}){% endif %}</li>
           <li>График: <strong>{{ site.work_days }}, {{ site.hours_without_days }}</strong></li>
-          <li>Телефон: <a href="tel:{{ site.phone_tel }}">{{ site.phone }}</a></li>
+          <li>Телефон: <a href="tel:{{ site.phone_tel }}">{{ site.phone|nbsp }}</a></li>
         </ul>
       </div>
     </div>
@@ -47,12 +54,12 @@
       <div class="zone-card">
         <span class="plan-pill">{{ site.city }}</span>
         <h3>По городу</h3>
-        <p>Курьером в день заказа или на следующий день. Самовывоз с {{ site.address }} — сразу после подтверждения.</p>
+        <p>Курьером в день заказа или на следующий день. Самовывоз с {{ site.address|nbsp }} — сразу после подтверждения.</p>
       </div>
       <div class="zone-card">
         <span class="plan-pill">Кыргызстан</span>
         <h3>По регионам</h3>
-        <p>Отправка транспортными службами. Срок зависит от города — точное время уточняет менеджер.</p>
+        <p>Бесплатная доставка по всему Кыргызстану. Точное время менеджер подтвердит в WhatsApp.</p>
       </div>
       <div class="zone-card">
         <span class="plan-pill">Проверка</span>
@@ -63,12 +70,12 @@
 
     <div class="bottom-cta-banner">
       <div>
-        <h2>Хотите заказать доставку?</h2>
-        <p class="muted">Напишите менеджеру в WhatsApp — уточним условия по вашему адресу.</p>
+        <h2>Бесплатная доставка по всему Кыргызстану</h2>
+        <p class="muted">Напишите менеджеру в WhatsApp — подтвердим наличие и время доставки по вашему адресу.</p>
       </div>
       <div style="flex:none">
-        <a class="btn btn-wa" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить сроки и условия доставки по моему адресу.' %}" target="_blank" rel="noopener">
-          <svg><use href="#i-wa"/></svg>
+        <a class="btn btn-primary" href="{% whatsapp_generic 'Здравствуйте! Хочу уточнить сроки и условия доставки по моему адресу.' %}" target="_blank" rel="noopener">
+          <svg aria-hidden="true"><use href="#i-wa"/></svg>
           Уточнить доставку в WhatsApp
         </a>
       </div>

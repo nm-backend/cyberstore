@@ -37,7 +37,7 @@ class SiteSettings(models.Model):
         help_text="Например: «Цокольный этаж» или «1 этаж, вход с торца». Пусто — не показывается.",
     )
     work_hours = models.CharField(
-        "Часы работы", max_length=120, default="09:00 – 22:00"
+        "Часы работы", max_length=120, default="09:00 – 22:00, без выходных"
     )
     work_days = models.CharField(
         "Дни работы", max_length=60, default="Ежедневно",
