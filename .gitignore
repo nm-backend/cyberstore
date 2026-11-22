@@ -15,3 +15,5 @@ _audit/
 
 .audit/
 .tmp_lalafo/
+
+deploy-poll.log
