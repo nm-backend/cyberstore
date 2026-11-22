@@ -1497,3 +1497,9 @@ body:has(.info-page) .wa-float { display: none; }
 @media (min-width: 380px) and (max-width: 768px) {
   .category-tiles-section { margin-top: 6px; }
 }
+
+@media (max-width: 768px) {
+  /* Four USP chips in two tidy rows, all visible without horizontal scroll. */
+  .hero-usp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .hero-usp li { justify-content: center; text-align: center; white-space: normal; line-height: 1.25; padding: 8px 10px; }
+}
